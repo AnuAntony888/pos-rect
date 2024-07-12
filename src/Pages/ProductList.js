@@ -217,8 +217,10 @@ const ProductList = () => {
               {cartItems.map((item) => (
           <tr>
           <td key={item.id}></td>
-            <td>{item.title}</td>
-            <td>Price: ${item.price.toFixed(2)}</td>
+                  <td>{item.title}</td>
+              
+
+             <td>Price: ${item?.price?.toFixed(2)}</td> 
             <td>Quantity: {item.cartCount}</td>
           <td><button onClick={() => handleIncrease(item.id)}>+</button></td>  
           <td> <button onClick={() => handleDecrease(item.id)}>-</button></td> 
