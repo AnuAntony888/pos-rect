@@ -5,22 +5,69 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Box, IconButton, Typography } from "@mui/material";
 
-const CartAmountToggle2 = ({ product_id }) => {
+const CartAmountToggle2 = (props) => {
+  // const{productId}=props
+  // const dispatch = useDispatch();
+  // const { cart_items } = useSelector((state) => state.cartUi);
+
+  // const handleIncrease = () => {
+  //   const product = cart_items.find((item) => item.id === product_id);
+  //   if (product && product.cartCount < product.stock) {
+  //     dispatch(increaseProduct(product_id));
+  //   }
+  // };
+
+  // const handleDecrease = () => {
+  //   dispatch(decreaseProduct(product_id));
+  // };
+
+  const { product_id, productData ,count} = props;
+
   const dispatch = useDispatch();
-  const { cart_items } = useSelector((state) => state.cartUi);
+  const { cart_items, product_item } = useSelector((state) => state.cartUi);
+  const products = useSelector((state) => state.cartUi.products);
+  const addToCartData = useSelector((state) =>
+    state.cartUi.products.find((product) => product.id === product_id)
+  );
 
   const handleIncrease = () => {
-    const product = cart_items.find((item) => item.id === product_id);
-    if (product && product.cartCount < product.quantity_label) {
-      dispatch(increaseProduct(product_id));
-    }
+    console.log(product_id,"pro")
+    // Find the cart item with matching product_id and get its cartCount
+    const cartItemCount = cart_items.find(
+      (ct) => ct.product_id ===addToCartData?.product_id)?.cartCount;
+  
+
+    // if (
+    //   productData?.stock === product_item || // Check if adding would exceed product stock
+    //   productData?.stock === cartItemCount   // Check if adding would exceed current cart count
+    // ) {
+    //   return; 
+    // }
+    const updtatedproducts = [...products]
+    console.log(updtatedproducts,"dddddddddp")
+    dispatch(increaseProduct({
+      products: updtatedproducts.map((p) => {
+        const obj = { ...p }
+        if (obj.id === product_id) {
+          console.log(obj.cartCount, "cartcount")
+          
+            obj["cartCount"] = obj?.cartCount  ? obj.cartCount + 1 : 2;   
+          console.log(obj,"obj")
+          return obj;            // ...p, cartCount:p?.cartCount ? p.cartCount++:2
+        
+          
+        }
+        else {
+          return obj;
+        }
+      
+    }) })); // Dispatch the action to increase product quantity
   };
+
 
   const handleDecrease = () => {
-    dispatch(decreaseProduct(product_id));
+    dispatch(decreaseProduct()); // Dispatch the action to decrease product quantity
   };
-
-  const product = cart_items.find((item) => item.id === product_id);
 
   return (
     <Box
@@ -46,12 +93,13 @@ const CartAmountToggle2 = ({ product_id }) => {
       >
         <RemoveIcon
           className="remove-icon"
-          sx={{ color: "black", fontSize: "1.5rem" }}
+          sx={{ color: "black", fontSize: "1rem" }}
         />
       </IconButton>
 
       <Typography variant="body1" style={{ margin: "0 8px" }}>
-        {product?.cartCount || 1}
+        {/* {product?.cartCount || 1} */}
+        {/* {product_item || 1} */}{count}
       </Typography>
 
       <IconButton
@@ -68,7 +116,7 @@ const CartAmountToggle2 = ({ product_id }) => {
       >
         <AddIcon
           className="add-icon"
-          sx={{ color: "black", fontSize: "1.5rem" }}
+          sx={{ color: "black", fontSize: "1rem" }}
         />
       </IconButton>
     </Box>

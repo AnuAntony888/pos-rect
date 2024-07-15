@@ -1,14 +1,16 @@
-
-import './App.css';
-import ProductList from './Pages/ProductList';
-import QRCodeScanner from './Pages/QRCodeScanner';
+import { BrowserRouter as Router } from "react-router-dom";
+import "./App.css";
+import Navigate from "./Navigate/Navigate";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
     <div className="App">
-      God bless me
-      {/* <QRCodeScanner /> */}
-      <ProductList/>
+      <Router>
+        <Navigate />
+        <ToastContainer />
+       </Router>
+    
     </div>
   );
 }

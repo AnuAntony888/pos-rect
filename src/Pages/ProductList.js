@@ -2,24 +2,25 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import AddToCart from "./AddToCart";
-import { useZxing } from 'react-zxing';
+import { useZxing } from "react-zxing";
 
 import {
   setProducts,
-  setSelectedProduct,  calculateCartTotal,  removeProductFromCart,
-  increaseProduct,
-  decreaseProduct,
-
-} from '../Redux/Caruislice';
+  setSelectedProduct,
+  calculateCartTotal,
+  removeProductFromCart,
+  increaseCart,
+  decreaseCart,
+} from "../Redux/Caruislice";
 import { Grid } from "@mui/material";
 const ProductList = () => {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.cartUi.products);
   const selectedProduct = useSelector((state) => state.cartUi.selectedProduct);
-  const  cartTotalAmount  = useSelector((state) => state.cartUi.cartTotalAmount);
+  const cartTotalAmount = useSelector((state) => state.cartUi.cartTotalAmount);
   const cartItems = useSelector((state) => state.cartUi.cart_items);
   const [searchBarcode, setSearchBarcode] = useState("");
-  const [result, setResult] = useState('');
+  const [result, setResult] = useState("");
   const [showVideoFeed, setShowVideoFeed] = useState(true);
   const { ref } = useZxing({
     onDecodeResult(result) {
@@ -67,56 +68,101 @@ const ProductList = () => {
   useEffect(() => {
     dispatch(calculateCartTotal());
   }, [dispatch, cartItems]);
-  const selectedProductDetails = selectedProduct ? products.find(product => product.id === selectedProduct) : null;
+  const selectedProductDetails = selectedProduct
+    ? products.find((product) => product.id === selectedProduct)
+    : null;
 
   console.log(selectedProductDetails, "selectedProductDetails");
+
   const handleRemove = (id) => {
     dispatch(removeProductFromCart({ id }));
     dispatch(calculateCartTotal());
   };
 
   const handleIncrease = (id) => {
-    dispatch(increaseProduct({ id }));
+    dispatch(increaseCart({ id }));
     dispatch(calculateCartTotal());
   };
 
   const handleDecrease = (id) => {
-    dispatch(decreaseProduct({ id }));
+    dispatch(decreaseCart({ id }));
     dispatch(calculateCartTotal());
   };
   return (
     <div>
-            <Grid container spacing={2}>
-            <Grid item xs={6}>
-      <h3>Product List</h3>
-      {showVideoFeed && (
-        <video
-          ref={ref}
-          style={{ width: '100%', maxWidth: '380px', height: 'auto' }}
-          autoPlay
-          playsInline
-        />
-      )}
-      {!showVideoFeed && (
-        <div>
-          <p>Scanned Result:</p>
-          <p>{result}</p>
-        </div>
-      )}
+      <Grid container spacing={2}>
+        <Grid item xs={7}>
+          <h3>Product List</h3>
+          {showVideoFeed && (
+            <video
+              ref={ref}
+              style={{ width: "100%", maxWidth: "380px", height: "auto" }}
+              autoPlay
+              playsInline
+            />
+          )}
+          {!showVideoFeed && (
+            <div>
+              <p>Scanned Result:</p>
+              <p>{result}</p>
+            </div>
+          )}
 
-      <div>
-        <h4>Search by Barcode</h4>
-        <input
-          type="text"
-          placeholder="Enter Barcode"
-          value={searchBarcode}
-          onChange={(e) => setSearchBarcode(e.target.value)}
-        />
-        <button onClick={handleSearch}>Search</button>
-      </div>
-      {selectedProductDetails && (
-        <div style={{ padding: '20px', border: '1px solid #ccc', margin: '20px 0' }}>
-          <h4>Scanned Product Details</h4>
+          <div>
+            <h4>Search by Barcode</h4>
+            <input
+              type="text"
+              placeholder="Enter Barcode"
+              value={searchBarcode}
+              onChange={(e) => setSearchBarcode(e.target.value)}
+            />
+            <button onClick={handleSearch}>Search</button>
+          </div>
+          {selectedProductDetails && (
+            <div
+              style={{
+                padding: "20px",
+                border: "1px solid #ccc",
+                margin: "20px 0",
+              }}
+            >
+              <h4>Scanned Product Details</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Image</th>
+                    <th>Barcode</th>
+             
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr key={selectedProductDetails.id}>
+                    <td>{selectedProductDetails.id}</td>
+                    <td>{selectedProductDetails.title}</td>
+                    <td>{selectedProductDetails.price}</td>
+                    <td>
+                      <img
+                        src={selectedProductDetails.thumbnail}
+                        width={"20px"}
+                        alt={selectedProductDetails.title}
+                      />
+                    </td>
+                    <td>{selectedProductDetails.meta.barcode}</td>
+               
+                    <td>
+                      <AddToCart productId={selectedProductDetails.id} count={selectedProduct?.cartCount || 1} />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+          <hr/>     <hr/>     <hr/>     <hr/>     <hr/>
+          <h4>All Products</h4>
           <table>
             <thead>
               <tr>
@@ -125,112 +171,84 @@ const ProductList = () => {
                 <th>Price</th>
                 <th>Image</th>
                 <th>Barcode</th>
-                <th>QR Code</th>
+
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr key={selectedProductDetails.id}>
-                <td>{selectedProductDetails.id}</td>
-                <td>{selectedProductDetails.title}</td>
-                <td>{selectedProductDetails.price}</td>
-                <td>
-                  <img
-                    src={selectedProductDetails.thumbnail}
-                    width={"100px"}
-                    alt={selectedProductDetails.title}
-                  />
-                </td>
-                <td>{selectedProductDetails.meta.barcode}</td>
-                <td>
-                  <img
-                    src={selectedProductDetails.meta.qrCode}
-                    width={"100px"}
-                    alt="QR Code"
-                  />
-                </td>
-                <td>
-                  <AddToCart productId={selectedProductDetails.id} />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      )}
-      <h4>All Products</h4>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Price</th>
-            <th>Image</th>
-            <th>Barcode</th>
-         
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product) => (
-            <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.title}</td>
-              <td>{product.price}</td>
-              <td>
-                <img
-                  src={product.thumbnail}
-                  width={"100px"}
-                  alt={product.title}
-                />
-              </td>
-              <td>{product.meta.barcode}</td>
-              {/* <td>
+              {products.map((product) => (
+                <tr key={product.id}>
+                  <td>{product.id}</td>
+                  <td style={{fontSize:'.8rem'}}>{product.title}</td>
+                  <td>{product.price}</td>
+                  <td>
+                    <img
+                      src={product.thumbnail}
+                      width={"30px"}
+                      alt={product.title}
+                    />
+                  </td>
+                  <td>{product.meta.barcode}</td>
+                  {/* <td>
                 <img src={product.meta.qrCode} width={"100px"} alt="QR Code" />
               </td> */}
-              <td>
-                <AddToCart productId={product.id} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div>
-      <h2>Cart Total: ${cartTotalAmount.toFixed(2)}</h2>
+                  <td>
+                    <AddToCart productId={product.id} count={product?.cartCount || 1}/>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div>
+            <h2>Cart Total: ${cartTotalAmount.toFixed(2)}</h2>
           </div>
         </Grid>
-        <Grid item xs={6}>
-        <h2>Product in cart</h2>
-        <h2>Cart Total: ${cartTotalAmount.toFixed(2)}</h2>
+        <Grid item xs={5}>
+          <h2>Product in cart</h2>
+          <h2>Cart Total: ${cartTotalAmount.toFixed(2)}</h2>
           <table>
-          <thead>
-          <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Price</th>
-            <th>Image</th>
-            <th>increaseProductqutity</th>
-            <th>decreaseProductqutity</th>
-            <th>Removeproduct</th>
-          </tr>
-        </thead>
-        <tbody>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Price</th>
+                <th>image</th>
+                <th>qutity</th>
+                <th>+</th>
+                <th>-</th>
+                <th>Removeproduct</th>
+              </tr>
+            </thead>
+            <tbody>
               {cartItems.map((item) => (
-          <tr>
-          <td key={item.id}></td>
+                <tr>
+                  <td key={item.id}>{item.id}</td>
                   <td>{item.title}</td>
-              
-
-             <td>Price: ${item?.price?.toFixed(2)}</td> 
-            <td>Quantity: {item.cartCount}</td>
-          <td><button onClick={() => handleIncrease(item.id)}>+</button></td>  
-          <td> <button onClick={() => handleDecrease(item.id)}>-</button></td> 
-         <td><button onClick={() => handleRemove(item.id)}>Remove</button></td>   
-         </tr>
-        ))}
-              </tbody>
-            </table>
+                  <td><img
+                      src={item.thumbnail}
+                      width={"50px"}
+                      alt={item.title}
+                    /></td>
+                  <td>${item?.price?.toFixed(2)}</td>
+                  <td> {item.cartCount }</td>
+                  <td>
+                    <button onClick={() => handleIncrease(item.id)}>+</button>
+                  </td>
+                  <td>
+                    {" "}
+                    <button onClick={() => handleDecrease(item.id)}>-</button>
+                  </td>
+                  <td>
+                    <button onClick={() => handleRemove(item.id)}>
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </Grid>
-        </Grid>
+      </Grid>
     </div>
   );
 };

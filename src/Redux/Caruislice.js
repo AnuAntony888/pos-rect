@@ -38,7 +38,7 @@ const Caruislice = createSlice({
       } else {
         state.cart_items.push({
           ...action.payload,
-          cartCount: state.product_item,
+           cartCount: action.payload.cartCount || 1
         });
       }
 
@@ -68,8 +68,19 @@ const Caruislice = createSlice({
       }
       localStorage.setItem("cart_items", JSON.stringify(state.cart_items));
     },
-    increaseProduct: (state) => {
-      state.product_item++;
+    increaseProduct: (state, action) => {
+      console.log(action.payload?.products, "list")
+      state.products=action.payload.products
+      // const item = state?.products?.find(
+      //   (item) => item.id === action.payload.id
+      // );
+      // console.log(item,"item")
+      // if (item.stock === item.cartCount) {
+      //   return;
+      // }
+      // item.cartCount++;
+      // localStorage.setItem("cart_items", JSON.stringify(state.cart_items));
+      // state.product_item++;
     },
     decreaseProduct: (state) => {
       if (state.product_item > 1) {
