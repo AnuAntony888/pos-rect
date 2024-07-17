@@ -109,7 +109,7 @@ const Billing = () => {
     { txt: "Price" },
     { txt: "Image" },
     { txt: "Action" },
-    ];
+  ];
 
   return (
     <div>
@@ -126,7 +126,8 @@ const Billing = () => {
               Typography={"Heade Information"}
               textAlign="left"
               fontSize=".9rem"
-            />
+            />{" "}
+            <hr />{" "}
           </Grid>
           {Invoice.map((data, index) => (
             <Grid item lg={3.5} xs={12}>
@@ -240,7 +241,7 @@ const Billing = () => {
               Typography={"Iteam Information"}
               textAlign="left"
               fontSize=".9rem"
-            />
+            />  <hr />
           </Grid>
           <Grid item lg={1.5} md={1.5} sm={9} xs={9}>
             <TypographyText
@@ -344,20 +345,145 @@ const Billing = () => {
               check
             </Button>
           </Grid>
-
-
-         
+          <Grid item xs={12}>
+            <br />
+            <Grid
+              container
+              spacing={2}
+              sx={{ border: "solid .5px", borderColor: "gray" }}
+            >
               {selec.map((data, index) => (
-                <Grid item xs={index===5?4:2} key={index}>
+                <Grid item xs={index === 5 ? 4 : 2} key={index}>
                   <TypographyText
                     Typography={data.txt}
                     textAlign="left"
                     fontSize=".8rem"
                   />
+                  <br />
                 </Grid>
               ))}
-     
+            </Grid>
+            <br />
+          </Grid>
+          <Grid item lg={12} xs={12}>
+            <TypographyText
+              Typography={"Summary"}
+              textAlign="left"
+              fontSize=".9rem"
+            />  <hr />
+          </Grid>
+          {/*********************last section******************************888 */}
+          <Grid item xs={12} lg={7} md={7}>
+            <Grid container spacing={2}>
+              {last.map((data, index) => (
+                <Grid item lg={2.5} md={2.2} sm={9} xs={9} key={index}>
+                  <TypographyText
+                    Typography={data.txt}
+                    textAlign="left"
+                    fontSize=".8rem"
+                  />
 
+                  <input
+                    //   type={data.type}
+                    //   name={data.name}
+                    //   value={data.value}
+                    //   onChange={data.onChange}
+                    required
+                    style={{
+                      height: "35px",
+                      width: "100%",
+                      border: "none",
+                      backgroundColor: "#F7F7F7",
+                    }}
+                  />
+                </Grid>
+              ))}
+              <Grid item lg={2} md={2}>
+                <Box sx={{ pb: "10px" }}>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    sx={{
+                      bgcolor: "#F7F7F7",
+                      color: "black",
+                      textAlign: "left",
+                      width: "100%",
+                      textTransform: "capitalize",
+                      margin: "auto",
+                      p: "2px",
+                    }}
+                  >
+                    Cash
+                  </Button>
+                </Box>
+
+                <Button
+                  variant="contained"
+                  type="submit"
+                  sx={{
+                    bgcolor: "#F7F7F7",
+                    color: "black",
+                    textAlign: "left",
+                    width: "100%",
+                    textTransform: "capitalize",
+                    margin: "auto",
+                    p: "2px",
+                  }}
+                >
+                  Card
+                </Button>
+              </Grid>
+              {last2.map((data, index) => (
+                <>
+                  <Grid item lg={index === 3 ? 4 : 2.6} md={2} sm={9} xs={9}>
+                    <TypographyText
+                      Typography={data.txt}
+                      textAlign="left"
+                      fontSize=".8rem"
+                    />
+
+                    <input
+                      //   type={data.type}
+                      //   name={data.name}
+                      //   value={data.value}
+                      //   onChange={data.onChange}
+                      required
+                      style={{
+                        height: "35px",
+                        width: "100%",
+                        border: "none",
+                        backgroundColor: "#F7F7F7",
+                      }}
+                    />
+                  </Grid>
+                </>
+              ))}
+            </Grid>
+          </Grid>
+          <Grid item xs={12} lg={5} md={5} sx={{ margin: "auto" }}>
+            <Grid container spacing={2}>
+              {lastbutton.map((data, index) => (
+                <Grid item lg={2} md={2} sm={3} xs={3}>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    sx={{
+                      bgcolor: "#F7F7F7",
+                      color: "black",
+                      textAlign: "left",
+                      width: "100%",
+                      textTransform: "capitalize",
+                      margin: "auto",
+                      pt: "25px",
+                      pb: "25px",
+                    }}
+                  >
+                    {data.text}
+                  </Button>
+                </Grid>
+              ))}
+            </Grid>
+          </Grid>
         </Grid>
       </Box>
     </div>
@@ -365,3 +491,53 @@ const Billing = () => {
 };
 
 export default Billing;
+const last = [
+  { txt: "Discount %" },
+  { txt: "Total" },
+  { txt: "Net Amount" },
+  { txt: "Empolyee" },
+];
+
+const last2 = [
+  { txt: "Tax %" },
+  { txt: "Total With Tax" },
+  { txt: "Round of Amount" },
+
+  { txt: "Remark" },
+];
+const lastbutton = [
+  { text: "Save" },
+  { text: "Print" },
+  { text: "Cancel" },
+  { text: "Find" },
+  { text: "New" },
+  { text: "Exit" },
+];
+{
+  /* <Grid item xs={12} lg={5} md={6}>
+            <Grid container spacing={2}>
+              {lastbutton.map((data, index) => (
+                <Grid item lg={2} md={2} sm={9} xs={9}>
+                  <Button
+                    variant="contained"
+                    type="submit"
+                    sx={{
+                      bgcolor: "#F7F7F7",
+                      color: "black",
+                      textAlign: "left",
+                      width: "100%",
+                      textTransform: "capitalize",
+                      margin: "auto",
+                      pt: "10px",
+                      pb: "10px",
+                    }}
+                  >
+                    {data.text}
+                  </Button>
+                </Grid>
+              ))}
+          
+          </Grid> 
+      
+        </Grid>*/
+}

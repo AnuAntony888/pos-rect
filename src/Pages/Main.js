@@ -4,6 +4,9 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import Billing from './Billing';
+import Master from './Master';
+import Employee from './Employee';
+import Invotory from './Invotory';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -43,10 +46,10 @@ export default function Main() {
     
     const tabs = [
         { label: 'Billing', content: <Billing/> },
-        { label: 'Inventory', content: 'Item Two Content' },
-        { label: 'Empolyee', content: 'Item Three Content' },
-        { label: 'Master', content: 'Item Three Content' },
-        { label: 'Sale Report', content: 'Item Three Content' },
+        { label: 'Inventory', content: <Invotory/>},
+        { label: 'Empolyee', content: <Employee/> },
+        { label: 'Master', content: <Master/> },
+        { label: 'Sale Report', content: 'dddddd' },
       ];
 
   return (
