@@ -1,13 +1,36 @@
+// import React from 'react'
+
+// const Singup = () => {
+//   return (
+//     <div>
+
+//     </div>
+//   )
+// }
+
+// export default Singup
 import { Box, Button, Grid } from "@mui/material";
 import React, { useState } from "react";
-import { Toastsucess, TypographyText } from "../../Reusable";
-import { Link, useNavigate } from "react-router-dom";
 
-const Login = () => {
+import { useNavigate } from "react-router-dom";
+import { Toastsucess, TypographyText } from "../Reusable";
+import { useRegister } from "../API/UserApi";
+
+const Singup = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const { register, isLoading, error } = useRegister();
   const Navigate = useNavigate();
+  const handleName = (e) => {
+    if (!e.target.value) {
+      setErrors((prev) => ({ ...prev, name: "name is required!" }));
+    } else {
+      setErrors((prev) => ({ ...prev, name: "" }));
+    }
+    setName(e.target.value);
+  };
   const handleEmail = (e) => {
     const value = e.target.value;
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -37,6 +60,13 @@ const Login = () => {
 
   const Data = [
     {
+      txt: "Name",
+      name: "name",
+      type: "text",
+      onChange: handleName,
+      value: name,
+    },
+    {
       txt: "Email",
       name: "email",
       type: "text",
@@ -54,14 +84,32 @@ const Login = () => {
 
   const handleApi = async () => {
     try {
-      if (!email || !password) {
-        Toastsucess("Please Enter Email and Password !");
+      if (!name || !email || !password) {
+        Toastsucess("Please Enter Name, Email, and Password!");
         return;
       }
-      Navigate("/main");
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+      if (!emailRegex.test(email)) {
+        Toastsucess("Please Enter a Valid Email Address!");
+        return;
+      }
+      const userData = await register({
+        name,
+        email,
+        password,
+      });
+      Toastsucess("Sucessfully Registered ! ", "sucess", "light");
+      setName("");
+      setEmail("");
+      setPassword("");
+      // Navigate("/main");
     } catch (error) {
-      console.log(error, "normal error");
-      Toastsucess("Email & Password does not match with our record !");
+      if (error.response && error.response.data) {
+        Toastsucess(`Error: ${error.response?.data || error.message}`);
+      } else {
+        Toastsucess(`${error.response?.data || error.message}.`);
+      }
     }
   };
 
@@ -125,7 +173,7 @@ const Login = () => {
                     Typography={errors[data.name]}
                     color="red"
                     textAlign="left"
-                    textTransform='lowercase'
+                    textTransform="lowercase"
                   />
                 )}
               </div>
@@ -140,16 +188,15 @@ const Login = () => {
                 width: "100%",
                 textTransform: "capitalize",
               }}
-             onClick={handleApi}
+              onClick={handleApi}
             >
               Send Message
             </Button>
           </Grid>
-          <Grid item xs={12}><Link to='/signup'>Signup</Link></Grid>
         </Grid>
       </Box>
     </div>
   );
 };
 
-export default Login;
+export default Singup;
