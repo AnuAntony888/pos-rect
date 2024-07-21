@@ -2,12 +2,14 @@ import { Box, Button, Grid } from "@mui/material";
 import React, { useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
 import { Link, useNavigate } from "react-router-dom";
+import { useUserLogin } from "../../API/UserApi";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const Navigate = useNavigate();
+  const { login, isLoading, error  } = useUserLogin();
   const handleEmail = (e) => {
     const value = e.target.value;
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -52,16 +54,35 @@ const Login = () => {
     },
   ];
 
+
   const handleApi = async () => {
     try {
-      if (!email || !password) {
-        Toastsucess("Please Enter Email and Password !");
+      if ( !email || !password) {
+        Toastsucess("Please Enter  Email, and Password!");
         return;
       }
-      Navigate("/main");
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+      if (!emailRegex.test(email)) {
+        Toastsucess("Please Enter a Valid Email Address!");
+        return;
+      }
+      const userData = await login({
+     
+        email,
+        password,
+      });
+      Toastsucess("Sucessfully Login ! ", "sucess", "light");
+  
+      setEmail("");
+      setPassword("");
+      // Navigate("/main");
     } catch (error) {
-      console.log(error, "normal error");
-      Toastsucess("Email & Password does not match with our record !");
+      if (error.response && error.response.data) {
+        Toastsucess(`Error: ${error.response?.data || error.message}`);
+      } else {
+        Toastsucess(`${error.response?.data || error.message}.`);
+      }
     }
   };
 

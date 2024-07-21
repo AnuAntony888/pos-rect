@@ -1,14 +1,3 @@
-// import React from 'react'
-
-// const Singup = () => {
-//   return (
-//     <div>
-
-//     </div>
-//   )
-// }
-
-// export default Singup
 import { Box, Button, Grid } from "@mui/material";
 import React, { useState } from "react";
 
