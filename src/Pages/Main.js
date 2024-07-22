@@ -7,6 +7,7 @@ import Billing from './Billing';
 import Master from './Master';
 import Employee from './Employee';
 import Invotory from './Invotory';
+import AddProduct from './AddProduct';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -49,7 +50,8 @@ export default function Main() {
         { label: 'Inventory', content: <Invotory/>},
         { label: 'Empolyee', content: <Employee/> },
         { label: 'Master', content: <Master/> },
-        { label: 'Sale Report', content: 'dddddd' },
+      { label: 'Sale Report', content: 'dddddd' },
+      { label: 'Add Product', content: <AddProduct/> },
       ];
 
   return (

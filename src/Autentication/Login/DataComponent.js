@@ -11,6 +11,7 @@
 // export default DataComponent
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import AddProduct from "./AddProduct";
 
 const DataComponent = () => {
     const [name, setName] = useState("");
@@ -18,7 +19,7 @@ const DataComponent = () => {
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
   
-    const handleSubmit = async (e) => {
+    const handlesignup = async (e) => {
       e.preventDefault();
       try {
         const response = await axios.post("http://localhost:5000/api/users/signup", {
@@ -51,10 +52,13 @@ const DataComponent = () => {
     fetchUsers();
   }, []);
   
+
+
+ 
     return (
       <div>
         <h2>Sign Up</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handlesignup}>
           <div>
             <label>Name:</label>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -80,15 +84,27 @@ const DataComponent = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {/* {users.map((user) => (
             <tr key={user.email}>
               <td>{user.name}</td>
               <td>{user.email}</td>
               <td>{user.password}</td>
             </tr>
-          ))}
+          ))} */}
         </tbody>
-      </table>
+        </table>
+        
+
+
+
+
+<AddProduct/>
+
+
+
+
+        {/**************************************************************/}
+
       </div>
   );
 };
