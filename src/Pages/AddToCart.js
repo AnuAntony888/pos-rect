@@ -9,7 +9,7 @@ const AddToCart = (props) => {
   const { productId ,count} = props;
 
   const dispatch = useDispatch();
-  const { cart_items, product_item } = useSelector((state) => state.cartUi);
+  const { cart_items,  } = useSelector((state) => state.cartUi);
 
   const addToCartData = useSelector((state) =>
     state.cartUi.products.find((product) => product.id === productId)
@@ -35,10 +35,10 @@ const AddToCart = (props) => {
             productData={addToCartData}
             count={count}
           />
-          {/* <CartAmountToggle2 product_id={addToCartData.id} /> */}
+    
         </Grid>
         <Grid item xs={6}>
-          <Button
+          {/* <Button
             variant="contained"
             className="popViewbtn"
             size="large"
@@ -46,8 +46,8 @@ const AddToCart = (props) => {
             onClick={handleAddToCart}
           >
             Add 
-          </Button>
-        </Grid>
+          </Button> */}
+        </Grid> 
       </Grid>
     </div>
   );

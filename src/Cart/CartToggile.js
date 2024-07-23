@@ -1,25 +1,23 @@
+// import React from 'react'
+
+// const CartToggile = () => {
+//   return (
+//     <div>
+      
+//     </div>
+//   )
+// }
+
+// export default CartToggile
+
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { increaseProduct, decreaseProduct } from "../Redux/Caruislice";
-import AddIcon from "@mui/icons-material/Add";
+import { useDispatch, useSelector } from "react-redux";
+import { decreaseProduct, increaseProduct } from "../Redux/Caruislice";
+import { Box, IconButton } from "@mui/material";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { Box, IconButton, Typography } from "@mui/material";
 
-const CartAmountToggle2 = (props) => {
-  // const{productId}=props
-  // const dispatch = useDispatch();
-  // const { cart_items } = useSelector((state) => state.cartUi);
+const CartToggile = (props) => {
 
-  // const handleIncrease = () => {
-  //   const product = cart_items.find((item) => item.id === product_id);
-  //   if (product && product.cartCount < product.stock) {
-  //     dispatch(increaseProduct(product_id));
-  //   }
-  // };
-
-  // const handleDecrease = () => {
-  //   dispatch(decreaseProduct(product_id));
-  // };
 
   const { product_id, productData ,count} = props;
 
@@ -118,4 +116,5 @@ const CartAmountToggle2 = (props) => {
   );
 };
 
-export default CartAmountToggle2;
+export default CartToggile;
+

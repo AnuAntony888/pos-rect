@@ -1,7 +1,7 @@
 import { useMutation } from "react-query";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api"; // Update API URL as needed
+export const API_URL = "http://localhost:5000/api"; // Update API URL as needed
 
 const registerHandler = async (params) => {
   try {

@@ -12,6 +12,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AddProduct from "./AddProduct";
+import ProductList from "../../Pages/ProductList";
 
 const DataComponent = () => {
     const [name, setName] = useState("");
@@ -91,6 +92,7 @@ const DataComponent = () => {
               <td>{user.password}</td>
             </tr>
           ))} */}
+            
         </tbody>
         </table>
         
@@ -101,7 +103,7 @@ const DataComponent = () => {
 <AddProduct/>
 
 
-
+<ProductList/>
 
         {/**************************************************************/}
 

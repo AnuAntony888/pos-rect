@@ -9,6 +9,14 @@ import {
   setProducts,
   setSelectedProduct,
 } from "../Redux/Caruislice";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+import Billing2 from "./Billing2";
 
 const Billing = () => {
   const Invoice = [{ txt: "Invoice No" }, { txt: "Invoice Date" }];
@@ -241,9 +249,13 @@ const Billing = () => {
               Typography={"Iteam Information"}
               textAlign="left"
               fontSize=".9rem"
-            />  <hr />
+            />{" "}
+            <hr />
           </Grid>
-          <Grid item lg={1.5} md={1.5} sm={9} xs={9}>
+          <Grid xs={12}>
+            <Billing2/>
+          </Grid>
+          {/* <Grid item lg={1.5} md={1.5} sm={9} xs={9}>
             <TypographyText
               Typography={"Item Code"}
               textAlign="left"
@@ -345,32 +357,43 @@ const Billing = () => {
               check
             </Button>
           </Grid>
+   
           <Grid item xs={12}>
-            <br />
-            <Grid
-              container
-              spacing={2}
-              sx={{ border: "solid .5px", borderColor: "gray" }}
-            >
-              {selec.map((data, index) => (
-                <Grid item xs={index === 5 ? 4 : 2} key={index}>
-                  <TypographyText
-                    Typography={data.txt}
-                    textAlign="left"
-                    fontSize=".8rem"
-                  />
-                  <br />
-                </Grid>
-              ))}
-            </Grid>
-            <br />
-          </Grid>
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label="caption table">
+                <TableHead>
+                  <TableRow>
+                    {selec.map((data, index) => (
+                      <TableCell
+                        className="shadow-checkoutCardheading"
+                        key={index}
+                      >
+                        {data.txt}
+                      </TableCell>
+                    ))}{" "}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell component="th" scope="row">
+             sssssssssss
+                    </TableCell>
+      
+           
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid> */}
+          {/***********************/}
+
           <Grid item lg={12} xs={12}>
             <TypographyText
               Typography={"Summary"}
               textAlign="left"
               fontSize=".9rem"
-            />  <hr />
+            />{" "}
+            <hr />
           </Grid>
           {/*********************last section******************************888 */}
           <Grid item xs={12} lg={7} md={7}>
