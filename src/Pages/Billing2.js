@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Grid,
@@ -8,12 +9,13 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import React, { useState } from "react";
+import CarttoAdd from "../Cart/CarttoAdd";
 import { Toastsucess, TypographyText } from "../Reusable";
 import Paper from "@mui/material/Paper";
 import { Singleproduct } from "../API/APIproduct";
 import { useDispatch, useSelector } from "react-redux";
-import AddToCart from "./AddToCart";
+import { calculateCartTotal, setProducts, setSelectedProduct } from "../Redux/Caruislice";
+
 const Billing2 = () => {
   const ite = [
     { txt: "Iteam Description" },
@@ -55,16 +57,23 @@ const Billing2 = () => {
       Toastsucess(error.message);
     }
   };
+
+
+
+
+  const dispatch = useDispatch();
+
+
+  useEffect(() => {
+    dispatch(setProducts(searchBarcode ));
+  }, [searchBarcode, dispatch]);
+  const products = useSelector((state) => state.cartUi.products);
+  console.log(products,"products")
   const imge = `http://localhost:5000/${searchBarcode?.images?.[0]
     .replace(/\\/g, "/")
     .replace("C:/Users/VBS/Desktop/POS TESTING/Backend/uploads", "uploads")
     .replace(" ", "%20")}`;
-
-  const dispatch = useDispatch();
-  const products = useSelector((state) => state.cartUi.products);
-  const selectedProduct = useSelector((state) => state.cartUi.selectedProduct);
-  const cartTotalAmount = useSelector((state) => state.cartUi.cartTotalAmount);
-  const cartItems = useSelector((state) => state.cartUi.cart_items);
+  // console.log(count, "count");
   return (
     <div>
       <Grid container spacing={2}>
@@ -192,23 +201,30 @@ const Billing2 = () => {
               </TableHead>
               <TableBody>
                 <TableRow>
-                  <TableCell component="th" scope="row">
-                    {searchBarcode.name}
+                <TableCell component="th" scope="row">
+                {products.Product_id}
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {searchBarcode.description}
+                    {products.name}
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    {searchBarcode.unit_price}
+                    {products.description}
+                  </TableCell>
+                  <TableCell component="th" scope="row">
+                    {products.unit_price}
                   </TableCell>
                   <TableCell component="th" scope="row">
                     <img
                       src={imge}
-                      alt={searchBarcode.name}
+                      alt={products.name}
                       style={{ width: "100px" }}
                     />
                   </TableCell>
-                  <TableCell component="th" scope="row"></TableCell>
+                  <TableCell component="th" scope="row">
+                    <CarttoAdd productId={products.Product_id} searchBarcode={products}
+                      count={products?.cartCount || 1 } />
+                   
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>

@@ -7,13 +7,14 @@ import CartAmountToggle2 from "./CartAmountToggle2";
 
 const AddToCart = (props) => {
   const { productId ,count} = props;
-
+  console.log(count, "count");
   const dispatch = useDispatch();
   const { cart_items,  } = useSelector((state) => state.cartUi);
 
   const addToCartData = useSelector((state) =>
     state.cartUi.products.find((product) => product.id === productId)
   );
+  console.log(addToCartData,"addtocartdata")
   console.log(addToCartData.id, addToCartData,productId, "add to cart");
   const handleAddToCart = () => {
     const item = cart_items.find((item) => item?.id === addToCartData.id);
@@ -37,16 +38,16 @@ const AddToCart = (props) => {
           />
     
         </Grid>
-        <Grid item xs={6}>
-          {/* <Button
+        <Grid item xs={8}>
+          <Button
             variant="contained"
             className="popViewbtn"
             size="large"
             id="addtocart"
             onClick={handleAddToCart}
           >
-            Add 
-          </Button> */}
+            A
+          </Button>
         </Grid> 
       </Grid>
     </div>

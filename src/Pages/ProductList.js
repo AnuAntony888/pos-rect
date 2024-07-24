@@ -88,6 +88,7 @@ const ProductList = () => {
     dispatch(decreaseCart({ id }));
     dispatch(calculateCartTotal());
   };
+  console.log(selectedProduct?.cartCount,"product")
   return (
     <div>
       <Grid container spacing={2}>

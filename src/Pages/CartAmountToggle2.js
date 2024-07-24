@@ -29,14 +29,12 @@ const CartAmountToggle2 = (props) => {
   const addToCartData = useSelector((state) =>
     state.cartUi.products.find((product) => product.id === product_id)
   );
-
+console.log(count,"count")
   const handleIncrease = () => {
     console.log(product_id,"pro")
     // Find the cart item with matching product_id and get its cartCount
     const cartItemCount = cart_items.find(
       (ct) => ct.product_id ===addToCartData?.product_id)?.cartCount;
-  
-
   
     const updtatedproducts = [...products]
     console.log(updtatedproducts,"dddddddddp")
