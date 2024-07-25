@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Billing from './Billing';
 import Master from './Master';
 import Employee from './Employee';
-import Invotory from './Invotory';
+import Invotory from './Inventory/Invotory';
 import AddProduct from './AddProduct';
 
 function CustomTabPanel(props) {

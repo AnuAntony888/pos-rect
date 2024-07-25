@@ -38,9 +38,11 @@ const ToggileCart = (props) => {
         ? updatedProducts.cartCount + 1
         : 2;
       dispatch(setProducts(updatedProducts));
+
     } else {
       return updatedProducts;
     }
+   
   };
 
   const handleDecrease = () => {

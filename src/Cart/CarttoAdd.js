@@ -4,6 +4,7 @@ import {
   addToCart,
   decreaseProduct,
   increaseProduct,
+  setProducts,
 } from "../Redux/Caruislice";
 import { useDispatch, useSelector } from "react-redux";
 import { Toastsucess } from "../Reusable";
@@ -11,10 +12,11 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import ToggileCart from "./ToggileCart";
 const CarttoAdd = (props) => {
-  const { productId, searchBarcode, count } = props;
+  const { productId: product_id, searchBarcode, count } = props;
   const dispatch = useDispatch();
   console.log(count, searchBarcode, "count");
   const { cart_items } = useSelector((state) => state.cartUi);
+  const products = useSelector((state) => state.cartUi.products);
 
   const handleAddToCart11 = () => {
     const item = cart_items.find(
@@ -22,10 +24,9 @@ const CarttoAdd = (props) => {
     );
     console.log(item, "item");
     if (item && item?.cartCount + count > searchBarcode?.stock) {
-      // Handle the case where item quantity exceeds available stock
-      // return;
     }
-    dispatch(addToCart(searchBarcode));
+    dispatch(addToCart({ searchBarcode }));
+
   };
 
   return (
