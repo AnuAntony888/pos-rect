@@ -7,38 +7,156 @@ import {
   Select,
 } from "@mui/material";
 import React, { useState } from "react";
-import { TypographyText } from "../../Reusable";
+import { Toastsucess, TypographyText } from "../../Reusable";
 import { GetAllSupplier } from "../../API/Apisupplier";
 import Supplier from "./Supplier";
+import { GetItemByCode, useIteamField } from "../../API/APiiteam";
 
 const IteamManagement = () => {
   const { data: allsupplier, error, isLoading } = GetAllSupplier();
-  console.log(allsupplier, "data");
-const [selectedSupplier, setSelectedSupplier] = useState(null);
-    
+  const { InserItem } = useIteamField();
+  const {itembyitemcode } = GetItemByCode();
+  const [ItemCode, setItemCode] = useState("");
+  const [ItemDescription, setItemDescription] = useState("");
+  const [ItemSupplier, setItemSupplier] = useState("");
+  const [ItemUnit, setItemUnit] = useState("");
+  const [ItemTax, setItemTax] = useState("");
+  const [IteamDiscount, setIteamDiscount] = useState("");
+  const [IteamPrice, setIteamPrice] = useState("");
+
+  const handlesetItemSupplier = (e) => {
+    setItemSupplier(e.target.value);
+  };
+  const handlesetItemCode = (e) => {
+    setItemCode(e.target.value);
+  };
+
+  const handlesetItemDescription = (e) => {
+    setItemDescription(e.target.value);
+  };
+
+  const handlesetItemUnit = (e) => {
+    setItemUnit(e.target.value);
+  };
+
+  const handlesetItemTax = (e) => {
+    setItemTax(e.target.value);
+  };
+  const handlesetIteamDiscount = (e) => {
+    setIteamDiscount(e.target.value);
+  };
+  const handlesetIteamPrice = (e) => {
+    setIteamPrice(e.target.value);
+  };
+
+  const handleinsertItem = async () => {
+    if (
+      !ItemCode ||
+      !ItemDescription ||
+      !ItemSupplier ||
+      !ItemUnit ||
+      !ItemTax ||
+      !IteamDiscount ||
+      !IteamPrice
+    ) {
+      Toastsucess("Please fill your Details");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("ItemCode", ItemCode);
+      formData.append("ItemDescription", ItemDescription);
+      formData.append("ItemSupplier", ItemSupplier);
+      formData.append("ItemUnit", ItemUnit);
+      formData.append("ItemTax", ItemTax);
+      formData.append("IteamDiscount", IteamDiscount);
+      formData.append("IteamPrice", IteamPrice);
+
+      const response = await InserItem(formData);
+      Toastsucess(response.message, "success", "light");
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+  };
+
+
+  const handlegetItemByItemcode = async () => {
+    try {
+      if (!ItemCode) {
+        Toastsucess("Please enter a barcode.");
+        return;
+      }
+      const productData = await itembyitemcode({ ItemCode });
+      // setAddress(productData?.SupplierAddress);
+      // setDescription(productData?.SupplierDescription);
+      console.log(productData, "consoleget supplier");
+      Toastsucess("Product fetched successfully!", "success", "light");
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+  };
+
+
+
+
+
+
+
   const Invoice3 = [
     {
-      txt: "Field 1",
-      value: "", // Add initial value or state variable here
-      onChange: () => {}, // Add change handler here
+      txt: "ItemCode",
+      value: ItemCode,
+      onChange: handlesetItemCode,
     },
     {
-      txt: "Field 2",
-      value: "", // Add initial value or state variable here
-      onChange: () => {}, // Add change handler here
+      txt: "ItemDescription",
+      value: ItemDescription,
+      onChange: handlesetItemDescription,
     },
     {
-      txt: "Select Supplier",
-      value: "", // Add initial value or state variable here
-      onChange: () => {}, // Add change handler here
-      datas: allsupplier || [],
+      label: "Item Supplier",
+      txt: "Item Supplier",
+      value: ItemSupplier,
+      onChange: handlesetItemSupplier,
+      datas: allsupplier
+        ? allsupplier.map((supplier) => ({
+            emivalue: supplier.SupplierDescription,
+            eminame: supplier.SupplierDescription,
+          }))
+        : [],
     },
-    // Add more items as needed
+    {
+      txt: "Item Unit",
+      value: ItemUnit,
+      onChange: handlesetItemUnit,
+    },
+    {
+      txt: "Item Tax",
+      value: ItemTax,
+      onChange: handlesetItemTax,
+    },
+    {
+      txt: "IteamDiscount",
+      value: IteamDiscount,
+      onChange: handlesetIteamDiscount,
+    },
+    {
+      txt: "Iteam Price",
+      value: IteamPrice,
+      onChange: handlesetIteamPrice,
+    },
   ];
 
   const Buttons = [
-    { txt: "Check" },
-    { txt: "Add" },
+    {
+      txt: "Check",
+      onClick:handlegetItemByItemcode
+    },
+    {
+      txt: "Add",
+      onClick: handleinsertItem,
+    },
     { txt: "Remove" },
     { txt: "Update" },
   ];
@@ -56,7 +174,7 @@ const [selectedSupplier, setSelectedSupplier] = useState(null);
         </Grid>
 
         {Invoice3.map((data, index) => (
-          <Grid item lg={1.28}>
+          <Grid item lg={1.28} key={index}>
             {index === 2 ? (
               <>
                 <TypographyText
@@ -64,7 +182,6 @@ const [selectedSupplier, setSelectedSupplier] = useState(null);
                   textAlign="left"
                   fontSize=".8rem"
                 />
-
                 <FormControl fullWidth size="small">
                   <InputLabel
                     id="location-select-label"
@@ -73,7 +190,7 @@ const [selectedSupplier, setSelectedSupplier] = useState(null);
                       fontSize: ".85rem",
                     }}
                   >
-                    Select Gender
+                    Item Supplier
                   </InputLabel>
                   <Select
                     labelId="location-select-label"
@@ -86,9 +203,9 @@ const [selectedSupplier, setSelectedSupplier] = useState(null);
                       fontSize: ".9rem",
                     }}
                   >
-                    {data?.datas?.map((datas, index) => (
-                      <MenuItem key={index} value={datas.SupplierDescription}>
-                        {datas.SupplierDescription}
+                    {data.datas.map((datas, index) => (
+                      <MenuItem key={index} value={datas.emivalue}>
+                        {datas.eminame}
                       </MenuItem>
                     ))}
                   </Select>
@@ -101,7 +218,6 @@ const [selectedSupplier, setSelectedSupplier] = useState(null);
                   textAlign="left"
                   fontSize=".8rem"
                 />
-
                 <input
                   required
                   style={{
@@ -110,6 +226,8 @@ const [selectedSupplier, setSelectedSupplier] = useState(null);
                     border: "none",
                     backgroundColor: "#F7F7F7",
                   }}
+                  value={data.value}
+                  onChange={data.onChange}
                 />
               </>
             )}
@@ -117,33 +235,32 @@ const [selectedSupplier, setSelectedSupplier] = useState(null);
         ))}
 
         {Buttons.map((data, index) => (
-          <>
-            <Grid item lg={0.75} md={1} sm={6} xs={6} key={index}>
-              <p></p>
-              <Button
-                variant="contained"
-                type="submit"
-                sx={{
-                  bgcolor:
-                    index === 0
-                      ? "#48DBE8"
-                      : index === 1
-                      ? "darkgreen"
-                      : index === 2
-                      ? "red"
-                      : "yellow",
+          <Grid item lg={0.75} md={1} sm={6} xs={6} key={index}>
+            <p></p>
+            <Button
+              variant="contained"
+              type="submit"
+              sx={{
+                bgcolor:
+                  index === 0
+                    ? "#48DBE8"
+                    : index === 1
+                    ? "darkgreen"
+                    : index === 2
+                    ? "red"
+                    : "yellow",
 
-                  color: "#fff",
-                  textAlign: "left",
-                  width: "100%",
-                  textTransform: "capitalize",
-                  margin: "auto",
-                }}
-              >
-                {data.txt}
-              </Button>
-            </Grid>
-          </>
+                color: "#fff",
+                textAlign: "left",
+                width: "100%",
+                textTransform: "capitalize",
+                margin: "auto",
+              }}
+              onClick={data.onClick}
+            >
+              {data.txt}
+            </Button>
+          </Grid>
         ))}
       </Grid>
     </div>
