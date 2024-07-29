@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
 import { Button, Grid } from "@mui/material";
 import {
+  GetAllSupplier,
   Getsupplier,
   Updatesupplier,
   useDeleteSupplier,
@@ -28,6 +29,13 @@ const Supplier = () => {
     setUserId(e.target.value);
   };
 
+  // Using GetAllSupplier hook
+  const { data: allsupplier, refetch, isLoading } = GetAllSupplier();
+  useEffect(() => {
+    // Refetch suppliers when component mounts
+    refetch();
+  }, [refetch]);
+
   const handleinsertSupplier = async () => {
     if (!description || !address) {
       Toastsucess("Please fill your Details");
@@ -43,11 +51,13 @@ const Supplier = () => {
       const response = await supplieraddress(formData);
       // console.log(response.message, "response");
       Toastsucess(response.message, "sucess", "light");
+      setDescription("");
+      setAddress("");
+      // Refetch supplier list after adding a new item
+      refetch();
     } catch (error) {
       Toastsucess(error.message);
     }
-    setDescription("");
-    setAddress("");
   };
 
   const handlegetsupplier = async () => {
@@ -61,6 +71,8 @@ const Supplier = () => {
       setDescription(productData?.SupplierDescription);
       console.log(productData, "consoleget supplier");
       Toastsucess("Product fetched successfully!", "success", "light");
+      // Refetch supplier list after adding a new item
+      refetch();
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -81,6 +93,8 @@ const Supplier = () => {
       setDescription(productData?.SupplierAddress);
       console.log(productData, "consoleget supplier");
       Toastsucess("Product fetched successfully!", "success", "light");
+      // Refetch supplier list after adding a new item
+      refetch();
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -100,6 +114,8 @@ const Supplier = () => {
 
       console.log(productData, "consoleget supplier");
       Toastsucess("Product fetched successfully!", "success", "light");
+      // Refetch supplier list after adding a new item
+      refetch();
     } catch (error) {
       Toastsucess(error.message);
     }

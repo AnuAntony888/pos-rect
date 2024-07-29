@@ -6,14 +6,14 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
 import { GetAllSupplier } from "../../API/Apisupplier";
 import Supplier from "./Supplier";
 import { GetItemByCode, useIteamField } from "../../API/APiiteam";
 
 const IteamManagement = () => {
-  const { data: allsupplier, error, isLoading } = GetAllSupplier();
+  const { data: allsupplier, refetch  } = GetAllSupplier();
   const { InserItem } = useIteamField();
   const {itembyitemcode } = GetItemByCode();
   const [ItemCode, setItemCode] = useState("");
@@ -49,6 +49,12 @@ const IteamManagement = () => {
     setIteamPrice(e.target.value);
   };
 
+  useEffect(() => {
+    refetch(); // Trigger a refetch if needed
+  }, [refetch]); // Dependency array includes refetch
+  
+
+
   const handleinsertItem = async () => {
     if (
       !ItemCode ||
@@ -78,6 +84,15 @@ const IteamManagement = () => {
     } catch (error) {
       Toastsucess(error.message);
     }
+    setItemCode('');
+    setIteamDiscount('');
+    setItemTax('');
+    setItemSupplier('');
+    setItemUnit('');
+    setItemDescription('');
+    setIteamPrice('');
+    
+    allsupplier();
   };
 
 
@@ -88,13 +103,19 @@ const IteamManagement = () => {
         return;
       }
       const productData = await itembyitemcode({ ItemCode });
-      // setAddress(productData?.SupplierAddress);
-      // setDescription(productData?.SupplierDescription);
+      setIteamDiscount(productData?.[0]?.IteamDiscount);
+      setIteamPrice(productData?.[0]?.IteamPrice);
+      setItemDescription(productData?.[0]?.ItemDescription)
+      setItemDescription(productData?.[0]?.ItemDescription);
+      setItemTax(productData?.[0]?.ItemTax);
+      setItemUnit(productData?.[0]?.ItemUnit);
+      setItemSupplier(productData?.[0]?.ItemSupplier);
       console.log(productData, "consoleget supplier");
       Toastsucess("Product fetched successfully!", "success", "light");
     } catch (error) {
       Toastsucess(error.message);
     }
+ 
   };
 
 

@@ -146,6 +146,6 @@ export function GetAllSupplier() {
     const res = await axios.get(`${API_URL}/supplier/getAllsuplier`);
     return res.data;
   };
-  const { data, error, isLoading } = useQuery("getsupplier", getsupplier);
-  return { data, error, isLoading };
+  const { data, error, isLoading ,refetch} = useQuery("getsupplier", getsupplier);
+  return { data, error, isLoading ,refetch };
 }
