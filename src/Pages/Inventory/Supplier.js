@@ -81,7 +81,8 @@ const Supplier = () => {
   const handleupdatesupplier = async () => {
     try {
       if (!user_id || !description || !address) {
-        Toastsucess("Please enter a barcode.");
+        Toastsucess("Please fill your Details");
+  
         return;
       }
       const productData = await updatesupplierdetails({

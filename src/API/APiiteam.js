@@ -62,3 +62,89 @@ export function GetItemByCode() {
 
   return { itembyitemcode, itembyitemcodeerror, itembyitemcodeisLoading };
 }
+
+{
+  /****************************update Iteam**************************************** */
+}
+export function UpdateIteam() {
+  const updatesupplier = async ({
+    ItemCode,
+    ItemDescription,
+    ItemSupplier,
+    ItemUnit,
+    ItemTax,
+    IteamDiscount,
+    IteamPrice,
+  }) => {
+    const res = await axios.put(
+      `${API_URL}/item/updateitem`,
+      {
+        ItemCode,
+        ItemDescription,
+        ItemSupplier,
+        ItemUnit,
+        ItemTax,
+        IteamDiscount,
+        IteamPrice,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json", // Ensure the content type is JSON
+        },
+      }
+    );
+
+    return res.data;
+  };
+
+  const {
+    mutateAsync: updateitemdetails,
+    error: updateitemerror,
+    isLoading: updateitemisLoading,
+  } = useMutation(updatesupplier, {
+    onError: (error) => {
+      console.error("API error:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.error || error.message);
+    },
+  });
+
+  return {
+    updateitemdetails,
+    updateitemerror,
+    updateitemisLoading,
+  };
+}
+
+
+{
+  /****************************update user**************************************** */
+}
+const deleteItem = async ({ ItemCode}) => {
+  const res = await axios.delete(`${API_URL}/item/deleteitem`, {
+    data: { ItemCode }, // Pass data here for a DELETE request
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return res.data;
+};
+
+export function useDeleteItem() {
+  const {
+    mutateAsync: deleteItemDetails,
+    error: deleteItemDetailsError,
+    isLoading: deleteItemDetailsIsLoading,
+  } = useMutation(deleteItem , {
+    onError: (error) => {
+      console.error("API error:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.error || error.message);
+    },
+  });
+
+  return {
+    deleteItemDetails,
+    deleteItemDetailsError,
+    deleteItemDetailsIsLoading,
+  };
+}

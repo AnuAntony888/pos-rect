@@ -1,29 +1,46 @@
 import {
+  Autocomplete,
   Button,
   FormControl,
   Grid,
   InputLabel,
   MenuItem,
   Select,
+  TextField,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
 import { GetAllSupplier } from "../../API/Apisupplier";
 import Supplier from "./Supplier";
-import { GetItemByCode, useIteamField } from "../../API/APiiteam";
+import { GetItemByCode, UpdateIteam, useDeleteItem, useIteamField } from "../../API/APiiteam";
 
 const IteamManagement = () => {
-  const { data: allsupplier, refetch  } = GetAllSupplier();
+  const { data: allsupplier, refetch } = GetAllSupplier();
   const { InserItem } = useIteamField();
-  const {itembyitemcode } = GetItemByCode();
+  const { itembyitemcode } = GetItemByCode();
+  const { updateitemdetails } = UpdateIteam();
+  const{ deleteItemDetails}=useDeleteItem()
   const [ItemCode, setItemCode] = useState("");
   const [ItemDescription, setItemDescription] = useState("");
-  const [ItemSupplier, setItemSupplier] = useState("");
+  const [ItemSupplier, setItemSupplier] = useState([]);
   const [ItemUnit, setItemUnit] = useState("");
   const [ItemTax, setItemTax] = useState("");
   const [IteamDiscount, setIteamDiscount] = useState("");
   const [IteamPrice, setIteamPrice] = useState("");
+  const [selectedSupplier, setSelectedSupplier] = useState([]);
 
+  console.log(allsupplier, "allsupplier");
+  useEffect(() => {
+    if (allsupplier) {
+      const initialSupplierList = allsupplier.map((supplier) => ({
+        emivalue: supplier.SupplierDescription,
+        eminame: supplier.SupplierDescription,
+      }));
+      setSelectedSupplier(initialSupplierList);
+    }
+  }, [allsupplier]);
+
+  console.log(selectedSupplier, "selectedSupplier");
   const handlesetItemSupplier = (e) => {
     setItemSupplier(e.target.value);
   };
@@ -52,8 +69,6 @@ const IteamManagement = () => {
   useEffect(() => {
     refetch(); // Trigger a refetch if needed
   }, [refetch]); // Dependency array includes refetch
-  
-
 
   const handleinsertItem = async () => {
     if (
@@ -84,17 +99,15 @@ const IteamManagement = () => {
     } catch (error) {
       Toastsucess(error.message);
     }
-    setItemCode('');
-    setIteamDiscount('');
-    setItemTax('');
-    setItemSupplier('');
-    setItemUnit('');
-    setItemDescription('');
-    setIteamPrice('');
-    
-    allsupplier();
+    setItemCode("");
+    setIteamDiscount("");
+    setItemTax("");
+    setItemSupplier("");
+    setItemUnit("");
+    setItemDescription("");
+    setIteamPrice("");
+    refetch();
   };
-
 
   const handlegetItemByItemcode = async () => {
     try {
@@ -103,27 +116,120 @@ const IteamManagement = () => {
         return;
       }
       const productData = await itembyitemcode({ ItemCode });
+      console.log(productData, "prduct");
       setIteamDiscount(productData?.[0]?.IteamDiscount);
       setIteamPrice(productData?.[0]?.IteamPrice);
-      setItemDescription(productData?.[0]?.ItemDescription)
+      setItemDescription(productData?.[0]?.ItemDescription);
       setItemDescription(productData?.[0]?.ItemDescription);
       setItemTax(productData?.[0]?.ItemTax);
       setItemUnit(productData?.[0]?.ItemUnit);
-      setItemSupplier(productData?.[0]?.ItemSupplier);
-      console.log(productData, "consoleget supplier");
+
+      const fetchedSuppliers = productData?.[0]?.ItemSupplier
+        ? JSON.parse(productData?.[0]?.ItemSupplier)
+        : [];
+
+  
+      // Handle empty fetchedSuppliers
+      if (fetchedSuppliers.length === 0) {
+        console.log("No suppliers found.");
+        setItemSupplier("");
+        return;
+      }
+
+      const initialSupplierList = fetchedSuppliers.map((supplier) => ({
+        emivalue: supplier,
+        eminame: supplier,
+      }));
+      setSelectedSupplier(initialSupplierList);
+
+      // console.log(fetchedSuppliers, "fetchedSuppliers");
+
       Toastsucess("Product fetched successfully!", "success", "light");
     } catch (error) {
       Toastsucess(error.message);
     }
+  };
+// console.log(ItemSupplier,selectedSupplier,"itemsupplier")
+  const handleupdatesupplier = async () => {
+    try {
+      if ( !ItemCode ||
+        !ItemDescription ||
+        !selectedSupplier.length || 
+        !ItemUnit ||
+        !ItemTax ||
+        !IteamDiscount ||
+        !IteamPrice
+      ) {
+        Toastsucess("Please fill your Details");
+  
+        return;
+      }
+      
+    // Convert selectedSupplier to the appropriate format
+    const initialSupplierList = selectedSupplier.map((supplier) => supplier.emivalue);
+
+    console.log(initialSupplierList, "initialSupplierList");
+      console.log(initialSupplierList,"initalsupplierlist")
+      const productData = await updateitemdetails({
+
+
+        ItemCode:ItemCode,
+        ItemDescription:ItemDescription,
+        ItemSupplier:initialSupplierList,
+        ItemUnit:ItemUnit,
+        ItemTax:ItemTax,
+        IteamDiscount:IteamDiscount,
+        IteamPrice:IteamPrice,
+      });
+      setIteamDiscount(productData?.ItemDescription);
+      setIteamPrice(productData?.IteamPrice);
+      setItemDescription(productData?.ItemDescription);
+      setItemTax(productData?.ItemTax);
+      setItemUnit(productData?.ItemUnit);
+      setItemSupplier(productData?.ItemSupplier);
+      console.log(productData, "consoleget supplier");
+      Toastsucess(productData?.message, "success", "light");
+
+      refetch();
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+    setItemCode("");
+    setIteamDiscount("");
+    setItemTax("");
+    setItemSupplier("");
+    setItemUnit("");
+    setItemDescription("");
+    setIteamPrice("");
+    refetch();
  
   };
 
+  const handledeletItem = async () => {
+    try {
+      if (!ItemCode) {
+        Toastsucess("Please enter a suppliercode");
+        return;
+      }
 
+      const productData = await deleteItemDetails({ ItemCode });
 
-
-
-
-
+      console.log(productData, "consoleget supplier");
+      Toastsucess(productData?.message, "success", "light");
+  
+  
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+    setItemCode("");
+    setIteamDiscount("");
+    setItemTax("");
+    setItemSupplier("");
+    setItemUnit("");
+    setItemDescription("");
+    setIteamPrice("");
+    // refetch();
+  };
   const Invoice3 = [
     {
       txt: "ItemCode",
@@ -140,12 +246,13 @@ const IteamManagement = () => {
       txt: "Item Supplier",
       value: ItemSupplier,
       onChange: handlesetItemSupplier,
-      datas: allsupplier
-        ? allsupplier.map((supplier) => ({
-            emivalue: supplier.SupplierDescription,
-            eminame: supplier.SupplierDescription,
-          }))
-        : [],
+      datas: selectedSupplier,
+      //   allsupplier
+      // ? allsupplier.map((supplier) => ({
+      //     emivalue: supplier.SupplierDescription,
+      //     eminame: supplier.SupplierDescription,
+      //   }))
+      // : []
     },
     {
       txt: "Item Unit",
@@ -172,14 +279,20 @@ const IteamManagement = () => {
   const Buttons = [
     {
       txt: "Check",
-      onClick:handlegetItemByItemcode
+      onClick: handlegetItemByItemcode,
     },
     {
       txt: "Add",
       onClick: handleinsertItem,
     },
-    { txt: "Remove" },
-    { txt: "Update" },
+    {
+      txt: "Remove",
+      onClick: handledeletItem
+    },
+    {
+      txt: "Update",
+      onClick:handleupdatesupplier
+    },
   ];
 
   return (
@@ -195,7 +308,7 @@ const IteamManagement = () => {
         </Grid>
 
         {Invoice3.map((data, index) => (
-          <Grid item lg={1.28} key={index}>
+          <Grid item lg={3} xs={12} sm={6} md={3} key={index}>
             {index === 2 ? (
               <>
                 <TypographyText
@@ -224,11 +337,12 @@ const IteamManagement = () => {
                       fontSize: ".9rem",
                     }}
                   >
-                    {data.datas.map((datas, index) => (
-                      <MenuItem key={index} value={datas.emivalue}>
-                        {datas.eminame}
-                      </MenuItem>
-                    ))}
+                    {Array.isArray(data.datas) &&
+                      data.datas.map((datas, index) => (
+                        <MenuItem key={index} value={datas.emivalue}>
+                          {datas.eminame}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
               </>
