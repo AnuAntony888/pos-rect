@@ -17,6 +17,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Billing2 from "./Billing2";
+import ItemBilling from "./Billing/ItemBilling";
 
 const Billing = () => {
   const Invoice = [{ txt: "Invoice No" }, { txt: "Invoice Date" }];
@@ -252,8 +253,13 @@ const Billing = () => {
             />{" "}
             <hr />
           </Grid>
-          <Grid xs={12}>
+          {/* <Grid xs={12}>
+
             <Billing2/>
+          </Grid> */}
+          <Grid xs={12}>
+            
+ <ItemBilling/>
           </Grid>
           {/* <Grid item lg={1.5} md={1.5} sm={9} xs={9}>
             <TypographyText

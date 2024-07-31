@@ -9,23 +9,64 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import CarttoAdd from "../Cart/CarttoAdd";
-import { Toastsucess, TypographyText } from "../Reusable";
-import Paper from "@mui/material/Paper";
-import { Singleproduct } from "../API/APIproduct";
-import { useDispatch, useSelector } from "react-redux";
-import { calculateCartTotal, setProducts, setSelectedProduct } from "../Redux/Caruislice";
 
-const Billing2 = () => {
+import Paper from "@mui/material/Paper";
+
+import { useDispatch, useSelector } from "react-redux";
+
+import { Toastsucess, TypographyText } from "../../Reusable";
+
+import { setProducts } from "../../Redux/Caruislice";
+import { GetItemByCode } from "../../API/APiiteam";
+
+const ItemBilling = () => {
+  const [searchBarcode, setSearchBarcode] = useState("");
+  const { itembyitemcode } = GetItemByCode();
+    const [ItemCode, setItemCode] = useState("");
+    const [count, setCount] = useState(1);
+  const handlesetItemCode = (e) => {
+    setItemCode(e.target.value);
+  };
+    const handlesetCount = (e) => {
+     setCount(e.target.value)
+ }
+  const handlegetItemByItemcode = async () => {
+    try {
+      if (!ItemCode) {
+        Toastsucess("Please enter a barcode.");
+        return;
+      }
+      const productData = await itembyitemcode({ ItemCode });
+      //   console.log(productData?.[0], "prduct");
+      setSearchBarcode(productData?.[0]);
+
+      Toastsucess("Product fetched successfully!", "success", "light");
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+  };
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (searchBarcode) {
+      dispatch(setProducts(searchBarcode));
+    }
+  }, [searchBarcode, dispatch]);
+
+  const products = useSelector((state) => state.cartUi.products);
+  console.log(products, "products");
   const ite = [
-    { txt: "Iteam Description" },
-    { txt: "Quantity" },
-    { txt: "Unit" },
-    { txt: "Unit Price" },
-    { txt: "Discount %" },
-    { txt: "Tax %" },
-    { txt: "Total" },
+    {
+      txt: "Item Description",
+      value: products?.ItemDescription || "",
+    },
+    { txt: "Quantity", value: count || "" ,onChange:handlesetCount},
+    { txt: "Unit", value: products?.ItemUnit || "" },
+    { txt: "Unit Price", value: products?.IteamPrice || "" },
+    { txt: "Discount %", value: products?.IteamDiscount || "" },
+    { txt: "Tax %", value: products?.ItemTax || "" },
+    { txt: "Total", value:  count * products?.IteamPrice || "" },
   ];
+
   const selec = [
     { txt: "ID" },
     { txt: "Title" },
@@ -33,52 +74,10 @@ const Billing2 = () => {
     { txt: "Image" },
     { txt: "Action" },
   ];
-
-  const [barcode, setBarcode] = useState("");
-  const [searchBarcode, setSearchBarcode] = useState("");
-  const { singleproduct, singleproducterror, singleproductisLoading } =
-    Singleproduct();
-
-  const handleBarcodeChange = (e) => {
-    setBarcode(e.target.value);
-  };
-  const handleApi = async () => {
-    try {
-      if (!barcode) {
-        Toastsucess("Please enter a barcode.");
-        return;
-      }
-
-      const productData = await singleproduct({ barcode });
-      console.log(productData,"productData")
-      setSearchBarcode(productData); // Store the response data    await singleproduct({ barcode });
-
-      Toastsucess("Product fetched successfully!", "success", "light");
-    } catch (error) {
-      Toastsucess(error.message);
-    }
-  };
-
-
-
-
-  const dispatch = useDispatch();
-
-
-  useEffect(() => {
-    dispatch(setProducts(searchBarcode ));
-  }, [searchBarcode, dispatch]);
-  const products = useSelector((state) => state.cartUi.products);
-  console.log(products,"products")
-  const imge = `http://localhost:5000/${searchBarcode?.images?.[0]
-    .replace(/\\/g, "/")
-    .replace("C:/Users/VBS/Desktop/POS TESTING/Backend/uploads", "uploads")
-    .replace(" ", "%20")}`;
-  // console.log(count, "count");
   return (
     <div>
       <Grid container spacing={2}>
-        <Grid item lg={1.5} md={1.5} sm={9} xs={9}>
+        <Grid item lg={2} md={3} sm={9} xs={9}>
           <TypographyText
             Typography={"Item Code"}
             textAlign="left"
@@ -87,9 +86,8 @@ const Billing2 = () => {
 
           <input
             type="text"
-            //   placeholder="Enter Barcode"
-            value={barcode}
-            onChange={handleBarcodeChange}
+            value={ItemCode}
+            onChange={handlesetItemCode}
             required
             style={{
               height: "35px",
@@ -114,7 +112,7 @@ const Billing2 = () => {
             }}
             onClick={(e) => {
               e.preventDefault();
-              handleApi();
+              handlegetItemByItemcode();
             }}
           >
             check
@@ -123,7 +121,7 @@ const Billing2 = () => {
 
         {ite.map((data, index) => (
           <>
-            <Grid item lg={index === 0 ? 1.5 : 1} md={1.5} sm={9} xs={9}>
+            <Grid item lg={3} md={3} sm={4} xs={4}>
               <TypographyText
                 Typography={data.txt}
                 textAlign="left"
@@ -131,10 +129,8 @@ const Billing2 = () => {
               />
 
               <input
-                //   type={data.type}
-                //   name={data.name}
-                //   value={data.value}
-                //   onChange={data.onChange}
+                value={data.value}
+                onChange={data.onChange}
                 required
                 style={{
                   height: "35px",
@@ -162,7 +158,7 @@ const Billing2 = () => {
             }}
             onClick={""}
           >
-            check
+            Add
           </Button>
         </Grid>
 
@@ -181,7 +177,7 @@ const Billing2 = () => {
             }}
             onClick={""}
           >
-            check
+           Remove
           </Button>
         </Grid>
 
@@ -202,7 +198,7 @@ const Billing2 = () => {
               </TableHead>
               <TableBody>
                 <TableRow>
-                <TableCell component="th" scope="row">
+                  {/* <TableCell component="th" scope="row">
                 {products.Product_id}
                   </TableCell>
                   <TableCell component="th" scope="row">
@@ -213,18 +209,11 @@ const Billing2 = () => {
                   </TableCell>
                   <TableCell component="th" scope="row">
                     {products.unit_price}
-                  </TableCell>
+                  </TableCell> */}
+                  <TableCell component="th" scope="row"></TableCell>
                   <TableCell component="th" scope="row">
-                    <img
-                      src={imge}
-                      alt={products.name}
-                      style={{ width: "100px" }}
-                    />
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    <CarttoAdd productId={products.Product_id} searchBarcode={products}
-                      count={products?.cartCount || 1 } />
-                   
+                    {/* <CarttoAdd productId={products.Product_id} searchBarcode={products}
+                      count={products?.cartCount || 1 } /> */}
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -236,4 +225,4 @@ const Billing2 = () => {
   );
 };
 
-export default Billing2;
+export default ItemBilling;
