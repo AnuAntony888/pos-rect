@@ -74,7 +74,7 @@ export function UpdateIteam() {
     ItemUnit,
     ItemTax,
     IteamDiscount,
-    IteamPrice,
+    IteamPrice,Iteamstock
   }) => {
     const res = await axios.put(
       `${API_URL}/item/updateitem`,
@@ -85,7 +85,7 @@ export function UpdateIteam() {
         ItemUnit,
         ItemTax,
         IteamDiscount,
-        IteamPrice,
+        IteamPrice,Iteamstock
       },
       {
         headers: {

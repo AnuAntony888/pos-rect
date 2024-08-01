@@ -28,7 +28,7 @@ const IteamManagement = () => {
   const [IteamDiscount, setIteamDiscount] = useState("");
   const [IteamPrice, setIteamPrice] = useState("");
   const [selectedSupplier, setSelectedSupplier] = useState([]);
-
+  const [Iteamstock, setIteamstock] = useState('');
   console.log(allsupplier, "allsupplier");
   useEffect(() => {
     if (allsupplier) {
@@ -65,7 +65,9 @@ const IteamManagement = () => {
   const handlesetIteamPrice = (e) => {
     setIteamPrice(e.target.value);
   };
-
+  const handlIteamstock = (e) => {
+    setIteamstock(e.target.value);
+}
   useEffect(() => {
     refetch(); // Trigger a refetch if needed
   }, [refetch]); // Dependency array includes refetch
@@ -78,7 +80,7 @@ const IteamManagement = () => {
       !ItemUnit ||
       !ItemTax ||
       !IteamDiscount ||
-      !IteamPrice
+      !IteamPrice || !Iteamstock
     ) {
       Toastsucess("Please fill your Details");
       return;
@@ -93,6 +95,7 @@ const IteamManagement = () => {
       formData.append("ItemTax", ItemTax);
       formData.append("IteamDiscount", IteamDiscount);
       formData.append("IteamPrice", IteamPrice);
+      formData.append("Iteamstock",Iteamstock)
 
       const response = await InserItem(formData);
       Toastsucess(response.message, "success", "light");
@@ -106,6 +109,7 @@ const IteamManagement = () => {
     setItemUnit("");
     setItemDescription("");
     setIteamPrice("");
+    setIteamstock("")
     refetch();
   };
 
@@ -123,6 +127,7 @@ const IteamManagement = () => {
       setItemDescription(productData?.[0]?.ItemDescription);
       setItemTax(productData?.[0]?.ItemTax);
       setItemUnit(productData?.[0]?.ItemUnit);
+      setIteamstock(productData?.[0]?.Iteamstock)
 
       const fetchedSuppliers = productData?.[0]?.ItemSupplier
         ? JSON.parse(productData?.[0]?.ItemSupplier)
@@ -149,7 +154,7 @@ const IteamManagement = () => {
       Toastsucess(error.message);
     }
   };
-// console.log(ItemSupplier,selectedSupplier,"itemsupplier")
+console.log(Iteamstock,selectedSupplier,"itemsupplier")
   const handleupdatesupplier = async () => {
     try {
       if ( !ItemCode ||
@@ -158,7 +163,8 @@ const IteamManagement = () => {
         !ItemUnit ||
         !ItemTax ||
         !IteamDiscount ||
-        !IteamPrice
+        !IteamPrice ||
+        !Iteamstock
       ) {
         Toastsucess("Please fill your Details");
   
@@ -169,17 +175,16 @@ const IteamManagement = () => {
     const initialSupplierList = selectedSupplier.map((supplier) => supplier.emivalue);
 
     console.log(initialSupplierList, "initialSupplierList");
-      console.log(initialSupplierList,"initalsupplierlist")
+      // console.log(initialSupplierList,Iteamstock,"initalsupplierlist")
       const productData = await updateitemdetails({
-
-
         ItemCode:ItemCode,
         ItemDescription:ItemDescription,
         ItemSupplier:initialSupplierList,
         ItemUnit:ItemUnit,
         ItemTax:ItemTax,
         IteamDiscount:IteamDiscount,
-        IteamPrice:IteamPrice,
+        IteamPrice: IteamPrice,
+        Iteamstock:Iteamstock
       });
       setIteamDiscount(productData?.ItemDescription);
       setIteamPrice(productData?.IteamPrice);
@@ -187,6 +192,7 @@ const IteamManagement = () => {
       setItemTax(productData?.ItemTax);
       setItemUnit(productData?.ItemUnit);
       setItemSupplier(productData?.ItemSupplier);
+      setIteamstock(productData?.Iteamstock);
       console.log(productData, "consoleget supplier");
       Toastsucess(productData?.message, "success", "light");
 
@@ -201,6 +207,7 @@ const IteamManagement = () => {
     setItemUnit("");
     setItemDescription("");
     setIteamPrice("");
+    setIteamstock("")
     refetch();
  
   };
@@ -274,6 +281,11 @@ const IteamManagement = () => {
       value: IteamPrice,
       onChange: handlesetIteamPrice,
     },
+    {
+      txt: "Iteam Stock",
+      value: Iteamstock,
+      onChange:handlIteamstock
+    }
   ];
 
   const Buttons = [

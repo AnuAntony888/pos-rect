@@ -16,8 +16,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Toastsucess, TypographyText } from "../../Reusable";
 
-import { setProducts } from "../../Redux/Caruislice";
+import { addToCart, setProducts } from "../../Redux/Caruislice";
 import { GetItemByCode } from "../../API/APiiteam";
+import Itemaddtocart from "./Itemaddtocart";
 
 const ItemBilling = () => {
   const [searchBarcode, setSearchBarcode] = useState("");
@@ -53,6 +54,7 @@ const ItemBilling = () => {
   }, [searchBarcode, dispatch]);
 
   const products = useSelector((state) => state.cartUi.products);
+
   console.log(products, "products");
   const ite = [
     {
@@ -64,6 +66,7 @@ const ItemBilling = () => {
     { txt: "Unit Price", value: products?.IteamPrice || "" },
     { txt: "Discount %", value: products?.IteamDiscount || "" },
     { txt: "Tax %", value: products?.ItemTax || "" },
+    { txt: "Stock", value: products?.Iteamstock || "" },
     { txt: "Total", value:  count * products?.IteamPrice || "" },
   ];
 
@@ -74,6 +77,8 @@ const ItemBilling = () => {
     { txt: "Image" },
     { txt: "Action" },
   ];
+ 
+
   return (
     <div>
       <Grid container spacing={2}>
@@ -145,21 +150,7 @@ const ItemBilling = () => {
 
         <Grid item lg={1} md={1} sm={3} xs={3}>
           <p></p>{" "}
-          <Button
-            variant="contained"
-            type="submit"
-            sx={{
-              bgcolor: "darkgreen",
-              color: "#fff",
-              textAlign: "left",
-              width: "100%",
-              textTransform: "capitalize",
-              margin: "auto",
-            }}
-            onClick={""}
-          >
-            Add
-          </Button>
+          <Itemaddtocart count={count} />
         </Grid>
 
         <Grid item lg={1} md={1} sm={3} xs={3}>
