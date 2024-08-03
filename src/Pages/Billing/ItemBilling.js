@@ -23,14 +23,23 @@ import Itemaddtocart from "./Itemaddtocart";
 const ItemBilling = () => {
   const [searchBarcode, setSearchBarcode] = useState("");
   const { itembyitemcode } = GetItemByCode();
-    const [ItemCode, setItemCode] = useState("");
-    const [count, setCount] = useState(1);
+  const [ItemCode, setItemCode] = useState("");
+  const { cart_items, product_item ,cartTotalAmount } = useSelector((state) => state.cartUi);
+  // const cartTotalAmount = useSelector((state) => state.cartUi.cartTotalAmount);
+  const [count, setCount] = useState(product_item);
+  const products = useSelector((state) => state.cartUi.products);
   const handlesetItemCode = (e) => {
     setItemCode(e.target.value);
   };
-    const handlesetCount = (e) => {
-     setCount(e.target.value)
- }
+  const handlesetCount = (e) => {
+    const inputValue = e.target.value;
+    if (inputValue > products?.Iteamstock) {
+      Toastsucess("Product Quantity is Larger than Stock");
+    }
+    setCount(inputValue);
+  };
+
+  console.log(products, "products");
   const handlegetItemByItemcode = async () => {
     try {
       if (!ItemCode) {
@@ -53,32 +62,47 @@ const ItemBilling = () => {
     }
   }, [searchBarcode, dispatch]);
 
-  const products = useSelector((state) => state.cartUi.products);
+  const Total = () => {
+    if (products?.IteamDiscount > 0) {
+      return count * products?.IteamDiscount;
+    } else {
+      return count * products?.IteamPrice || "";
+    }
+  };
 
-  console.log(products, "products");
   const ite = [
     {
       txt: "Item Description",
       value: products?.ItemDescription || "",
     },
-    { txt: "Quantity", value: count || "" ,onChange:handlesetCount},
+    { txt: "Quantity", value: count || "", onChange: handlesetCount },
     { txt: "Unit", value: products?.ItemUnit || "" },
     { txt: "Unit Price", value: products?.IteamPrice || "" },
     { txt: "Discount %", value: products?.IteamDiscount || "" },
     { txt: "Tax %", value: products?.ItemTax || "" },
     { txt: "Stock", value: products?.Iteamstock || "" },
-    { txt: "Total", value:  count * products?.IteamPrice || "" },
+    { txt: "Total", value: Total() },
   ];
 
   const selec = [
-    { txt: "ID" },
-    { txt: "Title" },
-    { txt: "Price" },
-    { txt: "Image" },
-    { txt: "Action" },
+    { txt: "Item Code" },
+    { txt: "Item Description" },
+    { txt: "Quantity" },
+    { txt: "Unit" },
+    { txt: "Unit Price" },
+    {txt: "Discount %",},
+    { txt: "Tax %", },
+    { txt: "Stock", },
+    {txt: 'Remove Item'}
   ];
- 
 
+  const handleRemove = () => {
+    setItemCode("");
+    setCount(1);
+
+    dispatch(setProducts({})); // Reset the product details
+    Toastsucess("Fields reset successfully!", "success", "light");
+  };
   return (
     <div>
       <Grid container spacing={2}>
@@ -150,7 +174,11 @@ const ItemBilling = () => {
 
         <Grid item lg={1} md={1} sm={3} xs={3}>
           <p></p>{" "}
-          <Itemaddtocart count={count} />
+          <Itemaddtocart
+            count={count}
+            product_id={products.product_id}
+            setCount={setCount}
+          />
         </Grid>
 
         <Grid item lg={1} md={1} sm={3} xs={3}>
@@ -166,12 +194,14 @@ const ItemBilling = () => {
               textTransform: "capitalize",
               margin: "auto",
             }}
-            onClick={""}
+            onClick={handleRemove}
           >
-           Remove
+            Remove
           </Button>
         </Grid>
-
+        <Grid item xs={12}>
+          {cartTotalAmount}
+        </Grid>
         <Grid item xs={12}>
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="caption table">
@@ -188,25 +218,37 @@ const ItemBilling = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow>
-                  {/* <TableCell component="th" scope="row">
-                {products.Product_id}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {products.name}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {products.description}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {products.unit_price}
-                  </TableCell> */}
-                  <TableCell component="th" scope="row"></TableCell>
-                  <TableCell component="th" scope="row">
-                    {/* <CarttoAdd productId={products.Product_id} searchBarcode={products}
-                      count={products?.cartCount || 1 } /> */}
-                  </TableCell>
-                </TableRow>
+                {cart_items.map((data) => (
+                  <TableRow key={data.product_id}>
+                    <TableCell component="th" scope="row">
+                      {data.ItemCode}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {data.ItemDescription}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {data.cartCount}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {data.ItemUnit}
+                    </TableCell>
+              
+                    <TableCell component="th" scope="row">
+                      {data.IteamPrice}
+                    </TableCell>  <TableCell component="th" scope="row">
+                      {data.IteamDiscount}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {data.Iteamstock}
+                    </TableCell>               
+                   
+                    <TableCell component="th" scope="row">
+                      {data.ItemTax}
+                    </TableCell>
+             
+                
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>

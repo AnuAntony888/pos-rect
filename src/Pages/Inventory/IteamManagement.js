@@ -183,7 +183,7 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
         ItemUnit:ItemUnit,
         ItemTax:ItemTax,
         IteamDiscount:IteamDiscount,
-        IteamPrice: IteamPrice,
+        IteamPrice:IteamPrice,
         Iteamstock:Iteamstock
       });
       setIteamDiscount(productData?.ItemDescription);

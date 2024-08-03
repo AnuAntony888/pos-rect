@@ -1,4 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { Toastsucess } from "../Reusable";
+import { json } from "react-router-dom";
 
 const initialState = {
   cart_items: localStorage.getItem("produt_items")
@@ -21,27 +23,29 @@ const Caruislice = createSlice({
     setSelectedProduct: (state, action) => {
       state.selectedProduct = action.payload;
     },
+
     addToCart: (state, action) => {
-      const itemInCart = state.cart_items.some(
-        (item) => item.id === action.payload.id
+      const { product_id, cartCount } = action.payload;
+      const itemInCart = state.cart_items.find(
+        (item) => item.product_id === product_id
       );
 
       if (itemInCart) {
-        const item = state.cart_items.find(
-          (item) => item.id === action.payload.id
-        );
-        if (state.product_item) {
-          item.cartCount = item.cartCount + state.product_item;
-        } else if (item.quantity_label !== item.cartCount) {
-          item.cartCount++;
+        const newCartCount = +itemInCart.cartCount + cartCount;
+
+        if (newCartCount > itemInCart.Iteamstock) {
+          // Prevent adding more than stock available
+          Toastsucess("Quantity exceeds stock limit.");
+          return;
         }
+        itemInCart.cartCount = newCartCount;
       } else {
         state.cart_items.push({
           ...action.payload,
-           cartCount: action.payload.cartCount || 1
+
+          cartCount: +cartCount || 1,
         });
       }
-
       localStorage.setItem("produt_items", JSON.stringify(state.cart_items));
     },
     increaseCart: (state, action) => {
@@ -69,11 +73,10 @@ const Caruislice = createSlice({
       localStorage.setItem("produt_items", JSON.stringify(state.cart_items));
     },
     increaseProduct: (state, action) => {
-      console.log(action.payload, "list")
-       state.products=action.payload.products
-     
+      console.log(action.payload, "list");
+      state.products = action.payload.products;
     },
- 
+
     decreaseProduct: (state) => {
       if (state.product_item > 1) {
         state.product_item--;
@@ -88,14 +91,29 @@ const Caruislice = createSlice({
       );
       localStorage.setItem("produt_items", JSON.stringify(state.cart_items));
     },
+
     calculateCartTotal: (state) => {
       const cartTotal = state.cart_items.reduce((total, item) => {
-        return total + item.price * item.cartCount;
+        // Calculate the item total based on discount or price
+        const itemTotal = item.IteamDiscount > 0
+          ? item.IteamDiscount * item.cartCount
+          : item.IteamPrice * item.cartCount;
+    
+        // Accumulate the total
+        return total + itemTotal;
       }, 0);
+    
+      // Update the cartTotalAmount in the state
       state.cartTotalAmount = cartTotal;
+    
+      // Update localStorage
+      if (cartTotal !== 0) {
+        localStorage.setItem("cartTotal", JSON.stringify(cartTotal));
+      } else {
+        localStorage.removeItem("cartTotal");
+      }
     },
-   
-  }    
+  },
 });
 
 export const {

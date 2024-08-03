@@ -20,6 +20,12 @@ import Billing2 from "./Billing2";
 import ItemBilling from "./Billing/ItemBilling";
 
 const Billing = () => {
+  const dispatch = useDispatch();
+  const { cart_items,  } = useSelector((state) => state.cartUi);
+  const cartTotalAmount = useSelector((state) => state.cartUi.cartTotalAmount);
+  useEffect(() => {
+    dispatch(calculateCartTotal());
+  }, [cart_items]);
   const Invoice = [{ txt: "Invoice No" }, { txt: "Invoice Date" }];
   const Customer = [
     {
@@ -53,64 +59,71 @@ const Billing = () => {
     { txt: "Tax %" },
     { txt: "Total" },
   ];
-  const dispatch = useDispatch();
-  const products = useSelector((state) => state.cartUi.products);
-  const selectedProduct = useSelector((state) => state.cartUi.selectedProduct);
-  const cartTotalAmount = useSelector((state) => state.cartUi.cartTotalAmount);
-  const cartItems = useSelector((state) => state.cartUi.cart_items);
-  const [searchBarcode, setSearchBarcode] = useState("");
-  const [result, setResult] = useState("");
-  const [showVideoFeed, setShowVideoFeed] = useState(true);
-  const { ref } = useZxing({
-    onDecodeResult(result) {
-      setResult(result.getText());
-      setShowVideoFeed(false);
-      setSearchBarcode(result.getText()); // Automatically search when barcode is scanned
-    },
-  });
+  const last = [
+    { txt: "Discount %" },
+    { txt: "Total", value:  cartTotalAmount
+},
+    { txt: "Net Amount" },
+    { txt: "Empolyee" },
+  ];
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get("https://dummyjson.com/products");
-        dispatch(setProducts(response.data.products));
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
+  // const products = useSelector((state) => state.cartUi.products);
+  // const selectedProduct = useSelector((state) => state.cartUi.selectedProduct);
 
-    fetchProducts();
-  }, [dispatch]);
-  useEffect(() => {
-    if (searchBarcode) {
-      const product = products.find(
-        (product) => product.meta.barcode === searchBarcode
-      );
-      dispatch(setSelectedProduct(product ? product.id : null));
-    } else if (result) {
-      const product = products.find(
-        (product) => product.meta.barcode === result
-      );
-      dispatch(setSelectedProduct(product ? product.id : null));
-    }
-  }, [searchBarcode, products, result, dispatch]);
+  // const cartItems = useSelector((state) => state.cartUi.cart_items);
+  // const [searchBarcode, setSearchBarcode] = useState("");
+  // const [result, setResult] = useState("");
+  // const [showVideoFeed, setShowVideoFeed] = useState(true);
+  // const { ref } = useZxing({
+  //   onDecodeResult(result) {
+  //     setResult(result.getText());
+  //     setShowVideoFeed(false);
+  //     setSearchBarcode(result.getText()); // Automatically search when barcode is scanned
+  //   },
+  // });
 
-  const handleSearch = () => {
-    const product = products.find(
-      (product) =>
-        product.meta.barcode.toLowerCase() ===
-        searchBarcode.trim().toLowerCase()
-    );
-    dispatch(setSelectedProduct(product ? product.id : null));
-  };
-  useEffect(() => {
-    dispatch(calculateCartTotal());
-  }, [dispatch, cartItems]);
-  const selectedProductDetails = selectedProduct
-    ? products.find((product) => product.id === selectedProduct)
-    : null;
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const response = await axios.get("https://dummyjson.com/products");
+  //       dispatch(setProducts(response.data.products));
+  //     } catch (error) {
+  //       console.error("Error fetching products:", error);
+  //     }
+  //   };
 
-  console.log(selectedProductDetails, "selectedProductDetails");
+  //   fetchProducts();
+  // }, [dispatch]);
+  // useEffect(() => {
+  //   if (searchBarcode) {
+  //     const product = products.find(
+  //       (product) => product.meta.barcode === searchBarcode
+  //     );
+  //     dispatch(setSelectedProduct(product ? product.id : null));
+  //   } else if (result) {
+  //     const product = products.find(
+  //       (product) => product.meta.barcode === result
+  //     );
+  //     dispatch(setSelectedProduct(product ? product.id : null));
+  //   }
+  // }, [searchBarcode, products, result, dispatch]);
+
+  // const handleSearch = () => {
+  //   const product = products.find(
+  //     (product) =>
+  //       product.meta.barcode.toLowerCase() ===
+  //       searchBarcode.trim().toLowerCase()
+  //   );
+  //   dispatch(setSelectedProduct(product ? product.id : null));
+  // };
+  // useEffect(() => {
+  //   dispatch(calculateCartTotal());
+  // }, [dispatch, cartItems]);
+  // const selectedProductDetails = selectedProduct
+  //   ? products.find((product) => product.id === selectedProduct)
+  //   : null;
+
+  // console.log(selectedProductDetails, "selectedProductDetails");
 
   const selec = [
     { txt: "ID" },
@@ -415,7 +428,7 @@ const Billing = () => {
                   <input
                     //   type={data.type}
                     //   name={data.name}
-                    //   value={data.value}
+                      value={data.value}
                     //   onChange={data.onChange}
                     required
                     style={{
@@ -520,12 +533,7 @@ const Billing = () => {
 };
 
 export default Billing;
-const last = [
-  { txt: "Discount %" },
-  { txt: "Total" },
-  { txt: "Net Amount" },
-  { txt: "Empolyee" },
-];
+
 
 const last2 = [
   { txt: "Tax %" },
