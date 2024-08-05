@@ -9,23 +9,23 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-
+import DeleteIcon from '@mui/icons-material/Delete';
 import Paper from "@mui/material/Paper";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import { Toastsucess, TypographyText } from "../../Reusable";
-
-import { addToCart, setProducts } from "../../Redux/Caruislice";
+import {  calculateCartTotal, decreaseCart, increaseCart, removeProductFromCart, setProducts } from "../../Redux/Caruislice";
 import { GetItemByCode } from "../../API/APiiteam";
 import Itemaddtocart from "./Itemaddtocart";
-
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 const ItemBilling = () => {
   const [searchBarcode, setSearchBarcode] = useState("");
   const { itembyitemcode } = GetItemByCode();
   const [ItemCode, setItemCode] = useState("");
-  const { cart_items, product_item ,cartTotalAmount } = useSelector((state) => state.cartUi);
-  // const cartTotalAmount = useSelector((state) => state.cartUi.cartTotalAmount);
+  const { cart_items, product_item, } = useSelector(
+    (state) => state.cartUi
+  );
+ 
   const [count, setCount] = useState(product_item);
   const products = useSelector((state) => state.cartUi.products);
   const handlesetItemCode = (e) => {
@@ -70,6 +70,10 @@ const ItemBilling = () => {
     }
   };
 
+  const cartTotalAmount = useSelector((state) => state.cartUi.cartTotalAmount);
+  useEffect(() => {
+    dispatch(calculateCartTotal());
+  }, [cart_items]);
   const ite = [
     {
       txt: "Item Description",
@@ -90,10 +94,12 @@ const ItemBilling = () => {
     { txt: "Quantity" },
     { txt: "Unit" },
     { txt: "Unit Price" },
-    {txt: "Discount %",},
-    { txt: "Tax %", },
-    { txt: "Stock", },
-    {txt: 'Remove Item'}
+    { txt: "Discount %" },
+    { txt: "Tax %" },
+    { txt: "Stock" },
+    {txt:'Add Item'},
+    { txt: "Remove Item" },
+    { txt: "Clear Item" },
   ];
 
   const handleRemove = () => {
@@ -102,6 +108,20 @@ const ItemBilling = () => {
 
     dispatch(setProducts({})); // Reset the product details
     Toastsucess("Fields reset successfully!", "success", "light");
+  };
+  const handleRemoveId = (product_id) => {
+    dispatch(removeProductFromCart({ product_id }));
+    dispatch(calculateCartTotal());
+  };
+
+  const handleIncrease = (product_id) => {
+    dispatch(increaseCart({ product_id }));
+    dispatch(calculateCartTotal());
+  };
+
+  const handleDecrease = (product_id) => {
+    dispatch(decreaseCart({ product_id }));
+    dispatch(calculateCartTotal());
   };
   return (
     <div>
@@ -218,6 +238,7 @@ const ItemBilling = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
+
                 {cart_items.map((data) => (
                   <TableRow key={data.product_id}>
                     <TableCell component="th" scope="row">
@@ -232,21 +253,32 @@ const ItemBilling = () => {
                     <TableCell component="th" scope="row">
                       {data.ItemUnit}
                     </TableCell>
-              
                     <TableCell component="th" scope="row">
                       {data.IteamPrice}
-                    </TableCell>  <TableCell component="th" scope="row">
+                    </TableCell>{" "}
+                    <TableCell component="th" scope="row">
                       {data.IteamDiscount}
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.Iteamstock}
-                    </TableCell>               
-                   
+                
                     <TableCell component="th" scope="row">
                       {data.ItemTax}
                     </TableCell>
-             
-                
+                    <TableCell component="th" scope="row">
+                      {data.Iteamstock}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      <button onClick={() => handleIncrease(data.product_id)}>
+                        <AddCircleIcon/>
+                    </button>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      <button onClick={() => handleDecrease(data.product_id)}>
+                        <RemoveCircleIcon/>
+                    </button>
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                    <button onClick={() => handleRemoveId(data.product_id)}><DeleteIcon/></button>
+                      </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

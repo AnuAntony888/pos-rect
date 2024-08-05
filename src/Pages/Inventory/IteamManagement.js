@@ -99,17 +99,18 @@ const IteamManagement = () => {
 
       const response = await InserItem(formData);
       Toastsucess(response.message, "success", "light");
+      setItemCode("");
+      setIteamDiscount("");
+      setItemTax("");
+      setItemSupplier("");
+      setItemUnit("");
+      setItemDescription("");
+      setIteamPrice("");
+      setIteamstock("")
     } catch (error) {
       Toastsucess(error.message);
     }
-    setItemCode("");
-    setIteamDiscount("");
-    setItemTax("");
-    setItemSupplier("");
-    setItemUnit("");
-    setItemDescription("");
-    setIteamPrice("");
-    setIteamstock("")
+
     refetch();
   };
 

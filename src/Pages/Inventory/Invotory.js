@@ -15,7 +15,7 @@ const Invotory = () => {
     const Invoice2 = [
         { txt: "Category Code" },
         { txt: "Category Description" },
-        // {  },
+    
     ];
 
   return (
