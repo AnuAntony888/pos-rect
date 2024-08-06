@@ -1,6 +1,6 @@
 import { Box, Button, Grid } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { TypographyText } from "../Reusable";
+import { Toastsucess, TypographyText } from "../Reusable";
 import { useDispatch, useSelector } from "react-redux";
 import { useZxing } from "react-zxing";
 import axios from "axios";
@@ -18,6 +18,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Billing2 from "./Billing2";
 import ItemBilling from "./Billing/ItemBilling";
+import { useCustomerField } from "../API/APICustomer";
+
 
 const Billing = () => {
   const dispatch = useDispatch();
@@ -27,57 +29,131 @@ const Billing = () => {
     dispatch(calculateCartTotal());
   }, [cart_items]);
   const today = new Date();
-   const day = today.getDate();
-   const month = today.getMonth() + 1; 
+  const day = today.getDate();
+  const month = today.getMonth() + 1;
   const year = today.getFullYear();
   const formattedDate = `${day} / ${month} / ${year}`;
-
-
 
   const generateInvoiceNumber = () => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const day = String(today.getDate()).padStart(2, "0");
     const randomPart = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit number
-  
+
     return `INV-${year}${month}${day}-${randomPart}`;
   };
 
-  const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [invoiceNumber, setInvoiceNumber] = useState("");
 
   useEffect(() => {
     setInvoiceNumber(generateInvoiceNumber());
   }, []);
+  const { InserCustomer } = useCustomerField(); 
+  const [customerName, setcustomerName] = useState("");
+  const [customerContactNo, setcustomerContactNo] = useState("");
+  const [customerTownCity, setcustomerTownCity] = useState("");
+  const [customerPin, setcustomerPin] = useState("");
+  const [customerGSTN, setcustomerGSTN] = useState("");
+  const [customerAddress, setcustomerAddress] = useState("");
 
-  const Invoice = [{
-    txt: "Invoice No",
-    value:invoiceNumber
-  }, {
-    txt: "Invoice Date",
-    value:formattedDate
-  }];
+  const handlecustomerName = (e) => {
+    setcustomerName(e.target.value);
+  };
+
+  const handlecustomerContactNo = (e) => {
+    setcustomerContactNo(e.target.value);
+  };
+  const handlecustomerTownCity = (e) => {
+    setcustomerTownCity(e.target.value);
+  };
+  const handlecustomerPin = (e) => {
+    setcustomerPin(e.target.value);
+  };
+  const handlecustomerGSTN = (e) => {
+    setcustomerGSTN(e.target.value);
+  };
+  const handlecustomerAddress = (e) => {
+    setcustomerAddress(e.target.value);
+  };
+
+  const handleinsertcustomer = async () => {
+    if (
+      !customerName ||
+      !customerContactNo ||
+      !customerTownCity ||
+      !customerPin ||
+      !customerGSTN ||
+      !customerAddress
+    ) {
+      Toastsucess("Please fill Customer Details");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+
+      formData.append("customerName",customerName);
+      formData.append("customerContactNo", customerContactNo);
+      formData.append("customerTownCity", customerTownCity);
+      formData.append("customerPin", customerPin);
+      formData.append("customerGSTN", customerGSTN);
+      formData.append("customerAddress",customerAddress);
+
+      const response = await InserCustomer(formData);
+      // console.log(response.message, "response");
+      Toastsucess(response.message, "sucess", "light");
+      setcustomerAddress('');
+      setcustomerContactNo('');
+      setcustomerName('');
+      setcustomerPin('');
+      setcustomerTownCity('');
+      setcustomerGSTN('');
+
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+  };
+
+  const Invoice = [
+    {
+      txt: "Invoice No",
+      value: invoiceNumber,
+    },
+    {
+      txt: "Invoice Date",
+      value: formattedDate,
+    },
+  ];
   const Customer = [
     {
       txt: "Customer Name",
-      name: "customername",
       type: "text",
+      value: customerName,
+      onChange:handlecustomerName
     },
     {
       txt: "Customer Contact No",
-      name: "customername",
+      value: customerContactNo,
+onChange:handlecustomerContactNo,
       type: "text",
     },
   ];
   const Customeraddress = [
     {
       txt: "Town/City",
+      value: customerTownCity,
+      onChange:handlecustomerTownCity,
     },
     {
       txt: "PIN",
+      value: customerPin,
+      onChange:handlecustomerPin
     },
     {
       txt: "Customer GSTN",
+      value: customerGSTN,
+      onChange:handlecustomerGSTN
     },
   ];
   const ite = [
@@ -103,7 +179,17 @@ const Billing = () => {
     { txt: "Image" },
     { txt: "Action" },
   ];
-
+  const lastbutton = [
+    {
+      text: "Save",
+      onClick:handleinsertcustomer
+    },
+    { text: "Print" },
+    { text: "Cancel" },
+    { text: "Find" },
+    { text: "New" },
+    { text: "Exit" },
+  ];
   return (
     <div>
       <Box
@@ -159,7 +245,7 @@ const Billing = () => {
                     //   type={data.type}
                     //   name={data.name}
                     value={data.value}
-                    //   onChange={data.onChange}
+                     onChange={data.onChange}
                     required
                     style={{
                       height: "35px",
@@ -198,8 +284,8 @@ const Billing = () => {
                   <input
                     //   type={data.type}
                     //   name={data.name}
-                    //   value={data.value}
-                    //   onChange={data.onChange}
+                    value={data.value}
+                     onChange={data.onChange}
                     required
                     style={{
                       height: "35px",
@@ -226,7 +312,10 @@ const Billing = () => {
                 border: "none",
                 width: "100%",
                 backgroundColor: "#F7F7F7",
+
               }}
+              onChange={handlecustomerAddress}
+              value={customerAddress}
             />
           </Grid>
           {/*********************section 3************************ */}
@@ -359,6 +448,7 @@ const Billing = () => {
                       pt: "25px",
                       pb: "25px",
                     }}
+                    onClick={data.onClick}
                   >
                     {data.text}
                   </Button>
@@ -381,11 +471,4 @@ const last2 = [
 
   { txt: "Remark" },
 ];
-const lastbutton = [
-  { text: "Save" },
-  { text: "Print" },
-  { text: "Cancel" },
-  { text: "Find" },
-  { text: "New" },
-  { text: "Exit" },
-];
+

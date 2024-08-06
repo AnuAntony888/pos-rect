@@ -39,10 +39,10 @@ export function useSupplierField() {
 }
 
 export function Getsupplier() {
-  const getsupplierdisply = async ({ user_id }) => {
+  const getsupplierdisply = async ({SupplierCode }) => {
     const res = await axios.post(
       `${API_URL}/supplier/getsuplier`,
-      { user_id },
+      { SupplierCode },
       {
         headers: {
           "Content-Type": "application/json", // Ensure the content type is JSON
@@ -72,13 +72,13 @@ export function Getsupplier() {
 }
 export function Updatesupplier() {
   const updatesupplier = async ({
-    user_id,
+    SupplierCode,
     SupplierAddress,
     SupplierDescription,
   }) => {
     const res = await axios.put(
       `${API_URL}/supplier/updatesuplier`,
-      { user_id, SupplierDescription, SupplierAddress },
+      { SupplierCode, SupplierDescription, SupplierAddress },
       {
         headers: {
           "Content-Type": "application/json", // Ensure the content type is JSON
@@ -110,9 +110,9 @@ export function Updatesupplier() {
 {
   /****************************update user**************************************** */
 }
-const deleteSupplier = async ({ user_id }) => {
+const deleteSupplier = async ({ SupplierCode }) => {
   const res = await axios.delete(`${API_URL}/supplier/deletesuplier`, {
-    data: { user_id }, // Pass data here for a DELETE request
+    data: { SupplierCode }, // Pass data here for a DELETE request
     headers: {
       "Content-Type": "application/json",
     },

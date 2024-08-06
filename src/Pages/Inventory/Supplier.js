@@ -11,6 +11,7 @@ import {
 
 const Supplier = () => {
   const [user_id, setUserId] = useState("");
+  const [SupplierCode, setSupplierCode] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
 
@@ -28,6 +29,10 @@ const Supplier = () => {
   const handlesetUserId = (e) => {
     setUserId(e.target.value);
   };
+  const handlesetSupplierCode = (e) => {
+    setSupplierCode(e.target.value);
+  };
+
 
   // Using GetAllSupplier hook
   const { data: allsupplier, refetch, isLoading } = GetAllSupplier();
@@ -62,17 +67,17 @@ const Supplier = () => {
 
   const handlegetsupplier = async () => {
     try {
-      if (!user_id) {
+      if (!SupplierCode) {
         Toastsucess("Please enter a barcode.");
         return;
       }
-      const productData = await supplierdisply({ user_id });
-      setAddress(productData?.SupplierAddress);
-      setDescription(productData?.SupplierDescription);
+      const productData = await supplierdisply({ SupplierCode});
+      setAddress(productData?.supplier?.SupplierAddress);
+      setDescription(productData?.supplier?.SupplierDescription);
       console.log(productData, "consoleget supplier");
-      Toastsucess("Product fetched successfully!", "success", "light");
-      // Refetch supplier list after adding a new item
-      refetch();
+       Toastsucess(productData?.message, "success", "light");
+  
+    
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -80,47 +85,47 @@ const Supplier = () => {
 
   const handleupdatesupplier = async () => {
     try {
-      if (!user_id || !description || !address) {
+      if (!SupplierCode || !description || !address) {
         Toastsucess("Please fill your Details");
   
         return;
       }
       const productData = await updatesupplierdetails({
-        user_id,
+        SupplierCode,
         SupplierDescription: description,
         SupplierAddress: address,
       });
       setAddress(productData?.SupplierAddress);
       setDescription(productData?.SupplierAddress);
-      console.log(productData, "consoleget supplier");
-      Toastsucess("Product fetched successfully!", "success", "light");
+      // console.log(productData, "consoleget supplier");
+      Toastsucess(productData.message, "success", "light");
       // Refetch supplier list after adding a new item
       refetch();
     } catch (error) {
       Toastsucess(error.message);
     }
-    setUserId("");
+    setSupplierCode("");
     setDescription("");
     setAddress("");
   };
 
   const handledeletesupplier = async () => {
     try {
-      if (!user_id) {
+      if (!SupplierCode) {
         Toastsucess("Please enter a suppliercode");
         return;
       }
 
-      const productData = await deleteSupplierDetails({ user_id });
+      const productData = await deleteSupplierDetails({ SupplierCode });
 
       console.log(productData, "consoleget supplier");
-      Toastsucess("Product fetched successfully!", "success", "light");
+      Toastsucess(productData.message, "success", "light");
       // Refetch supplier list after adding a new item
       refetch();
     } catch (error) {
       Toastsucess(error.message);
     }
-    setUserId("");
+    setSupplierCode("");
     setDescription("");
     setAddress("");
   };
@@ -128,8 +133,8 @@ const Supplier = () => {
   const Invoice = [
     {
       txt: "Supplier Code",
-      value: user_id,
-      onChange: handlesetUserId,
+      value: SupplierCode,
+      onChange: handlesetSupplierCode,
     },
     {
       txt: "Supplier Description",

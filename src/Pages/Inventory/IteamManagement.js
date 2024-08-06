@@ -108,12 +108,54 @@ const IteamManagement = () => {
       setIteamPrice("");
       setIteamstock("")
     } catch (error) {
+      console.log(error)
       Toastsucess(error.message);
     }
 
     refetch();
   };
 
+  // const handlegetItemByItemcode = async () => {
+  //   try {
+  //     if (!ItemCode) {
+  //       Toastsucess("Please enter a barcode.");
+  //       return;
+  //     }
+  //     const productData = await itembyitemcode({ ItemCode });
+  //     console.log(productData, "prduct");
+  //     setIteamDiscount(productData?.[0]?.IteamDiscount);
+  //     setIteamPrice(productData?.[0]?.IteamPrice);
+  //     setItemDescription(productData?.[0]?.ItemDescription);
+  //     setItemDescription(productData?.[0]?.ItemDescription);
+  //     setItemTax(productData?.[0]?.ItemTax);
+  //     setItemUnit(productData?.[0]?.ItemUnit);
+  //     setIteamstock(productData?.[0]?.Iteamstock)
+
+  //     // const fetchedSuppliers = productData?.[0]?.ItemSupplier
+  //     //   ? JSON.parse(productData?.[0]?.ItemSupplier)
+  //     //   : [];
+
+  
+  //     // Handle empty fetchedSuppliers
+  //     if (fetchedSuppliers.length === 0) {
+  //       console.log("No suppliers found.");
+  //       setItemSupplier("");
+  //       return;
+  //     }
+
+  //     const initialSupplierList = fetchedSuppliers.map((supplier) => ({
+  //       emivalue: supplier,
+  //       eminame: supplier,
+  //     }));
+  //     setSelectedSupplier(initialSupplierList);
+
+  //     // console.log(fetchedSuppliers, "fetchedSuppliers");
+
+  //     Toastsucess("Product fetched successfully!", "success", "light");
+  //   } catch (error) {
+  //     Toastsucess(error.message);
+  //   }
+  // };
   const handlegetItemByItemcode = async () => {
     try {
       if (!ItemCode) {
@@ -122,19 +164,24 @@ const IteamManagement = () => {
       }
       const productData = await itembyitemcode({ ItemCode });
       console.log(productData, "prduct");
-      setIteamDiscount(productData?.[0]?.IteamDiscount);
-      setIteamPrice(productData?.[0]?.IteamPrice);
-      setItemDescription(productData?.[0]?.ItemDescription);
-      setItemDescription(productData?.[0]?.ItemDescription);
-      setItemTax(productData?.[0]?.ItemTax);
-      setItemUnit(productData?.[0]?.ItemUnit);
-      setIteamstock(productData?.[0]?.Iteamstock)
-
-      const fetchedSuppliers = productData?.[0]?.ItemSupplier
-        ? JSON.parse(productData?.[0]?.ItemSupplier)
+  
+      // Extract the item data
+      const item = productData?.[0];
+      if (item) {
+        setIteamDiscount(item.IteamDiscount);
+        setIteamPrice(item.IteamPrice);
+        setItemDescription(item.ItemDescription);
+        setItemTax(item.ItemTax);
+        setItemUnit(item.ItemUnit);
+        setIteamstock(item.Iteamstock);
+  
+       
+              const fetchedSuppliers = productData?.ItemSupplier
+        ? productData?.ItemSupplier
         : [];
 
-  
+        console.log(productData?.map(item => item.ItemSupplier),"Itemsupplier");
+
       // Handle empty fetchedSuppliers
       if (fetchedSuppliers.length === 0) {
         console.log("No suppliers found.");
@@ -149,7 +196,11 @@ const IteamManagement = () => {
       setSelectedSupplier(initialSupplierList);
 
       // console.log(fetchedSuppliers, "fetchedSuppliers");
-
+      
+  
+        // setSelectedSupplier(initialSupplierList);
+      }
+  
       Toastsucess("Product fetched successfully!", "success", "light");
     } catch (error) {
       Toastsucess(error.message);
