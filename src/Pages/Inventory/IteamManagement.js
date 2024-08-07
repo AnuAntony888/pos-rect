@@ -12,14 +12,19 @@ import React, { useEffect, useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
 import { GetAllSupplier } from "../../API/Apisupplier";
 import Supplier from "./Supplier";
-import { GetItemByCode, UpdateIteam, useDeleteItem, useIteamField } from "../../API/APiiteam";
+import {
+  GetItemByCode,
+  UpdateIteam,
+  useDeleteItem,
+  useIteamField,
+} from "../../API/APiiteam";
 
 const IteamManagement = () => {
   const { data: allsupplier, refetch } = GetAllSupplier();
   const { InserItem } = useIteamField();
   const { itembyitemcode } = GetItemByCode();
   const { updateitemdetails } = UpdateIteam();
-  const{ deleteItemDetails}=useDeleteItem()
+  const { deleteItemDetails } = useDeleteItem();
   const [ItemCode, setItemCode] = useState("");
   const [ItemDescription, setItemDescription] = useState("");
   const [ItemSupplier, setItemSupplier] = useState([]);
@@ -28,8 +33,17 @@ const IteamManagement = () => {
   const [IteamDiscount, setIteamDiscount] = useState("");
   const [IteamPrice, setIteamPrice] = useState("");
   const [selectedSupplier, setSelectedSupplier] = useState([]);
-  const [Iteamstock, setIteamstock] = useState('');
-  console.log(allsupplier, "allsupplier");
+  const [Iteamstock, setIteamstock] = useState("");
+   // List of unit options
+   const unitOptions = [
+    { emivalue: "kg", eminame: "Kilogram (kg)" },
+    { emivalue: "l", eminame: "Liter (L)" },
+    { emivalue: "g", eminame: "Gram (g)" },
+    { emivalue: "ml", eminame: "Milliliter (mL)" },
+    { emivalue: "pc", eminame: "Piece (pc)" },
+    { emivalue: "box", eminame: "Box" },
+    // Add more units as needed
+  ];
   useEffect(() => {
     if (allsupplier) {
       const initialSupplierList = allsupplier.map((supplier) => ({
@@ -40,7 +54,7 @@ const IteamManagement = () => {
     }
   }, [allsupplier]);
 
-  console.log(selectedSupplier, "selectedSupplier");
+  // console.log(selectedSupplier, "selectedSupplier");
   const handlesetItemSupplier = (e) => {
     setItemSupplier(e.target.value);
   };
@@ -67,10 +81,12 @@ const IteamManagement = () => {
   };
   const handlIteamstock = (e) => {
     setIteamstock(e.target.value);
-}
+  };
   useEffect(() => {
     refetch(); // Trigger a refetch if needed
   }, [refetch]); // Dependency array includes refetch
+
+
 
   const handleinsertItem = async () => {
     if (
@@ -80,7 +96,8 @@ const IteamManagement = () => {
       !ItemUnit ||
       !ItemTax ||
       !IteamDiscount ||
-      !IteamPrice || !Iteamstock
+      !IteamPrice ||
+      !Iteamstock
     ) {
       Toastsucess("Please fill your Details");
       return;
@@ -95,7 +112,7 @@ const IteamManagement = () => {
       formData.append("ItemTax", ItemTax);
       formData.append("IteamDiscount", IteamDiscount);
       formData.append("IteamPrice", IteamPrice);
-      formData.append("Iteamstock",Iteamstock)
+      formData.append("Iteamstock", Iteamstock);
 
       const response = await InserItem(formData);
       Toastsucess(response.message, "success", "light");
@@ -106,56 +123,12 @@ const IteamManagement = () => {
       setItemUnit("");
       setItemDescription("");
       setIteamPrice("");
-      setIteamstock("")
-    } catch (error) {
-      console.log(error)
-      Toastsucess(error.message);
-    }
+      setIteamstock("");
+    } catch (error) {}
 
     refetch();
   };
 
-  // const handlegetItemByItemcode = async () => {
-  //   try {
-  //     if (!ItemCode) {
-  //       Toastsucess("Please enter a barcode.");
-  //       return;
-  //     }
-  //     const productData = await itembyitemcode({ ItemCode });
-  //     console.log(productData, "prduct");
-  //     setIteamDiscount(productData?.[0]?.IteamDiscount);
-  //     setIteamPrice(productData?.[0]?.IteamPrice);
-  //     setItemDescription(productData?.[0]?.ItemDescription);
-  //     setItemDescription(productData?.[0]?.ItemDescription);
-  //     setItemTax(productData?.[0]?.ItemTax);
-  //     setItemUnit(productData?.[0]?.ItemUnit);
-  //     setIteamstock(productData?.[0]?.Iteamstock)
-
-  //     // const fetchedSuppliers = productData?.[0]?.ItemSupplier
-  //     //   ? JSON.parse(productData?.[0]?.ItemSupplier)
-  //     //   : [];
-
-  
-  //     // Handle empty fetchedSuppliers
-  //     if (fetchedSuppliers.length === 0) {
-  //       console.log("No suppliers found.");
-  //       setItemSupplier("");
-  //       return;
-  //     }
-
-  //     const initialSupplierList = fetchedSuppliers.map((supplier) => ({
-  //       emivalue: supplier,
-  //       eminame: supplier,
-  //     }));
-  //     setSelectedSupplier(initialSupplierList);
-
-  //     // console.log(fetchedSuppliers, "fetchedSuppliers");
-
-  //     Toastsucess("Product fetched successfully!", "success", "light");
-  //   } catch (error) {
-  //     Toastsucess(error.message);
-  //   }
-  // };
   const handlegetItemByItemcode = async () => {
     try {
       if (!ItemCode) {
@@ -164,7 +137,7 @@ const IteamManagement = () => {
       }
       const productData = await itembyitemcode({ ItemCode });
       console.log(productData, "prduct");
-  
+
       // Extract the item data
       const item = productData?.[0];
       if (item) {
@@ -174,44 +147,39 @@ const IteamManagement = () => {
         setItemTax(item.ItemTax);
         setItemUnit(item.ItemUnit);
         setIteamstock(item.Iteamstock);
-  
-       
-              const fetchedSuppliers = productData?.ItemSupplier
-        ? productData?.ItemSupplier
-        : [];
 
-        console.log(productData?.map(item => item.ItemSupplier),"Itemsupplier");
+        const fetchedSuppliers = productData.map((item) => item.ItemSupplier);
 
-      // Handle empty fetchedSuppliers
-      if (fetchedSuppliers.length === 0) {
-        console.log("No suppliers found.");
-        setItemSupplier("");
-        return;
+        console.log(fetchedSuppliers, "fetchedSuppliers");
+
+        // Handle empty fetchedSuppliers
+        if (fetchedSuppliers.length === 0) {
+          console.log("No suppliers found.");
+          setItemSupplier("");
+          return;
+        }
+
+        const initialSupplierList = fetchedSuppliers.map((supplier) => ({
+          emivalue: supplier,
+          eminame: supplier,
+        }));
+
+        setSelectedSupplier(initialSupplierList);
+        console.log(initialSupplierList, "initialSupplierList");
       }
 
-      const initialSupplierList = fetchedSuppliers.map((supplier) => ({
-        emivalue: supplier,
-        eminame: supplier,
-      }));
-      setSelectedSupplier(initialSupplierList);
-
-      // console.log(fetchedSuppliers, "fetchedSuppliers");
-      
-  
-        // setSelectedSupplier(initialSupplierList);
-      }
-  
       Toastsucess("Product fetched successfully!", "success", "light");
     } catch (error) {
       Toastsucess(error.message);
     }
   };
-console.log(Iteamstock,selectedSupplier,"itemsupplier")
+  console.log(Iteamstock, selectedSupplier, "itemsupplier");
   const handleupdatesupplier = async () => {
     try {
-      if ( !ItemCode ||
+      if (
+        !ItemCode ||
         !ItemDescription ||
-        !selectedSupplier.length || 
+        !selectedSupplier.length ||
         !ItemUnit ||
         !ItemTax ||
         !IteamDiscount ||
@@ -219,24 +187,26 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
         !Iteamstock
       ) {
         Toastsucess("Please fill your Details");
-  
+
         return;
       }
-      
-    // Convert selectedSupplier to the appropriate format
-    const initialSupplierList = selectedSupplier.map((supplier) => supplier.emivalue);
 
-    console.log(initialSupplierList, "initialSupplierList");
+      // Convert selectedSupplier to the appropriate format
+      const initialSupplierList = selectedSupplier.map(
+        (supplier) => supplier.emivalue
+      );
+
+      console.log(initialSupplierList, "initialSupplierList");
       // console.log(initialSupplierList,Iteamstock,"initalsupplierlist")
       const productData = await updateitemdetails({
-        ItemCode:ItemCode,
-        ItemDescription:ItemDescription,
-        ItemSupplier:initialSupplierList,
-        ItemUnit:ItemUnit,
-        ItemTax:ItemTax,
-        IteamDiscount:IteamDiscount,
-        IteamPrice:IteamPrice,
-        Iteamstock:Iteamstock
+        ItemCode: ItemCode,
+        ItemDescription: ItemDescription,
+        ItemSupplier: initialSupplierList,
+        ItemUnit: ItemUnit,
+        ItemTax: ItemTax,
+        IteamDiscount: IteamDiscount,
+        IteamPrice: IteamPrice,
+        Iteamstock: Iteamstock,
       });
       setIteamDiscount(productData?.ItemDescription);
       setIteamPrice(productData?.IteamPrice);
@@ -259,9 +229,8 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
     setItemUnit("");
     setItemDescription("");
     setIteamPrice("");
-    setIteamstock("")
+    setIteamstock("");
     refetch();
- 
   };
 
   const handledeletItem = async () => {
@@ -275,8 +244,6 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
 
       console.log(productData, "consoleget supplier");
       Toastsucess(productData?.message, "success", "light");
-  
-  
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -287,8 +254,21 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
     setItemUnit("");
     setItemDescription("");
     setIteamPrice("");
-    // refetch();
+    refetch();
   };
+  const handleResetFields = () => {
+    setItemCode("");
+    setIteamDiscount("");
+    setItemTax("");
+    setItemSupplier("");
+    setItemUnit("");
+    setItemDescription("");
+    setIteamPrice("");
+    setIteamstock("");
+
+    refetch();
+  };
+
   const Invoice3 = [
     {
       txt: "ItemCode",
@@ -306,17 +286,13 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
       value: ItemSupplier,
       onChange: handlesetItemSupplier,
       datas: selectedSupplier,
-      //   allsupplier
-      // ? allsupplier.map((supplier) => ({
-      //     emivalue: supplier.SupplierDescription,
-      //     eminame: supplier.SupplierDescription,
-      //   }))
-      // : []
+   
     },
     {
       txt: "Item Unit",
       value: ItemUnit,
       onChange: handlesetItemUnit,
+      datas: unitOptions,
     },
     {
       txt: "Item Tax",
@@ -336,8 +312,8 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
     {
       txt: "Iteam Stock",
       value: Iteamstock,
-      onChange:handlIteamstock
-    }
+      onChange: handlIteamstock,
+    },
   ];
 
   const Buttons = [
@@ -351,11 +327,15 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
     },
     {
       txt: "Remove",
-      onClick: handledeletItem
+      onClick: handledeletItem,
     },
     {
       txt: "Update",
-      onClick:handleupdatesupplier
+      onClick: handleupdatesupplier,
+    },
+    {
+      txt: "Reset",
+      onClick: handleResetFields,
     },
   ];
 
@@ -391,8 +371,7 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
                     Item Supplier
                   </InputLabel>
                   <Select
-                    labelId="location-select-label"
-                    id="location-select"
+               
                     value={data.value}
                     onChange={data.onChange}
                     sx={{
@@ -410,7 +389,40 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
                   </Select>
                 </FormControl>
               </>
-            ) : (
+            ) :
+            
+              index === 3 ?(<>
+              <TypographyText
+              Typography={data.txt}
+              textAlign="left"
+              fontSize=".8rem"
+            />
+                <FormControl fullWidth size="small">
+             <InputLabel    sx={{
+                      fontFamily: "Poppins !important",
+                      fontSize: ".85rem",
+                    }}>{data.label || data.txt}</InputLabel>
+             <Select
+               value={data.value}
+               onChange={data.onChange}
+                    disabled={data.disabled}
+                    sx={{
+                      backgroundColor: "#F7F7F7",
+                      fontFamily: "Poppins !important",
+                      fontSize: ".9rem",
+                    }}
+             >
+               {data.datas &&
+                 data.datas.map((option, index) => (
+                   <MenuItem key={index} value={option.emivalue}>
+                     {option.eminame}
+                   </MenuItem>
+                 ))}
+             </Select>
+                </FormControl>
+                </>): 
+              
+              (
               <>
                 <TypographyText
                   Typography={data.txt}
@@ -434,7 +446,7 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
         ))}
 
         {Buttons.map((data, index) => (
-          <Grid item lg={0.75} md={1} sm={6} xs={6} key={index}>
+          <Grid item lg={0.75} md={2.4} sm={6} xs={6} key={index}>
             <p></p>
             <Button
               variant="contained"
@@ -446,8 +458,10 @@ console.log(Iteamstock,selectedSupplier,"itemsupplier")
                     : index === 1
                     ? "darkgreen"
                     : index === 2
-                    ? "red"
-                    : "yellow",
+                    ? "darkred"
+                    : index === 3
+                    ? "yellow"
+                    : "orange",
 
                 color: "#fff",
                 textAlign: "left",

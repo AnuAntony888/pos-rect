@@ -1,19 +1,43 @@
 import axios from "axios";
 import { useMutation, useQuery } from "react-query";
 import { API_URL } from "./UserApi";
+import { Toastsucess } from "../Reusable";
 {
   /***************************insert into product************************************** */
 }
+// export function useIteamField() {
+//   const ItemForm = async (formData) => {
+//     const res = await axios.post(`${API_URL}/item/createIteam`, formData, {
+//       method: "POST",
+
+//       headers: {
+//         "Content-type": "application/json; charset=UTF-8",
+//       },
+//     });
+//     // console.log(res, "response of profile");
+//     return res.data;
+//   };
+
+//   const {
+//     mutateAsync: InserItem,
+//     error: InserItemerror,
+//     isLoading: InserItemisLoading,
+//   } = useMutation(ItemForm, {
+//     onSuccess: (data) => {},
+//     onError: (error) => {
+//       throw new Error(error.message);
+
+//     },
+//   });
+//   return { InserItem, InserItemerror, InserItemisLoading };
+// }
 export function useIteamField() {
   const ItemForm = async (formData) => {
     const res = await axios.post(`${API_URL}/item/createIteam`, formData, {
-      method: "POST",
-
       headers: {
         "Content-type": "application/json; charset=UTF-8",
       },
     });
-    // console.log(res, "response of profile");
     return res.data;
   };
 
@@ -22,15 +46,21 @@ export function useIteamField() {
     error: InserItemerror,
     isLoading: InserItemisLoading,
   } = useMutation(ItemForm, {
-    onSuccess: (data) => {},
+    onSuccess: (data) => {
+      
+    },
     onError: (error) => {
-      throw new Error(error.message);
-
+      if (error.response) {
+        Toastsucess(`${error.response.data.error}`);
+      } else {
+        Toastsucess(error.message, );
+      }
+    
     },
   });
+
   return { InserItem, InserItemerror, InserItemisLoading };
 }
-
 {
   /*********************getItem********************************** */
 }

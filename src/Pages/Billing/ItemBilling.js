@@ -47,7 +47,7 @@ const ItemBilling = () => {
         return;
       }
       const productData = await itembyitemcode({ ItemCode });
-      //   console.log(productData?.[0], "prduct");
+
       setSearchBarcode(productData?.[0]);
 
       Toastsucess("Product fetched successfully!", "success", "light");
@@ -124,9 +124,9 @@ const ItemBilling = () => {
     dispatch(calculateCartTotal());
   };
   return (
-    <div>
-      <Grid container spacing={2}>
-        <Grid item lg={2} md={3} sm={9} xs={9}>
+ 
+      <Grid container spacing={2} >
+        <Grid item lg={2} md={3} sm={9} xs={12}>
           <TypographyText
             Typography={"Item Code"}
             textAlign="left"
@@ -146,7 +146,7 @@ const ItemBilling = () => {
             }}
           />
         </Grid>
-        <Grid item lg={1} md={1} sm={3} xs={3}>
+        <Grid item lg={1} md={3} sm={3} xs={12}>
           <p></p>{" "}
           <Button
             variant="contained"
@@ -170,7 +170,7 @@ const ItemBilling = () => {
 
         {ite.map((data, index) => (
           <>
-            <Grid item lg={3} md={3} sm={4} xs={4}>
+            <Grid item lg={3} md={3} sm={4} xs={12}>
               <TypographyText
                 Typography={data.txt}
                 textAlign="left"
@@ -192,7 +192,7 @@ const ItemBilling = () => {
           </>
         ))}
 
-        <Grid item lg={1} md={1} sm={3} xs={3}>
+        <Grid item lg={1} md={3} sm={3} xs={12}>
           <p></p>{" "}
           <Itemaddtocart
             count={count}
@@ -201,7 +201,7 @@ const ItemBilling = () => {
           />
         </Grid>
 
-        <Grid item lg={1} md={1} sm={3} xs={3}>
+        <Grid item lg={1} md={3} sm={3} xs={12}>
           <p></p>{" "}
           <Button
             variant="contained"
@@ -286,7 +286,7 @@ const ItemBilling = () => {
           </TableContainer>
         </Grid>
       </Grid>
-    </div>
+ 
   );
 };
 

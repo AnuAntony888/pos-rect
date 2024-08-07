@@ -149,3 +149,33 @@ export function GetAllSupplier() {
   const { data, error, isLoading ,refetch} = useQuery("getsupplier", getsupplier);
   return { data, error, isLoading ,refetch };
 }
+
+//check perticular suppier is existing or not 
+export function Checksupplier() {
+  const checksupplier = async ({SupplierDescription }) => {
+    const res = await axios.post(
+      `${API_URL}/supplier/check-supplier`,
+      {SupplierDescription},
+      {
+        headers: {
+          "Content-Type": "application/json", // Ensure the content type is JSON
+        },
+      }
+    );
+
+    return res.data;
+  };
+
+  const {
+    mutateAsync: suppliercheck,
+    error: suppliercheckerror,
+    isLoading: suppliercheckisLoading,
+  } = useMutation(checksupplier, {
+    onError: (error) => {
+      console.error("API error:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.error || error.message);
+    },
+  });
+
+  return { suppliercheck, suppliercheckerror, suppliercheckisLoading, };
+}

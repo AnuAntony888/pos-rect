@@ -1,33 +1,22 @@
 import { Box, Button, Grid } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Toastsucess, TypographyText } from "../Reusable";
 import { useDispatch, useSelector } from "react-redux";
-import { useZxing } from "react-zxing";
-import axios from "axios";
-import {
-  calculateCartTotal,
-  setProducts,
-  setSelectedProduct,
-} from "../Redux/Caruislice";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import Billing2 from "./Billing2";
+
+import { calculateCartTotal } from "../Redux/Caruislice";
+
 import ItemBilling from "./Billing/ItemBilling";
 import { useCustomerField } from "../API/APICustomer";
 
-
 const Billing = () => {
   const dispatch = useDispatch();
-  const { cart_items } = useSelector((state) => state.cartUi);
-  const cartTotalAmount = useSelector((state) => state.cartUi.cartTotalAmount);
+  const { cart_items ,cartTotalAmount,cartActualTotal,discountPercentage,totalTaxAmount} = useSelector((state) => state.cartUi);
+  // const cartTotalAmount = useSelector((state) => state.cartUi.cartTotalAmount);
   useEffect(() => {
     dispatch(calculateCartTotal());
-  }, [cart_items]);
+  }, [cart_items, dispatch]);
+
+
   const today = new Date();
   const day = today.getDate();
   const month = today.getMonth() + 1;
@@ -49,7 +38,7 @@ const Billing = () => {
   useEffect(() => {
     setInvoiceNumber(generateInvoiceNumber());
   }, []);
-  const { InserCustomer } = useCustomerField(); 
+  const { InserCustomer } = useCustomerField();
   const [customerName, setcustomerName] = useState("");
   const [customerContactNo, setcustomerContactNo] = useState("");
   const [customerTownCity, setcustomerTownCity] = useState("");
@@ -93,23 +82,22 @@ const Billing = () => {
     try {
       const formData = new FormData();
 
-      formData.append("customerName",customerName);
+      formData.append("customerName", customerName);
       formData.append("customerContactNo", customerContactNo);
       formData.append("customerTownCity", customerTownCity);
       formData.append("customerPin", customerPin);
       formData.append("customerGSTN", customerGSTN);
-      formData.append("customerAddress",customerAddress);
+      formData.append("customerAddress", customerAddress);
 
       const response = await InserCustomer(formData);
       // console.log(response.message, "response");
       Toastsucess(response.message, "sucess", "light");
-      setcustomerAddress('');
-      setcustomerContactNo('');
-      setcustomerName('');
-      setcustomerPin('');
-      setcustomerTownCity('');
-      setcustomerGSTN('');
-
+      setcustomerAddress("");
+      setcustomerContactNo("");
+      setcustomerName("");
+      setcustomerPin("");
+      setcustomerTownCity("");
+      setcustomerGSTN("");
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -130,12 +118,12 @@ const Billing = () => {
       txt: "Customer Name",
       type: "text",
       value: customerName,
-      onChange:handlecustomerName
+      onChange: handlecustomerName,
     },
     {
       txt: "Customer Contact No",
       value: customerContactNo,
-onChange:handlecustomerContactNo,
+      onChange: handlecustomerContactNo,
       type: "text",
     },
   ];
@@ -143,17 +131,17 @@ onChange:handlecustomerContactNo,
     {
       txt: "Town/City",
       value: customerTownCity,
-      onChange:handlecustomerTownCity,
+      onChange: handlecustomerTownCity,
     },
     {
       txt: "PIN",
       value: customerPin,
-      onChange:handlecustomerPin
+      onChange: handlecustomerPin,
     },
     {
       txt: "Customer GSTN",
       value: customerGSTN,
-      onChange:handlecustomerGSTN
+      onChange: handlecustomerGSTN,
     },
   ];
   const ite = [
@@ -166,9 +154,10 @@ onChange:handlecustomerContactNo,
     { txt: "Total" },
   ];
   const last = [
-    { txt: "Discount %" },
+    { txt: "Net Amount" ,value:cartActualTotal},
+    { txt: "Discount %" ,value:discountPercentage},
     { txt: "Total", value: cartTotalAmount },
-    { txt: "Net Amount" },
+
     { txt: "Empolyee" },
   ];
 
@@ -179,17 +168,38 @@ onChange:handlecustomerContactNo,
     { txt: "Image" },
     { txt: "Action" },
   ];
+  const printRef = useRef(null);
+
+  const handlePrintClick = () => {
+    if (printRef.current) {
+      const originalContents = document.body.innerHTML;
+      const printContents = printRef.current.innerHTML;
+      document.body.innerHTML = printContents;
+      window.print();
+      document.body.innerHTML = originalContents;
+      window.location.reload(); // Reload the page to restore original content
+    }
+  };
   const lastbutton = [
     {
       text: "Save",
-      onClick:handleinsertcustomer
+      onClick: handleinsertcustomer,
     },
-    { text: "Print" },
+    { text: "Print" ,onClick:handlePrintClick},
     { text: "Cancel" },
     { text: "Find" },
     { text: "New" },
     { text: "Exit" },
   ];
+
+  const last2 = [
+    { txt: "Tax %" ,value:totalTaxAmount},
+    { txt: "Total With Tax" },
+    { txt: "Round of Amount" },
+
+    { txt: "Remark" },
+  ];
+
   return (
     <div>
       <Box
@@ -198,8 +208,9 @@ onChange:handlecustomerContactNo,
           boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
           p: "3%",
         }}
+        ref={printRef}
       >
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{ padding: "10px" }}>
           <Grid item lg={12} xs={12}>
             <TypographyText
               Typography={"Heade Information"}
@@ -209,7 +220,7 @@ onChange:handlecustomerContactNo,
             <hr />{" "}
           </Grid>
           {Invoice.map((data, index) => (
-            <Grid item lg={3.5} xs={12}>
+            <Grid item lg={3.5} md={4} sm={6} xs={12}>
               <TypographyText
                 Typography={data.txt}
                 textAlign="left"
@@ -231,10 +242,10 @@ onChange:handlecustomerContactNo,
 
           {/**********************second section***************************/}
 
-          <Grid item lg={7} xs={12} md={7} sm={12}>
+          <Grid item lg={7} xs={12} md={8} sm={12}>
             <Grid container spacing={2}>
               {Customer.map((data, index) => (
-                <Grid item lg={5} xs={12} md={5} sm={12} key={index}>
+                <Grid item lg={5} xs={12} md={4} sm={4.5}  key={index}>
                   <TypographyText
                     Typography={data.txt}
                     textAlign="left"
@@ -245,7 +256,7 @@ onChange:handlecustomerContactNo,
                     //   type={data.type}
                     //   name={data.name}
                     value={data.value}
-                     onChange={data.onChange}
+                    onChange={data.onChange}
                     required
                     style={{
                       height: "35px",
@@ -256,7 +267,7 @@ onChange:handlecustomerContactNo,
                   />
                 </Grid>
               ))}
-              <Grid item lg={2} md={2} xs={12} sm={12} sx={{ margin: "auto" }}>
+              <Grid item lg={2} md={4} xs={12} sm={3} sx={{ margin: "auto" }}>
                 <p></p>
                 <Button
                   variant="contained"
@@ -274,7 +285,7 @@ onChange:handlecustomerContactNo,
                 </Button>
               </Grid>
               {Customeraddress.map((data, index) => (
-                <Grid item lg={4} xs={12} md={4} key={index}>
+                <Grid item lg={4} xs={12} md={4} key={index} sm={6}>
                   <TypographyText
                     Typography={data.txt}
                     textAlign="left"
@@ -285,7 +296,7 @@ onChange:handlecustomerContactNo,
                     //   type={data.type}
                     //   name={data.name}
                     value={data.value}
-                     onChange={data.onChange}
+                    onChange={data.onChange}
                     required
                     style={{
                       height: "35px",
@@ -298,7 +309,7 @@ onChange:handlecustomerContactNo,
               ))}
             </Grid>
           </Grid>
-          <Grid item lg={5} xs={12} md={5} sm={12}>
+          <Grid item lg={5} xs={12} md={4} sm={12}>
             <TypographyText
               Typography={"Address"}
               textAlign="left"
@@ -312,7 +323,6 @@ onChange:handlecustomerContactNo,
                 border: "none",
                 width: "100%",
                 backgroundColor: "#F7F7F7",
-
               }}
               onChange={handlecustomerAddress}
               value={customerAddress}
@@ -327,11 +337,8 @@ onChange:handlecustomerContactNo,
             />{" "}
             <hr />
           </Grid>
-          {/* <Grid xs={12}>
 
-            <Billing2/>
-          </Grid> */}
-          <Grid xs={12}>
+          <Grid item xs={12}>
             <ItemBilling />
           </Grid>
 
@@ -344,10 +351,10 @@ onChange:handlecustomerContactNo,
             <hr />
           </Grid>
           {/*********************last section******************************888 */}
-          <Grid item xs={12} lg={7} md={7}>
+          <Grid item xs={12} lg={7} md={12}>
             <Grid container spacing={2}>
               {last.map((data, index) => (
-                <Grid item lg={2.5} md={2.2} sm={9} xs={9} key={index}>
+                <Grid item lg={3} md={3} sm={6} xs={12} key={index}>
                   <TypographyText
                     Typography={data.txt}
                     textAlign="left"
@@ -369,7 +376,7 @@ onChange:handlecustomerContactNo,
                   />
                 </Grid>
               ))}
-              <Grid item lg={2} md={2}>
+              <Grid item lg={3} md={3} sm={6} xs={12} >
                 <Box sx={{ pb: "10px" }}>
                   <Button
                     variant="contained"
@@ -406,7 +413,7 @@ onChange:handlecustomerContactNo,
               </Grid>
               {last2.map((data, index) => (
                 <>
-                  <Grid item lg={index === 3 ? 4 : 2.6} md={2} sm={9} xs={9}>
+                  <Grid item lg={3} md={3} sm={6} xs={12}>
                     <TypographyText
                       Typography={data.txt}
                       textAlign="left"
@@ -414,10 +421,6 @@ onChange:handlecustomerContactNo,
                     />
 
                     <input
-                      //   type={data.type}
-                      //   name={data.name}
-                      //   value={data.value}
-                      //   onChange={data.onChange}
                       required
                       style={{
                         height: "35px",
@@ -425,13 +428,14 @@ onChange:handlecustomerContactNo,
                         border: "none",
                         backgroundColor: "#F7F7F7",
                       }}
+                      value={data.value}
                     />
                   </Grid>
                 </>
               ))}
             </Grid>
           </Grid>
-          <Grid item xs={12} lg={5} md={5} sx={{ margin: "auto" }}>
+          <Grid item xs={12} lg={5} md={12} sx={{ margin: "auto" }}>
             <Grid container spacing={2}>
               {lastbutton.map((data, index) => (
                 <Grid item lg={2} md={2} sm={3} xs={3}>
@@ -463,12 +467,3 @@ onChange:handlecustomerContactNo,
 };
 
 export default Billing;
-
-const last2 = [
-  { txt: "Tax %" },
-  { txt: "Total With Tax" },
-  { txt: "Round of Amount" },
-
-  { txt: "Remark" },
-];
-

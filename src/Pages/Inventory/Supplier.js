@@ -2,23 +2,28 @@ import React, { useEffect, useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
 import { Button, Grid } from "@mui/material";
 import {
+  Checksupplier,
   GetAllSupplier,
   Getsupplier,
   Updatesupplier,
   useDeleteSupplier,
   useSupplierField,
 } from "../../API/Apisupplier";
+import ReusableDialog from "../../Reuse/ReusableDialog";
 
 const Supplier = () => {
   const [user_id, setUserId] = useState("");
   const [SupplierCode, setSupplierCode] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
-
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogContent, setDialogContent] = useState("");
   const { supplieraddress } = useSupplierField();
   const { supplierdisply } = Getsupplier();
   const { updatesupplierdetails } = Updatesupplier();
   const { deleteSupplierDetails } = useDeleteSupplier();
+
+ const{suppliercheck}= Checksupplier() 
   const handlesetDescription = (e) => {
     setDescription(e.target.value);
   };
@@ -26,27 +31,54 @@ const Supplier = () => {
     setAddress(e.target.value);
   };
 
-  const handlesetUserId = (e) => {
-    setUserId(e.target.value);
-  };
+ 
   const handlesetSupplierCode = (e) => {
     setSupplierCode(e.target.value);
   };
 
-
   // Using GetAllSupplier hook
-  const { data: allsupplier, refetch, isLoading } = GetAllSupplier();
+  const { refetch } = GetAllSupplier();
   useEffect(() => {
     // Refetch suppliers when component mounts
     refetch();
   }, [refetch]);
+
+
+  const handleCheckSupplier = async () => {
+    if (!description || !address) {
+      Toastsucess("Please fill in all required details.");
+      return;
+    }
+  
+    try {
+      // Call suppliercheck API
+      const checkResponse = await suppliercheck({ SupplierDescription: description });
+      console.log(checkResponse.exists, "checkResponse.exists");
+  
+      if (checkResponse.exists) {
+        // Display popup if the supplier exists
+        setDialogContent("Supplier Name already exists. Do you want to proceed?");
+        setDialogOpen(true);
+      } else {
+        // If supplier does not exist, call handleinsertSupplier
+        await handleinsertSupplier();
+        setDialogOpen(false);
+      }
+    } catch (error) {
+      Toastsucess(error.message || "An error occurred while checking the supplier.");
+    }
+  };
+
+  const handleCancelDialog = () => {
+    setDialogOpen(false);
+  };
 
   const handleinsertSupplier = async () => {
     if (!description || !address) {
       Toastsucess("Please fill your Details");
       return;
     }
-
+ 
     try {
       const formData = new FormData();
 
@@ -60,6 +92,7 @@ const Supplier = () => {
       setAddress("");
       // Refetch supplier list after adding a new item
       refetch();
+      setDialogOpen(false);
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -154,7 +187,8 @@ const Supplier = () => {
     },
     {
       txt: "Add",
-      onClick: handleinsertSupplier,
+      // onClick: handleinsertSupplier,
+      onClick: handleCheckSupplier,
     },
     {
       txt: "Remove",
@@ -177,7 +211,7 @@ const Supplier = () => {
           <hr />
         </Grid>
         {Invoice.map((data, index) => (
-          <Grid item lg={index === 0 ? 1.2 : 3.4} xs={12}>
+          <Grid item lg={index === 0 ? 1.2 : 3.4} md={4} xs={12}>
             <TypographyText
               Typography={data.txt}
               textAlign="left"
@@ -199,7 +233,7 @@ const Supplier = () => {
         ))}
         {Buttons.map((data, index) => (
           <>
-            <Grid item lg={0.75} md={1} sm={6} xs={6} key={index}>
+            <Grid item lg={0.75} md={3} sm={6} xs={6} key={index}>
               <p></p>
               <Button
                 variant="contained"
@@ -211,7 +245,7 @@ const Supplier = () => {
                       : index === 1
                       ? "darkgreen"
                       : index === 2
-                      ? "red"
+                      ? "darkred"
                       : "yellow",
 
                   color: "#fff",
@@ -228,6 +262,24 @@ const Supplier = () => {
           </>
         ))}
       </Grid>
+
+      <ReusableDialog
+        open={dialogOpen}
+        onClose={handleCancelDialog}
+        title="Confirm Action"
+        actions={
+          <>
+            <Button onClick={handleinsertSupplier} color="primary">
+              Confirm
+            </Button>
+            <Button onClick={handleCancelDialog} color="secondary">
+              Cancel
+            </Button>
+          </>
+        }
+      >
+        <p>{dialogContent}</p>
+      </ReusableDialog>
     </div>
   );
 };

@@ -41,7 +41,7 @@ const Invotory = () => {
             />  <hr/>
                   </Grid>
                   {Invoice2.map((data, index) => (
-            <Grid item lg={index === 0 ? 1.2 : 3.4} xs={12}>
+            <Grid item lg={index === 0 ? 1.2 : 3.4} xs={12} md={6}>
               <TypographyText
                 Typography={data.txt}
                 textAlign="left"
@@ -59,10 +59,10 @@ const Invotory = () => {
               />
             </Grid>
                   ))}
-                  <Grid item lg={3.4} xs={12}></Grid>
+          <Grid item lg={3.4}  xs={12}></Grid>
                   {Buttons.map((data, index) => (
             <>
-              <Grid item lg={.75} md={1} sm={6} xs={6} key={index}>
+              <Grid item lg={.75} md={3} sm={6} xs={6} key={index}>
                 <p></p>
                 <Button
                   variant="contained"
@@ -74,7 +74,7 @@ const Invotory = () => {
                         : index === 1
                         ? "darkgreen"
                         : index === 2
-                        ? "red"
+                        ? "darkred"
                         : "yellow",
 
                     color: "#fff",

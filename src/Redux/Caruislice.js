@@ -102,49 +102,45 @@ const Caruislice = createSlice({
       );
       localStorage.setItem("produt_items", JSON.stringify(state.cart_items));
     },
+
     calculateCartTotal: (state) => {
-      const cartTotal = state.cart_items.reduce((total, item) => {
-        // Calculate the item total based on price, discount, and quantity
-        const itemTotal = item.IteamDiscount > 0 
-          ? item.IteamPrice * item.cartCount * (1 - item.IteamDiscount / 100)
-          : item.IteamPrice * item.cartCount;
-    
-        // Accumulate the total
-        return total + itemTotal;
-      }, 0);
-    
-      // Update the cartTotalAmount in the state
+      let cartTotal = 0;
+      let cartActualTotal = 0;
+      let totalDiscountAmount = 0;
+      // let totalTaxAmount = 0;
+
+      state.cart_items.forEach((item) => {
+        const itemActualTotal = item.IteamPrice * item.cartCount;
+        const discount =
+          itemActualTotal * (item.IteamDiscount / 100) * item.cartCount;
+        const itemDiscountedTotal =
+          item.IteamDiscount > 0 ? itemActualTotal - discount : itemActualTotal;
+
+        
+         // Calculate tax amount for the item
+    // const itemTaxAmount = itemDiscountedTotal * (item.ItemTax / 100); 
+        
+        cartTotal += itemDiscountedTotal;
+        cartActualTotal += itemActualTotal;
+        totalDiscountAmount += discount; // Accumulate total discount amount
+        // totalTaxAmount += itemTaxAmount;
+        item.itemActualTotal = itemActualTotal;
+      });
+
+      const discountPercentage = (totalDiscountAmount / cartActualTotal) * 100;
+
       state.cartTotalAmount = cartTotal;
-    
-      // Update localStorage
-      if (cartTotal !== 0) {
-        localStorage.setItem("cartTotal", JSON.stringify(cartTotal));
-      } else {
-        localStorage.removeItem("cartTotal");
-      }
+      state.cartActualTotal = cartActualTotal;
+      state.discountPercentage = discountPercentage;
+      // state.totalTaxAmount = totalTaxAmount;
+      localStorage.setItem("cartTotal", JSON.stringify(cartTotal));
+      localStorage.setItem("cartActualTotal", JSON.stringify(cartActualTotal));
+      localStorage.setItem(
+        "discountPercentage",
+        JSON.stringify(discountPercentage)
+      );
+      // localStorage.setItem("totalTaxAmount", JSON.stringify(totalTaxAmount));
     },
-    // calculateCartTotal: (state) => {
-    //   const cartTotal = state.cart_items.reduce((total, item) => {
-    //     // Calculate the item total based on discount or price
-    //     const itemTotal =
-    //       item.IteamDiscount > 0
-    //         ? item.IteamDiscount * item.cartCount
-    //         : item.IteamPrice * item.cartCount;
-
-    //     // Accumulate the total
-    //     return total + itemTotal;
-    //   }, 0);
-
-    //   // Update the cartTotalAmount in the state
-    //   state.cartTotalAmount = cartTotal;
-
-    //   // Update localStorage
-    //   if (cartTotal !== 0) {
-    //     localStorage.setItem("cartTotal", JSON.stringify(cartTotal));
-    //   } else {
-    //     localStorage.removeItem("cartTotal");
-    //   }
-    // },
   },
 });
 
