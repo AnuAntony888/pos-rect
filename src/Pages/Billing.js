@@ -47,7 +47,10 @@ console.log(cartActualTotal,"cart")
   const [customerPin, setcustomerPin] = useState("");
   const [customerGSTN, setcustomerGSTN] = useState("");
   const [customerAddress, setcustomerAddress] = useState("");
-const [customerid,setcustomerid]=useState('')
+  const [customerid, setcustomerid] = useState('')
+  const [paymentmethod, setpaymentmethod] = useState('');
+
+
   const handlecustomerName = (e) => {
     setcustomerName(e.target.value);
   };
@@ -124,25 +127,19 @@ const customerId = localStorage.getItem('customer_id');
 
     try {
       const formData = new FormData();
-    
+   formData.append("empolyee_id",'');
       formData.append("invoice_no", invoiceNumber );
-      formData.append("customer_id", customerId );
-     
+      formData.append("customer_id", customerId );     
       formData.append("product_actual_total", cartActualTotal);
       formData.append("orderstatus", "cancel");
       formData.append("product_id", JSON.stringify(cart_items.map(item => item.product_id)));
     formData.append("cartCount", JSON.stringify(cart_items.map(item => item.cartCount)));
        formData.append("product_discounted_total",cartActualTotal-cartTotalAmount);
-
+       formData.append("paymentmethod", paymentmethod );
       const response = await invoice(formData);
-      // console.log(response.message, "response");
+
       Toastsucess(response.message, "sucess", "light");
-      // setcustomerAddress("");
-      // setcustomerContactNo("");
-      // setcustomerName("");
-      // setcustomerPin("");
-      // setcustomerTownCity("");
-      // setcustomerGSTN("");
+
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -228,7 +225,7 @@ const customerId = localStorage.getItem('customer_id');
       document.body.innerHTML = printContents;
       window.print();
       document.body.innerHTML = originalContents;
-      window.location.reload(); // Reload the page to restore original content
+       window.location.reload(); 
     }
   };
   const lastbutton = [
@@ -250,7 +247,12 @@ const customerId = localStorage.getItem('customer_id');
 
     { txt: "Remark" },
   ];
-
+  const handlecash = () => {
+  setpaymentmethod('cash')
+  }
+  const handlecard = () => {
+    setpaymentmethod('card')
+  }
   return (
     <div>
       <Box
@@ -441,6 +443,7 @@ const customerId = localStorage.getItem('customer_id');
                       margin: "auto",
                       p: "2px",
                     }}
+                    onClick={handlecash}
                   >
                     Cash
                   </Button>
@@ -458,6 +461,7 @@ const customerId = localStorage.getItem('customer_id');
                     margin: "auto",
                     p: "2px",
                   }}
+                 onClick={handlecard} 
                 >
                   Card
                 </Button>
