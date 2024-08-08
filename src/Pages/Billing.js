@@ -7,16 +7,18 @@ import { calculateCartTotal } from "../Redux/Caruislice";
 
 import ItemBilling from "./Billing/ItemBilling";
 import { useCustomerField } from "../API/APICustomer";
+import { useInsertInvoice } from "../API/ApIOrder";
 
 const Billing = () => {
   const dispatch = useDispatch();
-  const { cart_items ,cartTotalAmount,cartActualTotal,discountPercentage,totalTaxAmount} = useSelector((state) => state.cartUi);
-  // const cartTotalAmount = useSelector((state) => state.cartUi.cartTotalAmount);
+  const { invoice } = useInsertInvoice();
+  const { cart_items ,cartTotalAmount,cartActualTotal,discountPercentage} = useSelector((state) => state.cartUi);
+  ;
   useEffect(() => {
     dispatch(calculateCartTotal());
   }, [cart_items, dispatch]);
 
-
+console.log(cartActualTotal,"cart")
   const today = new Date();
   const day = today.getDate();
   const month = today.getMonth() + 1;
@@ -45,7 +47,7 @@ const Billing = () => {
   const [customerPin, setcustomerPin] = useState("");
   const [customerGSTN, setcustomerGSTN] = useState("");
   const [customerAddress, setcustomerAddress] = useState("");
-
+const [customerid,setcustomerid]=useState('')
   const handlecustomerName = (e) => {
     setcustomerName(e.target.value);
   };
@@ -90,6 +92,8 @@ const Billing = () => {
       formData.append("customerAddress", customerAddress);
 
       const response = await InserCustomer(formData);
+      setcustomerid(response.customer_id)
+      localStorage.setItem('customer_id', response.customer_id);
       // console.log(response.message, "response");
       Toastsucess(response.message, "sucess", "light");
       setcustomerAddress("");
@@ -102,6 +106,54 @@ const Billing = () => {
       Toastsucess(error.message);
     }
   };
+
+console.log(customerid,"iid")
+const customerId = localStorage.getItem('customer_id');
+
+
+  const handleinsertinvoice = async () => {
+    if (
+      !invoiceNumber ||
+      !customerId ||
+      !cartActualTotal 
+      
+    ) {
+      Toastsucess("Please fill Customer Details");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+    
+      formData.append("invoice_no", invoiceNumber );
+      formData.append("customer_id", customerId );
+     
+      formData.append("product_actual_total", cartActualTotal);
+      formData.append("orderstatus", "cancel");
+      formData.append("product_id", JSON.stringify(cart_items.map(item => item.product_id)));
+    formData.append("cartCount", JSON.stringify(cart_items.map(item => item.cartCount)));
+       formData.append("product_discounted_total",cartActualTotal-cartTotalAmount);
+
+      const response = await invoice(formData);
+      // console.log(response.message, "response");
+      Toastsucess(response.message, "sucess", "light");
+      // setcustomerAddress("");
+      // setcustomerContactNo("");
+      // setcustomerName("");
+      // setcustomerPin("");
+      // setcustomerTownCity("");
+      // setcustomerGSTN("");
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+  };
+
+
+
+
+
+
+
 
   const Invoice = [
     {
@@ -155,8 +207,7 @@ const Billing = () => {
   ];
   const last = [
     { txt: "Net Amount" ,value:cartActualTotal},
-    { txt: "Discount %" ,value:discountPercentage},
-    { txt: "Total", value: cartTotalAmount },
+    { txt: "Discount %",value:discountPercentage?`${discountPercentage.toFixed(2)} %`:0 },  { txt: "Total", value: cartTotalAmount },
 
     { txt: "Empolyee" },
   ];
@@ -186,14 +237,14 @@ const Billing = () => {
       onClick: handleinsertcustomer,
     },
     { text: "Print" ,onClick:handlePrintClick},
-    { text: "Cancel" },
+    { text: "Cancel" ,onClick:handleinsertinvoice},
     { text: "Find" },
     { text: "New" },
     { text: "Exit" },
   ];
 
   const last2 = [
-    { txt: "Tax %" ,value:totalTaxAmount},
+    { txt: "Tax %" ,},
     { txt: "Total With Tax" },
     { txt: "Round of Amount" },
 

@@ -107,39 +107,44 @@ const Caruislice = createSlice({
       let cartTotal = 0;
       let cartActualTotal = 0;
       let totalDiscountAmount = 0;
-      // let totalTaxAmount = 0;
+      let totalTaxAmount = 0; 
 
       state.cart_items.forEach((item) => {
         const itemActualTotal = item.IteamPrice * item.cartCount;
-        const discount =
-          itemActualTotal * (item.IteamDiscount / 100) * item.cartCount;
+        const discount = itemActualTotal * (item.IteamDiscount / 100);
         const itemDiscountedTotal =
           item.IteamDiscount > 0 ? itemActualTotal - discount : itemActualTotal;
 
         
-         // Calculate tax amount for the item
-    // const itemTaxAmount = itemDiscountedTotal * (item.ItemTax / 100); 
-        
+          // Calculate tax amount for the item based on discounted total
+    const itemTaxAmount = itemDiscountedTotal * (item.ItemTax / 100);
+
         cartTotal += itemDiscountedTotal;
         cartActualTotal += itemActualTotal;
-        totalDiscountAmount += discount; // Accumulate total discount amount
-        // totalTaxAmount += itemTaxAmount;
+        totalDiscountAmount += discount; 
+
+        totalTaxAmount += itemTaxAmount; // Accumulate total tax amount
+        
         item.itemActualTotal = itemActualTotal;
       });
 
       const discountPercentage = (totalDiscountAmount / cartActualTotal) * 100;
+      const totalTaxPercentage = (totalTaxAmount / cartTotal) * 100;
+console.log(totalDiscountAmount,cartTotal,"totaldiscount")
 
       state.cartTotalAmount = cartTotal;
       state.cartActualTotal = cartActualTotal;
       state.discountPercentage = discountPercentage;
-      // state.totalTaxAmount = totalTaxAmount;
+      state.totalTaxPercentage = totalTaxPercentage;
+   
       localStorage.setItem("cartTotal", JSON.stringify(cartTotal));
       localStorage.setItem("cartActualTotal", JSON.stringify(cartActualTotal));
       localStorage.setItem(
         "discountPercentage",
         JSON.stringify(discountPercentage)
       );
-      // localStorage.setItem("totalTaxAmount", JSON.stringify(totalTaxAmount));
+      localStorage.setItem("totalTaxPercentage", JSON.stringify(totalTaxPercentage));
+     
     },
   },
 });
