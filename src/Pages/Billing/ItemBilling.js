@@ -18,9 +18,11 @@ import { GetItemByCode } from "../../API/APiiteam";
 import Itemaddtocart from "./Itemaddtocart";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import { useAuthContext } from "../../Context/AuthContext";
 const ItemBilling = () => {
+  const {  getuserdata } = useAuthContext();
   const [searchBarcode, setSearchBarcode] = useState("");
-  const { itembyitemcode } = GetItemByCode();
+  const { itembyitemcode } = GetItemByCode(getuserdata);
   const [ItemCode, setItemCode] = useState("");
   const { cart_items, product_item, } = useSelector(
     (state) => state.cartUi

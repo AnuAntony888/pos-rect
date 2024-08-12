@@ -2,59 +2,53 @@ import { Box, Button, Grid } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { Toastsucess, TypographyText } from "../Reusable";
 import { useDispatch, useSelector } from "react-redux";
-
 import { calculateCartTotal } from "../Redux/Caruislice";
-
 import ItemBilling from "./Billing/ItemBilling";
-import { useCustomerField } from "../API/APICustomer";
-import { useInsertInvoice } from "../API/ApIOrder";
+import { Getcustomer, useCustomerField } from "../API/APICustomer";
+import { GetInvoice, useInsertInvoice } from "../API/ApIOrder";
+import { useAuthContext } from "../Context/AuthContext";
 
 const Billing = () => {
+  const { getuserdata } = useAuthContext();
   const dispatch = useDispatch();
-  const { invoice } = useInsertInvoice();
-  const { cart_items ,cartTotalAmount,cartActualTotal,discountPercentage} = useSelector((state) => state.cartUi);
-  ;
+  const { invoice } = useInsertInvoice(getuserdata);
+  const { cart_items, cartTotalAmount, cartActualTotal, discountPercentage } =
+    useSelector((state) => state.cartUi);
   useEffect(() => {
     dispatch(calculateCartTotal());
   }, [cart_items, dispatch]);
-
-console.log(cartActualTotal,"cart")
   const today = new Date();
   const day = today.getDate();
   const month = today.getMonth() + 1;
   const year = today.getFullYear();
-  const formattedDate = `${day} / ${month} / ${year}`;
-
+  const formattedDate = `${day}/${month}/${year}`;
   const generateInvoiceNumber = () => {
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
     const day = String(today.getDate()).padStart(2, "0");
     const randomPart = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit number
-
     return `INV-${year}${month}${day}-${randomPart}`;
   };
-
   const [invoiceNumber, setInvoiceNumber] = useState("");
-
   useEffect(() => {
     setInvoiceNumber(generateInvoiceNumber());
   }, []);
-  const { InserCustomer } = useCustomerField();
+  const { InserCustomer } = useCustomerField(getuserdata);
+  const { customerdisply } = Getcustomer(getuserdata);
+  const {invoicedisply}=GetInvoice(getuserdata) 
   const [customerName, setcustomerName] = useState("");
   const [customerContactNo, setcustomerContactNo] = useState("");
   const [customerTownCity, setcustomerTownCity] = useState("");
   const [customerPin, setcustomerPin] = useState("");
   const [customerGSTN, setcustomerGSTN] = useState("");
   const [customerAddress, setcustomerAddress] = useState("");
-  const [customerid, setcustomerid] = useState('')
-  const [paymentmethod, setpaymentmethod] = useState('');
-
-
+  const [customerid, setcustomerid] = useState("");
+  const [paymentmethod, setpaymentmethod] = useState("");
+  const [status, setstatus] = useState("");
   const handlecustomerName = (e) => {
     setcustomerName(e.target.value);
   };
-
   const handlecustomerContactNo = (e) => {
     setcustomerContactNo(e.target.value);
   };
@@ -70,7 +64,6 @@ console.log(cartActualTotal,"cart")
   const handlecustomerAddress = (e) => {
     setcustomerAddress(e.target.value);
   };
-
   const handleinsertcustomer = async () => {
     if (
       !customerName ||
@@ -95,63 +88,98 @@ console.log(cartActualTotal,"cart")
       formData.append("customerAddress", customerAddress);
 
       const response = await InserCustomer(formData);
-      setcustomerid(response.customer_id)
-      localStorage.setItem('customer_id', response.customer_id);
-      // console.log(response.message, "response");
+      setcustomerid(response.customer_id);
+      localStorage.setItem("customer_id", response.customer_id);
       Toastsucess(response.message, "sucess", "light");
-      setcustomerAddress("");
-      setcustomerContactNo("");
-      setcustomerName("");
-      setcustomerPin("");
-      setcustomerTownCity("");
-      setcustomerGSTN("");
+      // setcustomerAddress("");
+      // setcustomerContactNo("");
+      // setcustomerName("");
+      // setcustomerPin("");
+      // setcustomerTownCity("");
+      // setcustomerGSTN("");
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+  };
+  const handlegetsupplier = async () => {
+    try {
+      if (!customerContactNo) {
+        Toastsucess("Please enter a barcode.");
+        return;
+      }
+      const productData = await customerdisply({ customerContactNo });
+      setcustomerName(productData?.customerTabele?.SupplierAddress);
+      setcustomerGSTN(productData?.customerTabele?.customerGSTN);
+      setcustomerTownCity(productData?.customerTabele?.customerTownCity);
+      setcustomerPin(productData?.customerTabele?.customerPin);
+      setcustomerName(productData?.customerTabele?.customerName);
+      setcustomerAddress(productData?.customerTabele?.customerAddress);
+      console.log(productData, "consoleget supplier");
+      Toastsucess(productData?.message, "success", "light");
     } catch (error) {
       Toastsucess(error.message);
     }
   };
 
-console.log(customerid,"iid")
-const customerId = localStorage.getItem('customer_id');
-
-
+  console.log(customerid, "iid");
+  const customerId = localStorage.getItem("customer_id");
+  const product_discounted_total = cartActualTotal - cartTotalAmount;
   const handleinsertinvoice = async () => {
-    if (
-      !invoiceNumber ||
-      !customerId ||
-      !cartActualTotal 
-      
-    ) {
-      Toastsucess("Please fill Customer Details");
-      return;
-    }
-
+    setstatus("Cancel");
+    await handleinsertcustomer(); // Ensure customer is inserted before proceeding
+    handleinsertcustomer();
     try {
       const formData = new FormData();
-   formData.append("empolyee_id",'');
-      formData.append("invoice_no", invoiceNumber );
-      formData.append("customer_id", customerId );     
+      formData.append("employee_id", getuserdata?.userId);
+      formData.append("invoice_no", invoiceNumber);
+      formData.append("invoice_date", formattedDate);
+      formData.append("customer_id", customerId);
+      formData.append(
+        "product_id",
+        JSON.stringify(cart_items.map((item) => item.product_id))
+      );
+      formData.append(
+        "ItemCode",
+        JSON.stringify(cart_items.map((item) => item.ItemCode))
+      );
+      formData.append(
+        "ItemDescription",
+        JSON.stringify(cart_items.map((item) => item.ItemDescription))
+      );
+      formData.append(
+        "ItemUnit",
+        JSON.stringify(cart_items.map((item) => item.ItemUnit))
+      );
+      formData.append(
+        "ItemTax",
+        JSON.stringify(cart_items.map((item) => item.ItemTax))
+      );
+      formData.append(
+        "ItemDiscount",
+        JSON.stringify(cart_items.map((item) => item.IteamDiscount))
+      );
+      formData.append(
+        "ItemPrice",
+        JSON.stringify(cart_items.map((item) => item.IteamPrice))
+      );
+      formData.append(
+        "Itemstock",
+        JSON.stringify(cart_items.map((item) => item.Iteamstock))
+      );
+      formData.append(
+        "cartCount",
+        JSON.stringify(cart_items.map((item) => item.cartCount))
+      );
       formData.append("product_actual_total", cartActualTotal);
-      formData.append("orderstatus", "cancel");
-      formData.append("product_id", JSON.stringify(cart_items.map(item => item.product_id)));
-    formData.append("cartCount", JSON.stringify(cart_items.map(item => item.cartCount)));
-       formData.append("product_discounted_total",cartActualTotal-cartTotalAmount);
-       formData.append("paymentmethod", paymentmethod );
+      formData.append("orderstatus", status);
+      formData.append("product_discounted_total", product_discounted_total);
+      formData.append("paymentmethod", paymentmethod);
       const response = await invoice(formData);
-
       Toastsucess(response.message, "sucess", "light");
-
     } catch (error) {
       Toastsucess(error.message);
     }
   };
-
-
-
-
-
-
-
-
   const Invoice = [
     {
       txt: "Invoice No",
@@ -203,8 +231,12 @@ const customerId = localStorage.getItem('customer_id');
     { txt: "Total" },
   ];
   const last = [
-    { txt: "Net Amount" ,value:cartActualTotal},
-    { txt: "Discount %",value:discountPercentage?`${discountPercentage.toFixed(2)} %`:0 },  { txt: "Total", value: cartTotalAmount },
+    { txt: "Net Amount", value: cartActualTotal },
+    {
+      txt: "Discount %",
+      value: discountPercentage ? `${discountPercentage.toFixed(2)} %` : 0,
+    },
+    { txt: "Total", value: cartTotalAmount },
 
     { txt: "Empolyee" },
   ];
@@ -217,42 +249,207 @@ const customerId = localStorage.getItem('customer_id');
     { txt: "Action" },
   ];
   const printRef = useRef(null);
+  const handlePrintClick = async () => {
+    setstatus("print");
+    try {
+      await handleinsertcustomer();
+      // Validate required fields
+      if (!invoiceNumber || !customerId || !cartActualTotal || !formattedDate) {
+        Toastsucess("Please fill Customer Details");
+        return;
+      }
+      try {
+        const formData = new FormData();
 
-  const handlePrintClick = () => {
-    if (printRef.current) {
-      const originalContents = document.body.innerHTML;
-      const printContents = printRef.current.innerHTML;
-      document.body.innerHTML = printContents;
-      window.print();
-      document.body.innerHTML = originalContents;
-       window.location.reload(); 
+        formData.append("employee_id", getuserdata?.userId);
+        formData.append("invoice_no", invoiceNumber);
+        formData.append("invoice_date", formattedDate);
+        formData.append("customer_id", customerId);
+        formData.append(
+          "product_id",
+          JSON.stringify(cart_items.map((item) => item.product_id))
+        );
+        formData.append(
+          "ItemCode",
+          JSON.stringify(cart_items.map((item) => item.ItemCode))
+        );
+        formData.append(
+          "ItemDescription",
+          JSON.stringify(cart_items.map((item) => item.ItemDescription))
+        );
+        formData.append(
+          "ItemUnit",
+          JSON.stringify(cart_items.map((item) => item.ItemUnit))
+        );
+        formData.append(
+          "ItemTax",
+          JSON.stringify(cart_items.map((item) => item.ItemTax))
+        );
+        formData.append(
+          "ItemDiscount",
+          JSON.stringify(cart_items.map((item) => item.IteamDiscount))
+        );
+        formData.append(
+          "ItemPrice",
+          JSON.stringify(cart_items.map((item) => item.IteamPrice))
+        );
+        formData.append(
+          "Itemstock",
+          JSON.stringify(cart_items.map((item) => item.Iteamstock))
+        );
+        formData.append(
+          "cartCount",
+          JSON.stringify(cart_items.map((item) => item.cartCount))
+        );
+        formData.append("product_actual_total", cartActualTotal);
+        formData.append("orderstatus", status);
+        formData.append("product_discounted_total", product_discounted_total);
+        formData.append("paymentmethod", paymentmethod);
+        const response = await invoice(formData);
+        Toastsucess(response.message, "sucess", "light");
+        if (printRef.current) {
+          const originalContents = document.body.innerHTML;
+          const printContents = printRef.current.innerHTML;
+          document.body.innerHTML = printContents;
+          window.print();
+          document.body.innerHTML = originalContents;
+        }
+      } catch (error) {
+        Toastsucess(error.message);
+      }
+    } catch (error) {
+      console.error("Error during print process:", error);
+      Toastsucess("An error occurred while processing your request.");
+    }
+  };
+  const handlesaveinvoice = async () => {
+    setstatus("save");
+    await handleinsertcustomer(); // Ensure customer is inserted before proceeding
+    handleinsertcustomer();
+    try {
+      const formData = new FormData();
+
+      formData.append("employee_id", getuserdata?.userId);
+      formData.append("invoice_no", invoiceNumber);
+      formData.append("invoice_date", formattedDate);
+      formData.append("customer_id", customerId);
+      formData.append(
+        "product_id",
+        JSON.stringify(cart_items.map((item) => item.product_id))
+      );
+      formData.append(
+        "ItemCode",
+        JSON.stringify(cart_items.map((item) => item.ItemCode))
+      );
+      formData.append(
+        "ItemDescription",
+        JSON.stringify(cart_items.map((item) => item.ItemDescription))
+      );
+      formData.append(
+        "ItemUnit",
+        JSON.stringify(cart_items.map((item) => item.ItemUnit))
+      );
+      formData.append(
+        "ItemTax",
+        JSON.stringify(cart_items.map((item) => item.ItemTax))
+      );
+      formData.append(
+        "ItemDiscount",
+        JSON.stringify(cart_items.map((item) => item.IteamDiscount))
+      );
+      formData.append(
+        "ItemPrice",
+        JSON.stringify(cart_items.map((item) => item.IteamPrice))
+      );
+      formData.append(
+        "Itemstock",
+        JSON.stringify(cart_items.map((item) => item.Iteamstock))
+      );
+      formData.append(
+        "cartCount",
+        JSON.stringify(cart_items.map((item) => item.cartCount))
+      );
+      formData.append("product_actual_total", cartActualTotal);
+      formData.append("orderstatus", status);
+      formData.append("product_discounted_total", product_discounted_total);
+      formData.append("paymentmethod", paymentmethod);
+
+      const response = await invoice(formData);
+
+      Toastsucess(response.message, "sucess", "light");
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+  };
+
+  const handleresetinvoice = async () => {
+    setcustomerAddress("");
+    setcustomerContactNo("");
+    setcustomerName("");
+    setcustomerPin("");
+    setcustomerTownCity("");
+    setcustomerGSTN("");
+    setpaymentmethod("");
+    // Remove individual items
+    localStorage.removeItem("totalTaxPercentage");
+    localStorage.removeItem("cartTotal");
+    localStorage.removeItem("produt_items");
+    localStorage.removeItem("lastExternalReferrer");
+    localStorage.removeItem("cartActualTotal");
+    localStorage.removeItem("customer_id");
+    window.location.reload();
+  };
+
+  const handlegetinvoice = async () => {
+    try {
+      if (!invoiceNumber) {
+        Toastsucess("Please enter a barcode.");
+        return;
+      }
+      const productData = await invoicedisply({ invoiceNumber});
+      
+      console.log(productData, "consoleget supplier");
+       Toastsucess(productData?.message, "success", "light");
+  
+    
+    } catch (error) {
+      Toastsucess(error.message);
     }
   };
   const lastbutton = [
     {
       text: "Save",
-      onClick: handleinsertcustomer,
+      onClick: handlesaveinvoice,
     },
-    { text: "Print" ,onClick:handlePrintClick},
-    { text: "Cancel" ,onClick:handleinsertinvoice},
-    { text: "Find" },
-    { text: "New" },
+    {
+      text: "Print",
+      onClick: handlePrintClick
+    },
+    {
+      text: "Cancel",
+      onClick: handleinsertinvoice
+    },
+    { text: "Find" ,onClick:handlegetinvoice},
+    {
+      text: "New",
+      onClick: handleresetinvoice
+    },
     { text: "Exit" },
   ];
 
   const last2 = [
-    { txt: "Tax %" ,},
+    { txt: "Tax %" },
     { txt: "Total With Tax" },
     { txt: "Round of Amount" },
 
     { txt: "Remark" },
   ];
   const handlecash = () => {
-  setpaymentmethod('cash')
-  }
+    setpaymentmethod("cash");
+  };
   const handlecard = () => {
-    setpaymentmethod('card')
-  }
+    setpaymentmethod("card");
+  };
   return (
     <div>
       <Box
@@ -298,7 +495,7 @@ const customerId = localStorage.getItem('customer_id');
           <Grid item lg={7} xs={12} md={8} sm={12}>
             <Grid container spacing={2}>
               {Customer.map((data, index) => (
-                <Grid item lg={5} xs={12} md={4} sm={4.5}  key={index}>
+                <Grid item lg={5} xs={12} md={4} sm={4.5} key={index}>
                   <TypographyText
                     Typography={data.txt}
                     textAlign="left"
@@ -333,6 +530,7 @@ const customerId = localStorage.getItem('customer_id');
                     textTransform: "capitalize",
                     margin: "auto",
                   }}
+                  onClick={handlegetsupplier}
                 >
                   check
                 </Button>
@@ -429,14 +627,15 @@ const customerId = localStorage.getItem('customer_id');
                   />
                 </Grid>
               ))}
-              <Grid item lg={3} md={3} sm={6} xs={12} >
+              <Grid item lg={3} md={3} sm={6} xs={12}>
                 <Box sx={{ pb: "10px" }}>
                   <Button
                     variant="contained"
                     type="submit"
                     sx={{
-                      bgcolor: "#F7F7F7",
-                      color: "black",
+                      bgcolor: paymentmethod === "cash" ? "green" : "#F7F7F7",
+                      color: paymentmethod === "cash" ? "white" : "black",
+
                       textAlign: "left",
                       width: "100%",
                       textTransform: "capitalize",
@@ -453,15 +652,15 @@ const customerId = localStorage.getItem('customer_id');
                   variant="contained"
                   type="submit"
                   sx={{
-                    bgcolor: "#F7F7F7",
-                    color: "black",
+                    bgcolor: paymentmethod === "card" ? "green" : "#F7F7F7",
+                    color: paymentmethod === "card" ? "white" : "black",
                     textAlign: "left",
                     width: "100%",
                     textTransform: "capitalize",
                     margin: "auto",
                     p: "2px",
                   }}
-                 onClick={handlecard} 
+                  onClick={handlecard}
                 >
                   Card
                 </Button>
@@ -522,3 +721,59 @@ const customerId = localStorage.getItem('customer_id');
 };
 
 export default Billing;
+// const orderApi = async () => {
+//   try {
+//     const formData = new FormData();
+
+//     formData.append("employee_id", getuserdata?.userId);
+//     formData.append("invoice_no", invoiceNumber);
+//     formData.append("invoice_date", formattedDate);
+//     formData.append("customer_id", customerId);
+//     formData.append(
+//       "product_id",
+//       JSON.stringify(cart_items.map((item) => item.product_id))
+//     );
+//     formData.append(
+//       "ItemCode",
+//       JSON.stringify(cart_items.map((item) => item.ItemCode))
+//     );
+//     formData.append(
+//       "ItemDescription",
+//       JSON.stringify(cart_items.map((item) => item.ItemDescription))
+//     );
+//     formData.append(
+//       "ItemUnit",
+//       JSON.stringify(cart_items.map((item) => item.ItemUnit))
+//     );
+//     formData.append(
+//       "ItemTax",
+//       JSON.stringify(cart_items.map((item) => item.ItemTax))
+//     );
+//     formData.append(
+//       "ItemDiscount",
+//       JSON.stringify(cart_items.map((item) => item.IteamDiscount))
+//     );
+//     formData.append(
+//       "ItemPrice",
+//       JSON.stringify(cart_items.map((item) => item.IteamPrice))
+//     );
+//     formData.append(
+//       "Itemstock",
+//       JSON.stringify(cart_items.map((item) => item.Iteamstock))
+//     );
+//     formData.append(
+//       "cartCount",
+//       JSON.stringify(cart_items.map((item) => item.cartCount))
+//     );
+//     formData.append("product_actual_total", cartActualTotal);
+//     formData.append("orderstatus", status);
+//     formData.append("product_discounted_total", product_discounted_total);
+//     formData.append("paymentmethod", paymentmethod);
+
+//     const response = await invoice(formData);
+
+//     Toastsucess(response.message, "sucess", "light");
+//   } catch (error) {
+//     Toastsucess(error.message);
+//   }
+// };

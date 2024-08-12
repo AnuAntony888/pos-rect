@@ -1,11 +1,11 @@
-import { createContext, useContext,  useReducer } from "react";
-
+import { createContext, useContext, useEffect, useReducer } from "react";
+// import axios from "axios";
 import reducer from "../reducer/Authreducer";
-
+// import { Password } from "@mui/icons-material";
 
 const AuthContext = createContext();
 
-
+// const API = "https://myfamilyfitness.com/api/v1";
 const initialState = {
   isLoading: false,
   isError: false,
@@ -23,7 +23,7 @@ const initialState = {
 const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // console.log(localStorage.getItem("user"), "hai how are you");
+
 
   const saveUser = (payload) => {
     if (payload) {
@@ -31,7 +31,7 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // console.log(state, "state ....");
+
 
   return (
     <AuthContext.Provider

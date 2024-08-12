@@ -3,13 +3,16 @@ import React, { useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserLogin } from "../../API/UserApi";
+import { useAuthContext } from "../../Context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const Navigate = useNavigate();
-  const { login, isLoading, error  } = useUserLogin();
+  const { login, isLoading, error } = useUserLogin();
+  const { user, getuserdata } = useAuthContext();
+  const { saveUser } = useAuthContext();
   const handleEmail = (e) => {
     const value = e.target.value;
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -72,11 +75,12 @@ const Login = () => {
         email,
         password,
       });
+      saveUser(userData)
       Toastsucess("Sucessfully Login ! ", "sucess", "light");
 
       setEmail("");
       setPassword("");
-      // Navigate("/main");
+      Navigate("/main");
     } catch (error) {
       if (error.response && error.response.data) {
         Toastsucess(`Error: ${error.response?.data || error.message}`);
@@ -85,7 +89,7 @@ const Login = () => {
       }
     }
   };
-
+console.log(getuserdata,"anju@email.com")
   return (
     <div>
       <Box sx={{ flexGrow: 1, p: "8%" }}>

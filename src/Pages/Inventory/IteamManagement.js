@@ -18,12 +18,15 @@ import {
   useDeleteItem,
   useIteamField,
 } from "../../API/APiiteam";
+import { useAuthContext } from "../../Context/AuthContext";
 
 const IteamManagement = () => {
-  const { data: allsupplier, refetch } = GetAllSupplier();
-  const { InserItem } = useIteamField();
-  const { itembyitemcode } = GetItemByCode();
-  const { updateitemdetails } = UpdateIteam();
+  const { getuserdata } = useAuthContext();
+  console.log(getuserdata, "localStorage");
+  const { data: allsupplier, refetch } = GetAllSupplier(getuserdata);
+  const { InserItem } = useIteamField(getuserdata);
+  const { itembyitemcode } = GetItemByCode(getuserdata);
+  const { updateitemdetails } = UpdateIteam(getuserdata);
   const { deleteItemDetails } = useDeleteItem();
   const [ItemCode, setItemCode] = useState("");
   const [ItemDescription, setItemDescription] = useState("");
@@ -34,6 +37,15 @@ const IteamManagement = () => {
   const [IteamPrice, setIteamPrice] = useState("");
   const [selectedSupplier, setSelectedSupplier] = useState([]);
   const [Iteamstock, setIteamstock] = useState("");
+  useEffect(() => {
+    if (allsupplier) {
+      const initialSupplierList = allsupplier.map((supplier) => ({
+        emivalue: supplier.SupplierDescription,
+        eminame: supplier.SupplierDescription,
+      }));
+      setSelectedSupplier(initialSupplierList);
+    }
+  }, [allsupplier]);
    // List of unit options
    const unitOptions = [
     { emivalue: "kg", eminame: "Kilogram (kg)" },
@@ -44,15 +56,7 @@ const IteamManagement = () => {
     { emivalue: "box", eminame: "Box" },
     // Add more units as needed
   ];
-  useEffect(() => {
-    if (allsupplier) {
-      const initialSupplierList = allsupplier.map((supplier) => ({
-        emivalue: supplier.SupplierDescription,
-        eminame: supplier.SupplierDescription,
-      }));
-      setSelectedSupplier(initialSupplierList);
-    }
-  }, [allsupplier]);
+
 
   // console.log(selectedSupplier, "selectedSupplier");
   const handlesetItemSupplier = (e) => {

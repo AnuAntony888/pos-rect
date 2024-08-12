@@ -10,20 +10,21 @@ import {
   useSupplierField,
 } from "../../API/Apisupplier";
 import ReusableDialog from "../../Reuse/ReusableDialog";
+import { useAuthContext } from "../../Context/AuthContext";
 
 const Supplier = () => {
-  const [user_id, setUserId] = useState("");
+  const { user, getuserdata } = useAuthContext();
   const [SupplierCode, setSupplierCode] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState("");
-  const { supplieraddress } = useSupplierField();
-  const { supplierdisply } = Getsupplier();
-  const { updatesupplierdetails } = Updatesupplier();
+  const { supplieraddress } = useSupplierField(getuserdata);
+  const { supplierdisply } = Getsupplier(getuserdata);
+  const { updatesupplierdetails } = Updatesupplier(getuserdata);
   const { deleteSupplierDetails } = useDeleteSupplier();
 
- const{suppliercheck}= Checksupplier() 
+ const{suppliercheck}= Checksupplier(getuserdata) 
   const handlesetDescription = (e) => {
     setDescription(e.target.value);
   };
@@ -37,7 +38,7 @@ const Supplier = () => {
   };
 
   // Using GetAllSupplier hook
-  const { refetch } = GetAllSupplier();
+  const { refetch } = GetAllSupplier(getuserdata);
   useEffect(() => {
     // Refetch suppliers when component mounts
     refetch();
@@ -87,11 +88,12 @@ const Supplier = () => {
 
       const response = await supplieraddress(formData);
       // console.log(response.message, "response");
+      refetch();
       Toastsucess(response.message, "sucess", "light");
       setDescription("");
       setAddress("");
       // Refetch supplier list after adding a new item
-      refetch();
+      // refetch();
       setDialogOpen(false);
     } catch (error) {
       Toastsucess(error.message);

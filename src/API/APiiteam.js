@@ -5,37 +5,13 @@ import { Toastsucess } from "../Reusable";
 {
   /***************************insert into product************************************** */
 }
-// export function useIteamField() {
-//   const ItemForm = async (formData) => {
-//     const res = await axios.post(`${API_URL}/item/createIteam`, formData, {
-//       method: "POST",
 
-//       headers: {
-//         "Content-type": "application/json; charset=UTF-8",
-//       },
-//     });
-//     // console.log(res, "response of profile");
-//     return res.data;
-//   };
-
-//   const {
-//     mutateAsync: InserItem,
-//     error: InserItemerror,
-//     isLoading: InserItemisLoading,
-//   } = useMutation(ItemForm, {
-//     onSuccess: (data) => {},
-//     onError: (error) => {
-//       throw new Error(error.message);
-
-//     },
-//   });
-//   return { InserItem, InserItemerror, InserItemisLoading };
-// }
-export function useIteamField() {
+export function useIteamField(getuserdata) {
   const ItemForm = async (formData) => {
     const res = await axios.post(`${API_URL}/item/createIteam`, formData, {
       headers: {
         "Content-type": "application/json; charset=UTF-8",
+        Authorization: `Bearer ${getuserdata.token}`,
       },
     });
     return res.data;
@@ -65,7 +41,7 @@ export function useIteamField() {
   /*********************getItem********************************** */
 }
 
-export function GetItemByCode() {
+export function GetItemByCode(getuserdata) {
   const getitembyitemcode = async ({ ItemCode }) => {
     const res = await axios.post(
       `${API_URL}/item/getitembyitemcode`,
@@ -73,6 +49,7 @@ export function GetItemByCode() {
       {
         headers: {
           "Content-Type": "application/json", // Ensure the content type is JSON
+          Authorization: `Bearer ${getuserdata.token}`,
         },
       }
     );
@@ -97,7 +74,7 @@ export function GetItemByCode() {
 {
   /****************************update Iteam**************************************** */
 }
-export function UpdateIteam() {
+export function UpdateIteam(getuserdata) {
   const updatesupplier = async ({
     ItemCode,
     ItemDescription,
@@ -121,6 +98,7 @@ export function UpdateIteam() {
       {
         headers: {
           "Content-Type": "application/json", // Ensure the content type is JSON
+          Authorization: `Bearer ${getuserdata.token}`,
         },
       }
     );

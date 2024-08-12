@@ -56,7 +56,10 @@ export function useUserLogin() {
       } else {
         // Handle successful login
         console.log("Login successful:", data);
+        localStorage.setItem("user", JSON.stringify(data));
+        
       }
+      // localStorage.setItem("user", JSON.stringify(data));
     },
     onError: (error) => {
       console.error("Login failed:", error.message);
@@ -65,3 +68,35 @@ export function useUserLogin() {
 
   return { login, isLoading, error };
 }
+
+export function useLogout() {
+  const logoutHandler = async (params) => {
+    const res = await axios.post(`${API_URL}/user/logout`, params);
+
+    return res.data;
+  };
+
+  const {
+    mutateAsync: logout,
+    isLoading,
+    error,
+  } = useMutation(logoutHandler, {
+    onSuccess: (data) => {
+      if (data.statusCode === 401) {
+        throw new Error("Something went wrong");
+      }
+      localStorage.removeItem("user");
+      window.location.href = "/";
+    },
+    onError: (error) => {
+      throw new Error(error.message);
+    },
+  });
+  return { logout, isLoading, error };
+}
+
+// const logoutHandler = () => {
+//   logout({ token: JSON.parse(localStorage.getItem("user"))?.token });
+//   googleLogout();
+//   setopenpopup(false);
+// };
