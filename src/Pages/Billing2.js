@@ -14,7 +14,11 @@ import { Toastsucess, TypographyText } from "../Reusable";
 import Paper from "@mui/material/Paper";
 import { Singleproduct } from "../API/APIproduct";
 import { useDispatch, useSelector } from "react-redux";
-import { calculateCartTotal, setProducts, setSelectedProduct } from "../Redux/Caruislice";
+import {
+  calculateCartTotal,
+  setProducts,
+  setSelectedProduct,
+} from "../Redux/Caruislice";
 
 const Billing2 = () => {
   const ite = [
@@ -50,7 +54,7 @@ const Billing2 = () => {
       }
 
       const productData = await singleproduct({ barcode });
-      console.log(productData,"productData")
+      console.log(productData, "productData");
       setSearchBarcode(productData); // Store the response data    await singleproduct({ barcode });
 
       Toastsucess("Product fetched successfully!", "success", "light");
@@ -59,17 +63,13 @@ const Billing2 = () => {
     }
   };
 
-
-
-
   const dispatch = useDispatch();
 
-
   useEffect(() => {
-    dispatch(setProducts(searchBarcode ));
+    dispatch(setProducts(searchBarcode));
   }, [searchBarcode, dispatch]);
   const products = useSelector((state) => state.cartUi.products);
-  console.log(products,"products")
+  console.log(products, "products");
   const imge = `http://localhost:5000/${searchBarcode?.images?.[0]
     .replace(/\\/g, "/")
     .replace("C:/Users/VBS/Desktop/POS TESTING/Backend/uploads", "uploads")
@@ -202,8 +202,8 @@ const Billing2 = () => {
               </TableHead>
               <TableBody>
                 <TableRow>
-                <TableCell component="th" scope="row">
-                {products.Product_id}
+                  <TableCell component="th" scope="row">
+                    {products.Product_id}
                   </TableCell>
                   <TableCell component="th" scope="row">
                     {products.name}
@@ -222,9 +222,11 @@ const Billing2 = () => {
                     />
                   </TableCell>
                   <TableCell component="th" scope="row">
-                    <CarttoAdd productId={products.Product_id} searchBarcode={products}
-                      count={products?.cartCount || 1 } />
-                   
+                    <CarttoAdd
+                      productId={products.Product_id}
+                      searchBarcode={products}
+                      count={products?.cartCount || 1}
+                    />
                   </TableCell>
                 </TableRow>
               </TableBody>

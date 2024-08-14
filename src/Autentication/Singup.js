@@ -1,17 +1,35 @@
 import { Box, Button, Grid } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 import { Toastsucess, TypographyText } from "../Reusable";
 import { useRegister } from "../API/UserApi";
 
 const Singup = () => {
+  const generateInvoiceNumber = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const day = String(today.getDate()).padStart(2, "0");
+    const randomPart = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit number
+    return `ADMIN-${year}${month}${day}-${randomPart}`;
+  };
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const { register, isLoading, error } = useRegister();
-  const Navigate = useNavigate();
+  const [employeeno, setemployeeno] = useState();
+  const [employeecategory, setemployeecategory] = useState();
+  const [employeestatus, setemployeestatus] = useState();
+  const { register } = useRegister();
+
+
+  useEffect(() => {
+    setemployeecategory("admin");
+    setemployeeno(generateInvoiceNumber())
+    setemployeestatus("admin")
+  },[])
+
   const handleName = (e) => {
     if (!e.target.value) {
       setErrors((prev) => ({ ...prev, name: "name is required!" }));
@@ -87,6 +105,9 @@ const Singup = () => {
         name,
         email,
         password,
+        employeeno,
+        employeestatus,
+        employeecategory
       });
       Toastsucess("Sucessfully Registered ! ", "sucess", "light");
       setName("");

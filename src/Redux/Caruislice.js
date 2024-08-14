@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Toastsucess } from "../Reusable";
-import { json } from "react-router-dom";
+
 
 const initialState = {
   cart_items: localStorage.getItem("produt_items")
@@ -107,23 +107,29 @@ const Caruislice = createSlice({
       let cartTotal = 0;
       let cartActualTotal = 0;
       let totalDiscountAmount = 0;
+      let totalTaxAmount = 0;
       state.cart_items.forEach((item) => {
         const itemActualTotal = item.IteamPrice * item.cartCount;
         const discount = itemActualTotal * (item.IteamDiscount / 100);
         const itemDiscountedTotal =
           item.IteamDiscount > 0 ? itemActualTotal - discount : itemActualTotal;
+                
+        const itemTax = itemDiscountedTotal * (item.ItemTax / 100);
+        totalTaxAmount += itemTax;
         cartTotal += itemDiscountedTotal;
         cartActualTotal += itemActualTotal;
         totalDiscountAmount += discount;
         item.itemActualTotal = itemActualTotal;
       });
       const discountPercentage = (totalDiscountAmount / cartActualTotal) * 100;
+  const totalTaxPercentage = cartTotal > 0 ? (totalTaxAmount / cartTotal) * 100 : 0;
       state.cartTotalAmount = cartTotal;
       state.cartActualTotal = cartActualTotal;
       state.discountPercentage = discountPercentage;
       localStorage.setItem("cartTotal", JSON.stringify(cartTotal));
       localStorage.setItem("cartActualTotal", JSON.stringify(cartActualTotal));
-      localStorage.setItem("discountPercentage",JSON.stringify(discountPercentage));
+      localStorage.setItem("discountPercentage", JSON.stringify(discountPercentage));
+      localStorage.setItem("totalTaxPercentage", JSON.stringify(totalTaxPercentage));
     },
   },
 });

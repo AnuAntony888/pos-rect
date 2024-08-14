@@ -104,6 +104,18 @@ const ItemBilling = () => {
     { txt: "Clear Item" },
   ];
 
+  const productinvoice = [
+    { txt: "Item Code" },
+    { txt: "Item Description" },
+    { txt: "Quantity" },
+    { txt: "Unit" },
+    { txt: "Unit Price" },
+
+    { txt: "Tax %" },
+    { txt: "Stock" },
+
+  ];
+
   const handleRemove = () => {
     setItemCode("");
     setCount(1);
@@ -125,6 +137,8 @@ const ItemBilling = () => {
     dispatch(decreaseCart({ product_id }));
     dispatch(calculateCartTotal());
   };
+  const productfectchdatils = JSON.parse(localStorage.getItem("invoicedetails"));
+  console.log(productfectchdatils, "productfectchdatils");
   return (
  
       <Grid container spacing={2} >
@@ -224,7 +238,59 @@ const ItemBilling = () => {
         <Grid item xs={12}>
           {cartTotalAmount}
         </Grid>
-        <Grid item xs={12}>
+      <Grid item xs={12}>
+        {productfectchdatils ?
+          <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="caption table">
+            <TableHead>
+              <TableRow>
+                {productinvoice.map((data, index) => (
+                  <TableCell
+                    className="shadow-checkoutCardheading"
+                    key={index}
+                  >
+                    {data.txt}
+                  </TableCell>
+                ))}{" "}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {
+                productfectchdatils.map((data) => (
+                  <TableRow key={data.product_id}>
+                    <TableCell component="th" scope="row">
+                      {data.ItemCode}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {data.ItemDescription}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {data.cartCount}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {data.ItemUnit}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {data.ItemPrice}
+                    </TableCell>{" "}
+                    <TableCell component="th" scope="row">
+                      {data.ItemDiscount}
+                    </TableCell>
+                
+                    <TableCell component="th" scope="row">
+                      {data.ItemTax}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {data.Iteamstock}
+                    </TableCell>
+                    
+                  </TableRow>
+                ))}
+              
+               
+            </TableBody>
+          </Table>
+        </TableContainer> :
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="caption table">
               <TableHead>
@@ -240,52 +306,56 @@ const ItemBilling = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-
-                {cart_items.map((data) => (
-                  <TableRow key={data.product_id}>
-                    <TableCell component="th" scope="row">
-                      {data.ItemCode}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.ItemDescription}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.cartCount}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.ItemUnit}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.IteamPrice}
-                    </TableCell>{" "}
-                    <TableCell component="th" scope="row">
-                      {data.IteamDiscount}
-                    </TableCell>
-                
-                    <TableCell component="th" scope="row">
-                      {data.ItemTax}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.Iteamstock}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      <button onClick={() => handleIncrease(data.product_id)}>
-                        <AddCircleIcon/>
-                    </button>
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      <button onClick={() => handleDecrease(data.product_id)}>
-                        <RemoveCircleIcon/>
-                    </button>
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                    <button onClick={() => handleRemoveId(data.product_id)}><DeleteIcon/></button>
+                {
+                  cart_items.map((data) => (
+                    <TableRow key={data.product_id}>
+                      <TableCell component="th" scope="row">
+                        {data.ItemCode}
                       </TableCell>
-                  </TableRow>
-                ))}
+                      <TableCell component="th" scope="row">
+                        {data.ItemDescription}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.cartCount}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.ItemUnit}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.IteamPrice}
+                      </TableCell>{" "}
+                      <TableCell component="th" scope="row">
+                        {data.IteamDiscount}
+                      </TableCell>
+                
+                      <TableCell component="th" scope="row">
+                        {data.ItemTax}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.Iteamstock}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <button onClick={() => handleIncrease(data.product_id)}>
+                          <AddCircleIcon />
+                        </button>
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <button onClick={() => handleDecrease(data.product_id)}>
+                          <RemoveCircleIcon />
+                        </button>
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <button onClick={() => handleRemoveId(data.product_id)}><DeleteIcon /></button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              
+               
               </TableBody>
             </Table>
           </TableContainer>
+        }
+        
         </Grid>
       </Grid>
  
