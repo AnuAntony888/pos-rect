@@ -27,7 +27,7 @@ const IteamManagement = () => {
   const { InserItem } = useIteamField(getuserdata);
   const { itembyitemcode } = GetItemByCode(getuserdata);
   const { updateitemdetails } = UpdateIteam(getuserdata);
-  const { deleteItemDetails } = useDeleteItem();
+  const { deleteItemDetails } = useDeleteItem(getuserdata);
   const [ItemCode, setItemCode] = useState("");
   const [ItemDescription, setItemDescription] = useState("");
   const [ItemSupplier, setItemSupplier] = useState([]);
@@ -46,8 +46,8 @@ const IteamManagement = () => {
       setSelectedSupplier(initialSupplierList);
     }
   }, [allsupplier]);
-   // List of unit options
-   const unitOptions = [
+  // List of unit options
+  const unitOptions = [
     { emivalue: "kg", eminame: "Kilogram (kg)" },
     { emivalue: "l", eminame: "Liter (L)" },
     { emivalue: "g", eminame: "Gram (g)" },
@@ -56,7 +56,6 @@ const IteamManagement = () => {
     { emivalue: "box", eminame: "Box" },
     // Add more units as needed
   ];
-
 
   // console.log(selectedSupplier, "selectedSupplier");
   const handlesetItemSupplier = (e) => {
@@ -89,8 +88,6 @@ const IteamManagement = () => {
   useEffect(() => {
     refetch(); // Trigger a refetch if needed
   }, [refetch]); // Dependency array includes refetch
-
-
 
   const handleinsertItem = async () => {
     if (
@@ -238,28 +235,33 @@ const IteamManagement = () => {
   };
 
   const handledeletItem = async () => {
+    if (!ItemCode) {
+      Toastsucess("Please enter a suppliercode");
+      return;
+    }
     try {
-      if (!ItemCode) {
-        Toastsucess("Please enter a suppliercode");
-        return;
-      }
+      const formData = new FormData();
 
-      const productData = await deleteItemDetails({ ItemCode });
+      formData.append("ItemCode ", ItemCode);
 
-      console.log(productData, "consoleget supplier");
-      Toastsucess(productData?.message, "success", "light");
+      const response = await deleteItemDetails(formData);
+      // console.log(response.message, "response");
+
+      Toastsucess(response.message, "sucess", "light");
+      setItemCode("");
+      setIteamDiscount("");
+      setItemTax("");
+      setItemSupplier("");
+      setItemUnit("");
+      setItemDescription("");
+      setIteamPrice("");
+      setIteamstock("");
+      refetch();
     } catch (error) {
       Toastsucess(error.message);
     }
-    setItemCode("");
-    setIteamDiscount("");
-    setItemTax("");
-    setItemSupplier("");
-    setItemUnit("");
-    setItemDescription("");
-    setIteamPrice("");
-    refetch();
   };
+
   const handleResetFields = () => {
     setItemCode("");
     setIteamDiscount("");
@@ -290,7 +292,6 @@ const IteamManagement = () => {
       value: ItemSupplier,
       onChange: handlesetItemSupplier,
       datas: selectedSupplier,
-   
     },
     {
       txt: "Item Unit",
@@ -375,7 +376,6 @@ const IteamManagement = () => {
                     Item Supplier
                   </InputLabel>
                   <Select
-               
                     value={data.value}
                     onChange={data.onChange}
                     sx={{
@@ -393,40 +393,42 @@ const IteamManagement = () => {
                   </Select>
                 </FormControl>
               </>
-            ) :
-            
-              index === 3 ?(<>
-              <TypographyText
-              Typography={data.txt}
-              textAlign="left"
-              fontSize=".8rem"
-            />
+            ) : index === 3 ? (
+              <>
+                <TypographyText
+                  Typography={data.txt}
+                  textAlign="left"
+                  fontSize=".8rem"
+                />
                 <FormControl fullWidth size="small">
-             <InputLabel    sx={{
+                  <InputLabel
+                    sx={{
                       fontFamily: "Poppins !important",
                       fontSize: ".85rem",
-                    }}>{data.label || data.txt}</InputLabel>
-             <Select
-               value={data.value}
-               onChange={data.onChange}
+                    }}
+                  >
+                    {data.label || data.txt}
+                  </InputLabel>
+                  <Select
+                    value={data.value}
+                    onChange={data.onChange}
                     disabled={data.disabled}
                     sx={{
                       backgroundColor: "#F7F7F7",
                       fontFamily: "Poppins !important",
                       fontSize: ".9rem",
                     }}
-             >
-               {data.datas &&
-                 data.datas.map((option, index) => (
-                   <MenuItem key={index} value={option.emivalue}>
-                     {option.eminame}
-                   </MenuItem>
-                 ))}
-             </Select>
+                  >
+                    {data.datas &&
+                      data.datas.map((option, index) => (
+                        <MenuItem key={index} value={option.emivalue}>
+                          {option.eminame}
+                        </MenuItem>
+                      ))}
+                  </Select>
                 </FormControl>
-                </>): 
-              
-              (
+              </>
+            ) : (
               <>
                 <TypographyText
                   Typography={data.txt}

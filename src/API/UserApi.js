@@ -1,4 +1,4 @@
-import { useMutation } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import axios from "axios";
 
 export const API_URL = "http://localhost:5000/api"; // Update API URL as needed
@@ -138,4 +138,104 @@ export function GetEmpolyee(getuserdata) {
   return {  getemployeedisply,
  getemployeeerror,
     getemployeeisLoading,};
+}
+
+/*********************update user**************************88 */
+export function UpdateEmployee(getuserdata) {
+  const updateemployee = async ({
+    email,
+    name,  
+    employeeno,
+    employeecategory,
+
+  }) => {
+    const res = await axios.put(
+      `${API_URL}/users/updateuser`,
+      {   email,
+        name,  
+        employeeno,
+        employeecategory,
+     },
+      {
+        headers: {
+          "Content-Type": "application/json", // Ensure the content type is JSON
+          Authorization: `Bearer ${getuserdata.token}`,
+        },
+      }
+    );
+
+    return res.data;
+  };
+
+  const {
+    mutateAsync: updateemployeedetails,
+    error:  updateemployeedetailserror,
+    isLoading: updateemployeedetailsisLoading,
+  } = useMutation(updateemployee, {
+    onError: (error) => {
+      console.error("API error:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.error || error.message);
+    },
+  });
+
+  return {
+    updateemployeedetails,
+    updateemployeedetailserror,
+    updateemployeedetailsisLoading,
+  };
+}
+
+/*********************************delete employee********************************** */
+export function DeleteEmployee(getuserdata) {
+  const deleteeemployee = async (formData) => {
+    const res = await axios.post(
+      `${API_URL}/users/deleteuser`,
+      formData,
+
+      {
+        method: "POST",
+
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          Authorization: `Bearer ${getuserdata.token}`,
+        },
+      }
+    );
+
+    return res.data;
+  };
+
+  const {
+    mutateAsync: deleteeemployeedetails,
+    error:  deleteeemployeeerror,
+    isLoading: deleteeemployeeisLoading,
+  } = useMutation(deleteeemployee, {
+    onError: (error) => {
+      console.error("API error:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.error || error.message);
+    },
+  });
+
+  return {
+    deleteeemployeedetails,
+    deleteeemployeeerror,
+    deleteeemployeeisLoading,
+  };
+}
+/***************************get all employee****************************8 */
+export function GetAllEmployes(getuserdata) {
+  const getemployee = async () => {
+    console.log(getuserdata, "getuserdata");
+    const res = await axios.get(`${API_URL}/users/getallemployee`, {
+      headers: {
+        Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+      },
+    });
+    return res.data;
+  };
+  const { data, error, isLoading, refetch } = useQuery(
+    "getemployee",
+    getemployee
+  );
+  return { data, error, isLoading, refetch };
 }

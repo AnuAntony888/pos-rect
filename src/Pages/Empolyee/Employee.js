@@ -1,7 +1,7 @@
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
-import { GetEmpolyee, useRegister } from "../../API/UserApi";
+import { DeleteEmployee, GetAllEmployes, GetEmpolyee, UpdateEmployee, useRegister } from "../../API/UserApi";
 import { useAuthContext } from "../../Context/AuthContext";
 
 const Employee = () => {
@@ -22,7 +22,14 @@ const Employee = () => {
   const [errors, setErrors] = useState({});
   const { getuserdata } = useAuthContext();
   const { register } = useRegister();
+  const { data ,refetch} = GetAllEmployes(getuserdata)
+  useEffect(() => {
+    // Refetch suppliers when component mounts
+    refetch();
+  }, [refetch]);
   const { getemployeedisply } = GetEmpolyee(getuserdata);
+  const { updateemployeedetails } = UpdateEmployee(getuserdata);
+  const { deleteeemployeedetails }= DeleteEmployee(getuserdata)
   const handleName = (e) => {
     if (!e.target.value) {
       setErrors((prev) => ({ ...prev, name: "name is required!" }));
@@ -126,6 +133,7 @@ const Employee = () => {
       setEmail("");
       setPassword("");
       setemployeecategory("");
+      refetch();
       // setemployeeno("");
     } catch (error) {
       if (error.response && error.response.data) {
@@ -144,7 +152,7 @@ const Employee = () => {
       const productData = await getemployeedisply({ email });
       setName(productData?.name);
       setEmail(productData?.email);
-      setPassword(productData?.password);
+      // setPassword(productData?.password);
       setemployeecategory(productData?.employeecategory);
       setemployeeno(productData?.employeeno);
       console.log(productData, "consoleget supplier");
@@ -153,6 +161,58 @@ const Employee = () => {
       Toastsucess(error.message);
     }
   };
+
+  const handleupdatesupplier = async () => {
+    try {
+      if (!name || !email || !employeecategory || !employeeno) {
+        Toastsucess("Please fill your Details");
+
+        return;
+      }
+      const productData = await updateemployeedetails({
+        email,
+        name,
+        employeeno,
+        employeecategory,
+        employeestatus,
+      });
+
+      // console.log(productData, "consoleget supplier");
+      Toastsucess(productData.message, "success", "light");
+      setEmail("");
+      setName("");
+      setemployeeno("");
+      setemployeecategory("");
+      refetch();
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+  };
+  const handledeleteeemployee = async () => {
+    if (!email) {
+      Toastsucess("Please fill your Details");
+      return;
+    } 
+    try {
+      const formData = new FormData();
+
+      formData.append("email", email);
+
+
+      const response = await deleteeemployeedetails(formData);
+      // console.log(response.message, "response");
+ 
+      Toastsucess(response.message, "sucess", "light");
+      setName("");
+      setEmail("");
+      setPassword("");
+      setemployeecategory("");
+      refetch();
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+  };
+
   const Buttons = [
     {
       txt: "Check",
@@ -162,8 +222,14 @@ const Employee = () => {
       txt: "Add",
       onClick: handleApi,
     },
-    { txt: "Remove" },
-    { txt: "Update" },
+    {
+      txt: "Remove",
+      onClick:handledeleteeemployee
+    },
+    {
+      txt: "Update",
+      onClick: handleupdatesupplier,
+    },
   ];
 
   return (
@@ -257,7 +323,43 @@ const Employee = () => {
             <hr />
           </Grid>
           <Grid item lg={12} md={12}>
-            <Box sx={{ pb: "50px", border: "solid gray .5px" }}></Box>
+
+          <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="caption table">
+            <TableHead>
+              <TableRow>
+                {EmployeeDetails.map((data, index) => (
+                  <TableCell
+                    className="shadow-checkoutCardheading"
+                    key={index}
+                  >
+                    {data.txt}
+                  </TableCell>
+                ))}{" "}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+       {
+          data?.map((data) => (
+                  <TableRow key={data.product_id}>
+                    <TableCell component="th" scope="row">
+                      {data.employeeno}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {data.name}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {data.email}
+                    </TableCell>
+                   
+                    
+                  </TableRow>
+                ))}  
+              
+               
+            </TableBody>
+          </Table>
+        </TableContainer> 
           </Grid>
         </Grid>
       </Box>
@@ -266,3 +368,12 @@ const Employee = () => {
 };
 
 export default Employee;
+const EmployeeDetails = [{
+  txt:"Employee No"
+},
+{
+txt:"Employee Name"
+  },
+  {
+    txt:"Employee Email"
+    }]

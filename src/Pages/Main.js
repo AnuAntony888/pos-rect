@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import Billing from "./Billing";
-import Master from "./Master";
+
+import Master from "./Master/Master";
 
 import Invotory from "./Inventory/Invotory";
 import Employee from "./Empolyee/Employee";
@@ -13,6 +13,7 @@ import { useLogout } from "../API/UserApi";
 import { useAuthContext } from "../Context/AuthContext";
 import { Toastsucess } from "../Reusable";
 import { useNavigate } from "react-router-dom";
+import Billing from "./Billing/Billing";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -69,8 +70,11 @@ export default function Main() {
   const tabs = [
     { label: "Billing", content: <Billing /> },
     { label: "Inventory", content: <Invotory /> },
-    { label: "Empolyee", content: <Employee /> },
-    { label: "Master", content: <Master /> },
+    
+      // Conditional rendering for the "Master" tab
+  ...(getuserdata?.employeestatus === "admin"
+    ? [{ label: "Empolyee", content: <Employee /> },{ label: "Master", content: <Master /> },]
+    : []),
     { label: <Button onClick={handleLogout}>Logout</Button> },
   ];
 

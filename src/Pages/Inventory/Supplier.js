@@ -22,7 +22,7 @@ const Supplier = () => {
   const { supplieraddress } = useSupplierField(getuserdata);
   const { supplierdisply } = Getsupplier(getuserdata);
   const { updatesupplierdetails } = Updatesupplier(getuserdata);
-  const { deleteSupplierDetails } = useDeleteSupplier();
+  const { deleteSupplierDetails } = useDeleteSupplier(getuserdata);
 
  const{suppliercheck}= Checksupplier(getuserdata) 
   const handlesetDescription = (e) => {
@@ -144,26 +144,31 @@ const Supplier = () => {
     setAddress("");
   };
 
+
   const handledeletesupplier = async () => {
+    if (!SupplierCode) {
+      Toastsucess("Please enter a suppliercode");
+      return;
+    } 
     try {
-      if (!SupplierCode) {
-        Toastsucess("Please enter a suppliercode");
-        return;
-      }
+      const formData = new FormData();
 
-      const productData = await deleteSupplierDetails({ SupplierCode });
+      formData.append("SupplierCode ", SupplierCode );
 
-      console.log(productData, "consoleget supplier");
-      Toastsucess(productData.message, "success", "light");
-      // Refetch supplier list after adding a new item
-      refetch();
+
+      const response = await deleteSupplierDetails(formData);
+      // console.log(response.message, "response");
+ 
+      Toastsucess(response.message, "sucess", "light");
+      setSupplierCode("");
+      setDescription("");
+      setAddress("");
+
     } catch (error) {
       Toastsucess(error.message);
     }
-    setSupplierCode("");
-    setDescription("");
-    setAddress("");
   };
+
 
   const Invoice = [
     {

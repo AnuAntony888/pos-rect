@@ -128,23 +128,59 @@ export function UpdateIteam(getuserdata) {
 {
   /****************************update user**************************************** */
 }
-const deleteItem = async ({ ItemCode}) => {
-  const res = await axios.delete(`${API_URL}/item/deleteitem`, {
-    data: { ItemCode }, // Pass data here for a DELETE request
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+// const deleteItem = async ({ ItemCode}) => {
+//   const res = await axios.delete(`${API_URL}/item/deleteitem`, {
+//     data: { ItemCode }, // Pass data here for a DELETE request
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//   });
 
-  return res.data;
-};
+//   return res.data;
+// };
 
-export function useDeleteItem() {
+// export function useDeleteItem() {
+//   const {
+//     mutateAsync: deleteItemDetails,
+//     error: deleteItemDetailsError,
+//     isLoading: deleteItemDetailsIsLoading,
+//   } = useMutation(deleteItem , {
+//     onError: (error) => {
+//       console.error("API error:", error.response?.data || error.message);
+//       throw new Error(error.response?.data?.error || error.message);
+//     },
+//   });
+
+//   return {
+//     deleteItemDetails,
+//     deleteItemDetailsError,
+//     deleteItemDetailsIsLoading,
+//   };
+// }
+export function useDeleteItem(getuserdata) {
+  const deleteItem = async (formData) => {
+    const res = await axios.post(
+      `${API_URL}/item/deleteitem`,
+      formData,
+
+      {
+        method: "POST",
+
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          Authorization: `Bearer ${getuserdata.token}`,
+        },
+      }
+    );
+
+    return res.data;
+  };
+
   const {
     mutateAsync: deleteItemDetails,
-    error: deleteItemDetailsError,
-    isLoading: deleteItemDetailsIsLoading,
-  } = useMutation(deleteItem , {
+    error:  deleteItemDetailsError,
+    isLoading:  deleteItemDetailsIsLoading,
+  } = useMutation(deleteItem, {
     onError: (error) => {
       console.error("API error:", error.response?.data || error.message);
       throw new Error(error.response?.data?.error || error.message);
@@ -152,8 +188,8 @@ export function useDeleteItem() {
   });
 
   return {
-    deleteItemDetails,
-    deleteItemDetailsError,
-    deleteItemDetailsIsLoading,
+deleteItemDetails,
+   deleteItemDetailsError,
+   deleteItemDetailsIsLoading,
   };
 }

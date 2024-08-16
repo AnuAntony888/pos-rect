@@ -110,8 +110,8 @@ const ItemBilling = () => {
     { txt: "Quantity" },
     { txt: "Unit" },
     { txt: "Unit Price" },
-
     { txt: "Tax %" },
+    { txt: "Discount %" },
     { txt: "Stock" },
 
   ];
@@ -137,8 +137,24 @@ const ItemBilling = () => {
     dispatch(decreaseCart({ product_id }));
     dispatch(calculateCartTotal());
   };
-  const productfectchdatils = JSON.parse(localStorage.getItem("invoicedetails"));
+  // const productfectchdatils = JSON.parse(localStorage.getItem("invoicedetails"));
+  const productfectchdatils = JSON.parse(localStorage.getItem("invoicedetails")) || { invoiceDetails: [], productDetails: [] };
+
   console.log(productfectchdatils, "productfectchdatils");
+  // const productfectchdatils = JSON.parse(localStorage.getItem("invoicedetails"));
+
+const combinedDetails = productfectchdatils.invoiceDetails.map(invoice => {
+  const product = productfectchdatils.productDetails.find(prod => prod.product_id === invoice.product_id);
+  
+  return {
+    ...invoice, // Include all invoice details
+    ...product, // Include all matching product details
+  };
+}) || [];
+  
+
+
+  
   return (
  
       <Grid container spacing={2} >
@@ -239,7 +255,7 @@ const ItemBilling = () => {
           {cartTotalAmount}
         </Grid>
       <Grid item xs={12}>
-        {productfectchdatils ?
+        {/* {combinedDetails.length > 0 ?
           <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="caption table">
             <TableHead>
@@ -256,7 +272,7 @@ const ItemBilling = () => {
             </TableHead>
             <TableBody>
               {
-                productfectchdatils.map((data) => (
+                combinedDetails.map((data) => (
                   <TableRow key={data.product_id}>
                     <TableCell component="th" scope="row">
                       {data.ItemCode}
@@ -271,15 +287,16 @@ const ItemBilling = () => {
                       {data.ItemUnit}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {data.ItemPrice}
+                      {data.IteamPrice}
                     </TableCell>{" "}
                     <TableCell component="th" scope="row">
-                      {data.ItemDiscount}
+                      {data.ItemTax}
+                    </TableCell>{" "}
+                    <TableCell component="th" scope="row">
+                      {data.IteamDiscount}
                     </TableCell>
                 
-                    <TableCell component="th" scope="row">
-                      {data.ItemTax}
-                    </TableCell>
+                 
                     <TableCell component="th" scope="row">
                       {data.Iteamstock}
                     </TableCell>
@@ -290,7 +307,7 @@ const ItemBilling = () => {
                
             </TableBody>
           </Table>
-        </TableContainer> :
+        </TableContainer> : */}
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="caption table">
               <TableHead>
@@ -354,7 +371,7 @@ const ItemBilling = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        }
+        {/* } */}
         
         </Grid>
       </Grid>

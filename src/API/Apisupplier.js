@@ -2,8 +2,6 @@ import axios from "axios";
 import { useMutation, useQuery } from "react-query";
 import { API_URL } from "./UserApi";
 
-
-
 {
   /***************************insert into product************************************** */
 }
@@ -44,7 +42,7 @@ export function useSupplierField(getuserdata) {
 }
 
 export function Getsupplier(getuserdata) {
-  const getsupplierdisply = async ({SupplierCode }) => {
+  const getsupplierdisply = async ({ SupplierCode }) => {
     const res = await axios.post(
       `${API_URL}/supplier/getsuplier`,
       { SupplierCode },
@@ -117,19 +115,26 @@ export function Updatesupplier(getuserdata) {
 {
   /****************************delete user**************************************** */
 }
-const deleteSupplier = async ({ SupplierCode }) => {
-  const res = await axios.delete(`${API_URL}/supplier/deletesuplier`, {
-    data: { SupplierCode },
-    headers: {
-      "Content-Type": "application/json",
-      
-    },
-  });
 
-  return res.data;
-};
+export function useDeleteSupplier(getuserdata) {
+  const deleteSupplier = async (formData) => {
+    const res = await axios.post(
+      `${API_URL}/supplier/deletesuplier`,
+      formData,
 
-export function useDeleteSupplier() {
+      {
+        method: "POST",
+
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          Authorization: `Bearer ${getuserdata.token}`,
+        },
+      }
+    );
+
+    return res.data;
+  };
+
   const {
     mutateAsync: deleteSupplierDetails,
     error: deleteSupplierDetailsError,
@@ -148,31 +153,32 @@ export function useDeleteSupplier() {
   };
 }
 
-
-
-{/*****************************ceck alluser****************************** */}
+{
+  /*****************************ceck alluser****************************** */
+}
 export function GetAllSupplier(getuserdata) {
   const getsupplier = async () => {
-    console.log(getuserdata,"getuserdata")
-    const res = await axios.get(`${API_URL}/supplier/getAllsuplier`,
-      {
-        headers: {
-          Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
-        }
-      }
-    );
+    console.log(getuserdata, "getuserdata");
+    const res = await axios.get(`${API_URL}/supplier/getAllsuplier`, {
+      headers: {
+        Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+      },
+    });
     return res.data;
   };
-  const { data, error, isLoading ,refetch} = useQuery("getsupplier", getsupplier);
-  return { data, error, isLoading ,refetch };
+  const { data, error, isLoading, refetch } = useQuery(
+    "getsupplier",
+    getsupplier
+  );
+  return { data, error, isLoading, refetch };
 }
 
-//check perticular suppier is existing or not 
+//check perticular suppier is existing or not
 export function Checksupplier(getuserdata) {
-  const checksupplier = async ({SupplierDescription }) => {
+  const checksupplier = async ({ SupplierDescription }) => {
     const res = await axios.post(
       `${API_URL}/supplier/check-supplier`,
-      {SupplierDescription},
+      { SupplierDescription },
       {
         headers: {
           // "Content-Type": "application/json", // Ensure the content type is JSON
@@ -195,5 +201,5 @@ export function Checksupplier(getuserdata) {
     },
   });
 
-  return { suppliercheck, suppliercheckerror, suppliercheckisLoading, };
+  return { suppliercheck, suppliercheckerror, suppliercheckisLoading };
 }

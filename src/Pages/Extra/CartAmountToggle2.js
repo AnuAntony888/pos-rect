@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { increaseProduct, decreaseProduct } from "../Redux/Caruislice";
+import { increaseProduct, decreaseProduct } from "../../Redux/Caruislice";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Box, IconButton, Typography } from "@mui/material";

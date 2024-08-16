@@ -110,6 +110,7 @@ const Caruislice = createSlice({
       let totalTaxAmount = 0;
       state.cart_items.forEach((item) => {
         const itemActualTotal = item.IteamPrice * item.cartCount;
+        
         const discount = itemActualTotal * (item.IteamDiscount / 100);
         const itemDiscountedTotal =
           item.IteamDiscount > 0 ? itemActualTotal - discount : itemActualTotal;

@@ -26,6 +26,7 @@ const Itemaddtocart = (props) => {
     updatedProducts["cartCount"] = JSON.parse(count); 
       // count;
     dispatch(setProducts(updatedProducts));
+    // console.log(updatedProducts,"12222")
     dispatch(addToCart(updatedProducts));
     setCount(1);
   };
