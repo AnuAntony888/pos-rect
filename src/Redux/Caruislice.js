@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { Toastsucess } from "../Reusable";
 
-
 const initialState = {
   cart_items: localStorage.getItem("produt_items")
     ? JSON.parse(localStorage.getItem("produt_items"))
@@ -108,34 +107,61 @@ const Caruislice = createSlice({
       let cartActualTotal = 0;
       let totalDiscountAmount = 0;
       let totalTaxAmount = 0;
+
       state.cart_items.forEach((item) => {
         const itemActualTotal = item.IteamPrice * item.cartCount;
-        
+
         const discount = itemActualTotal * (item.IteamDiscount / 100);
+        console.log(discount, "discount ");
         const itemDiscountedTotal =
           item.IteamDiscount > 0 ? itemActualTotal - discount : itemActualTotal;
-                
+        console.log(itemDiscountedTotal, "itemDiscountedTotal ");
+
+        // const itemTax = itemActualTotal * (item.ItemTax / 100);
         const itemTax = itemDiscountedTotal * (item.ItemTax / 100);
+
+        // console.log(itemTax, "itemtax");
         totalTaxAmount += itemTax;
         cartTotal += itemDiscountedTotal;
         cartActualTotal += itemActualTotal;
         totalDiscountAmount += discount;
         item.itemActualTotal = itemActualTotal;
       });
+
       const discountPercentage = (totalDiscountAmount / cartActualTotal) * 100;
-  const totalTaxPercentage = cartTotal > 0 ? (totalTaxAmount / cartTotal) * 100 : 0;
+
+      const cartGrandTotalAmount = discountPercentage + totalTaxAmount;
+      console.log(cartActualTotal, "cartActualTotal");
+      console.log(cartTotal, "cartTotal");
+      console.log(totalTaxAmount, "totalTaxAmount");
+
       state.cartTotalAmount = cartTotal;
       state.cartActualTotal = cartActualTotal;
       state.discountPercentage = discountPercentage;
+      state.totalTaxAmount = totalTaxAmount;
+      state.cartGrandTotalAmount = cartGrandTotalAmount;
       localStorage.setItem("cartTotal", JSON.stringify(cartTotal));
       localStorage.setItem("cartActualTotal", JSON.stringify(cartActualTotal));
-      localStorage.setItem("discountPercentage", JSON.stringify(discountPercentage));
-      localStorage.setItem("totalTaxPercentage", JSON.stringify(totalTaxPercentage));
+      localStorage.setItem(
+        "discountPercentage",
+        JSON.stringify(discountPercentage)
+      );
+      localStorage.setItem("totalTaxAmount", JSON.stringify(totalTaxAmount));
+      localStorage.setItem("cartGrandTotalAmount", JSON.stringify(cartGrandTotalAmount));
     },
   },
 });
 
 export const {
-  setProducts,setSelectedProduct,addToCart,increaseCart,decreaseCart,removeProductFromCart,
-  increaseProduct,decreaseProduct,resetProduct,calculateCartTotal,} = Caruislice.actions;
+  setProducts,
+  setSelectedProduct,
+  addToCart,
+  increaseCart,
+  decreaseCart,
+  removeProductFromCart,
+  increaseProduct,
+  decreaseProduct,
+  resetProduct,
+  calculateCartTotal,
+} = Caruislice.actions;
 export default Caruislice.reducer;

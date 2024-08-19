@@ -22,7 +22,7 @@ const Singup = () => {
   const [employeecategory, setemployeecategory] = useState();
   const [employeestatus, setemployeestatus] = useState();
   const { register } = useRegister();
-
+  const Navigate = useNavigate();
 
   useEffect(() => {
     setemployeecategory("admin");
@@ -113,7 +113,7 @@ const Singup = () => {
       setName("");
       setEmail("");
       setPassword("");
-      // Navigate("/main");
+       Navigate("/");
     } catch (error) {
       if (error.response && error.response.data) {
         Toastsucess(`Error: ${error.response?.data || error.message}`);

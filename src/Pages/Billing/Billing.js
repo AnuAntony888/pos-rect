@@ -11,6 +11,8 @@ import ItemBilling from "./ItemBilling";
 import { Getcustomer, useCustomerField } from "../../API/APICustomer";
 import { GetInvoice, useInsertInvoice } from "../../API/ApIOrder";
 import { useAuthContext } from "../../Context/AuthContext";
+import { useLogout } from "../../API/UserApi";
+import { useNavigate } from "react-router-dom";
 
 const Billing = () => {
   const { getuserdata } = useAuthContext();
@@ -30,7 +32,9 @@ const Billing = () => {
   const [status, setstatus] = useState("");
   const [empname, setempname] = useState("");
 
-  const { cart_items, cartTotalAmount, cartActualTotal, discountPercentage } =
+  const { cart_items, cartTotalAmount, cartActualTotal, discountPercentage, totalTaxAmount,
+    cartGrandTotalAmount
+  } =
     useSelector((state) => state.cartUi);
   console.log(cartTotalAmount);
   useEffect(() => {
@@ -49,8 +53,10 @@ const Billing = () => {
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
     const day = String(today.getDate()).padStart(2, "0");
-    const randomPart = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit number
-    return `INV-${year}${month}${day}-${randomPart}`;
+
+    const sequentialPart = 1; // Start at 1 by default
+    const sequentialPartStr = String(sequentialPart).padStart(4, "0");// Generate a random 4-digit number
+    return `INV-${year}${month}${day}-${sequentialPartStr}`;
   };
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [todaydate, settodaydate] = useState("");
@@ -193,12 +199,19 @@ const Billing = () => {
   const [actual_total, set_actual_total] = useState("");
   const [actual_discount, set_actual_discount] = useState("");
   const [total, settotal] = useState("");
+  const [totaltax, settax] = useState('');
+  const [totalgrand, settotalgrand] = useState('');
+  const { logout } = useLogout(getuserdata);
+  const navigate = useNavigate();
   // Use the setter function to update the state
   useEffect(() => {
     set_actual_total(cartActualTotal);
     set_actual_discount(discountPercentage);
     settotal(cartTotalAmount);
-  }, [cartActualTotal, discountPercentage, cartTotalAmount]); // Dependency array ensures this runs when cartActualTotal changes
+    settax(totalTaxAmount);
+    settotalgrand(cartGrandTotalAmount);
+    console.log(totalTaxAmount, "totalTaxAmount");
+  }, [cartActualTotal, discountPercentage, cartTotalAmount,totalTaxAmount,cartGrandTotalAmount]); // Dependency array ensures this runs when cartActualTotal changes
 
   const last = [
     { txt: "Net Amount", value: actual_total },
@@ -210,7 +223,11 @@ const Billing = () => {
 
     { txt: "Empolyee", value: empname },
   ];
-
+  const last2 = [
+    { txt: "Tax " ,value:totaltax},
+    { txt: "Total With Tax",value:totalgrand ?totalgrand:0},
+    { txt: "Round of Amount" ,value:totalgrand?`${totalgrand.toFixed(2)}`:0},
+  ];
   const printRef = useRef(null);
   const handlePrintClick = async () => {
     setstatus("print");
@@ -369,7 +386,9 @@ const Billing = () => {
     localStorage.removeItem("cartActualTotal");
     localStorage.removeItem("customer_id");
     localStorage.removeItem("invoicedetails");
-    window.location.reload();
+    localStorage.removeItem("cartGrandTotalAmount");
+    localStorage.removeItem("discountPercentage");
+     window.location.reload();
   };
 
   const handlegetinvoice = async () => {
@@ -434,7 +453,34 @@ const Billing = () => {
       Toastsucess(error.message);
     }
   };
-
+  const handleLogout = async () => {
+    try {
+      const params = {}; // Replace with any params you need to pass
+      setcustomerAddress("");
+      setcustomerContactNo("");
+      setcustomerName("");
+      setcustomerPin("");
+      setcustomerTownCity("");
+      setcustomerGSTN("");
+      setpaymentmethod("");
+      // Remove individual items
+      localStorage.removeItem("totalTaxPercentage");
+      localStorage.removeItem("cartTotal");
+      localStorage.removeItem("produt_items");
+      localStorage.removeItem("lastExternalReferrer");
+      localStorage.removeItem("cartActualTotal");
+      localStorage.removeItem("customer_id");
+      localStorage.removeItem("invoicedetails");
+      const response = logout({ params, getuserdata }).catch((err) => {
+        console.error("Failed to logout:", err.message);
+      });
+      Toastsucess(response.message, "sucess", "light");
+      
+      navigate("/");
+    } catch (error) {
+      Toastsucess(`${error.response?.data || error.message}.`);
+    }
+  };
   const lastbutton = [
     {
       text: "Save",
@@ -453,14 +499,10 @@ const Billing = () => {
       text: "New",
       onClick: handleresetinvoice,
     },
-    { text: "Exit" ,onClick: handleresetinvoice},
+    { text: "Exit" ,onClick: handleLogout },
   ];
 
-  const last2 = [
-    { txt: "Tax %" },
-    { txt: "Total With Tax" },
-    { txt: "Round of Amount" },
-  ];
+
   const handlecash = () => {
     setpaymentmethod("cash");
   };

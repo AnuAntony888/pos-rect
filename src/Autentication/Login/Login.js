@@ -106,9 +106,9 @@ console.log(getuserdata,"anju@email.com")
             sx={{ pb: "16px", pr: "15px", margin: "auto" }}
           >
             <img
-              src="https://ondemandhomecare.com/wp-content/uploads/2022/11/More-Features-1024x711.png"
+              src="https://cdni.iconscout.com/illustration/premium/thumb/profile-login-6748762-5574989.png?f=webp"
               alt=""
-              width={"100%"}
+              width={"80%"}
             />
           </Grid>
           <Grid
