@@ -9,7 +9,11 @@ import {
 } from "../../Redux/Caruislice";
 import ItemBilling from "./ItemBilling";
 import { Getcustomer, useCustomerField } from "../../API/APICustomer";
-import { GetInvoice, useInsertInvoice } from "../../API/ApIOrder";
+import {
+  GetInvoice,
+  GetInvoiceNumber,
+  useInsertInvoice,
+} from "../../API/ApIOrder";
 import { useAuthContext } from "../../Context/AuthContext";
 import { useLogout } from "../../API/UserApi";
 import { useNavigate } from "react-router-dom";
@@ -31,15 +35,48 @@ const Billing = () => {
   const [paymentmethod, setpaymentmethod] = useState("");
   const [status, setstatus] = useState("");
   const [empname, setempname] = useState("");
+  const { invoicenumber } = GetInvoiceNumber();
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  useEffect(() => {
+    const fetchInvoiceNumber = async () => {
+      try {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
 
-  const { cart_items, cartTotalAmount, cartActualTotal, discountPercentage, totalTaxAmount,
-    cartGrandTotalAmount
-  } =
-    useSelector((state) => state.cartUi);
+        const response = await invoicenumber({
+          date: `${year}-${month}-${day}`,
+        });
+        console.log(response);
+        setInvoiceNumber(response.invoiceNumber); // Adjust if your API returns a different field
+
+        Toastsucess(
+          "Invoice number generated successfully!",
+          "success",
+          "light"
+        );
+      } catch (error) {
+        Toastsucess(error.message, "error", "light");
+      }
+    };
+
+    fetchInvoiceNumber();
+  }, [invoicenumber]);
+
+  const {
+    cart_items,
+    cartTotalAmount,
+    cartActualTotal,
+    discountPercentage,
+    totalTaxAmount,
+    cartGrandTotalAmount,
+  } = useSelector((state) => state.cartUi);
   console.log(cartTotalAmount);
   useEffect(() => {
     dispatch(calculateCartTotal());
   }, [cart_items, dispatch]);
+
   const genratedate = () => {
     const today = new Date();
     const day = today.getDate();
@@ -48,20 +85,10 @@ const Billing = () => {
     const formattedDate = `${day}/${month}/${year}`;
     return formattedDate;
   };
-  const generateInvoiceNumber = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
-    const day = String(today.getDate()).padStart(2, "0");
 
-    const sequentialPart = 1; // Start at 1 by default
-    const sequentialPartStr = String(sequentialPart).padStart(4, "0");// Generate a random 4-digit number
-    return `INV-${year}${month}${day}-${sequentialPartStr}`;
-  };
-  const [invoiceNumber, setInvoiceNumber] = useState("");
   const [todaydate, settodaydate] = useState("");
   useEffect(() => {
-    setInvoiceNumber(generateInvoiceNumber());
+    // setInvoiceNumber(generateInvoiceNumber());
     settodaydate(genratedate());
     setempname(getuserdata?.name);
   }, []);
@@ -135,11 +162,6 @@ const Billing = () => {
     }
   };
 
-  console.log(customerid, "iid");
-  const customerId = localStorage.getItem("customer_id");
-  // console.log(cartActualTotal, "cart");
-  const product_discounted_total = cartActualTotal - cartTotalAmount;
-
   const handleInvoicenumber = (e) => {
     setInvoiceNumber(e.target.value);
   };
@@ -186,32 +208,29 @@ const Billing = () => {
       onChange: handlecustomerGSTN,
     },
   ];
-  const ite = [
-    { txt: "Iteam Description" },
-    { txt: "Quantity" },
-    { txt: "Unit" },
-    { txt: "Unit Price" },
-    { txt: "Discount %" },
-    { txt: "Tax %" },
-    { txt: "Total" },
-  ];
 
   const [actual_total, set_actual_total] = useState("");
   const [actual_discount, set_actual_discount] = useState("");
   const [total, settotal] = useState("");
-  const [totaltax, settax] = useState('');
-  const [totalgrand, settotalgrand] = useState('');
+  const [totaltax, settax] = useState("");
+  const [totalgrand, settotalgrand] = useState("");
   const { logout } = useLogout(getuserdata);
   const navigate = useNavigate();
-  // Use the setter function to update the state
+
   useEffect(() => {
     set_actual_total(cartActualTotal);
     set_actual_discount(discountPercentage);
     settotal(cartTotalAmount);
     settax(totalTaxAmount);
     settotalgrand(cartGrandTotalAmount);
-    console.log(totalTaxAmount, "totalTaxAmount");
-  }, [cartActualTotal, discountPercentage, cartTotalAmount,totalTaxAmount,cartGrandTotalAmount]); // Dependency array ensures this runs when cartActualTotal changes
+    // console.log(totalTaxAmount, "totalTaxAmount");
+  }, [
+    cartActualTotal,
+    discountPercentage,
+    cartTotalAmount,
+    totalTaxAmount,
+    cartGrandTotalAmount,
+  ]); // Dependency array ensures this runs when cartActualTotal changes
 
   const last = [
     { txt: "Net Amount", value: actual_total },
@@ -224,27 +243,23 @@ const Billing = () => {
     { txt: "Empolyee", value: empname },
   ];
   const last2 = [
-    { txt: "Tax " ,value:totaltax},
-    { txt: "Total With Tax",value:totalgrand ?totalgrand:0},
-    { txt: "Round of Amount" ,value:totalgrand?`${totalgrand.toFixed(2)}`:0},
+    { txt: "Tax ", value: totaltax },
+    { txt: "Total With Tax", value: totalgrand ? totalgrand : 0 },
+    {
+      txt: "Round of Amount",
+      value: totalgrand ? `${totalgrand.toFixed(2)}` : 0,
+    },
   ];
   const printRef = useRef(null);
   const handlePrintClick = async () => {
     setstatus("print");
     try {
-
-      if (
-        !invoiceNumber ||
-   
-        !cartActualTotal ||
-        !todaydate ||
-        !paymentmethod
-      ) {
+      if (!invoiceNumber || !cartActualTotal || !todaydate || !paymentmethod) {
         Toastsucess("Please fill Customer Details");
         return;
       }
       try {
-        const res=  await handleinsertcustomer(); 
+        const res = await handleinsertcustomer();
         const formData = new FormData();
 
         formData.append("employee_id", getuserdata?.userId);
@@ -267,9 +282,8 @@ const Billing = () => {
         formData.append("paymentmethod", paymentmethod);
         const response = await invoice(formData);
         Toastsucess(response.message, "sucess", "light");
-    
-          window.print();
-      
+
+        window.print();
       } catch (error) {
         Toastsucess(error.message);
       }
@@ -280,14 +294,12 @@ const Billing = () => {
   };
 
   const handlesaveinvoice = async () => {
-
-     if (
-      !invoiceNumber  || !cartActualTotal || !todaydate || !paymentmethod
-    ) {
+    if (!invoiceNumber || !cartActualTotal || !todaydate || !paymentmethod) {
       Toastsucess("Please fill Customer Details");
-      return;    }
+      return;
+    }
     try {
-      const res=  await handleinsertcustomer(); 
+      const res = await handleinsertcustomer();
       const formData = new FormData();
 
       formData.append("employee_id", getuserdata?.userId);
@@ -319,15 +331,7 @@ const Billing = () => {
 
   /****************************cancel*************************************888 */
   const handlecancelinvoice = async () => {
-   
-
-    if (
-      !invoiceNumber ||
-     
-      !cartActualTotal ||
-      !todaydate ||
-      !paymentmethod
-    ) {
+    if (!invoiceNumber || !cartActualTotal || !todaydate || !paymentmethod) {
       Toastsucess("Please fill Customer Details");
       return;
     }
@@ -339,7 +343,7 @@ const Billing = () => {
     }
 
     try {
-      const res=  await handleinsertcustomer(); 
+      const res = await handleinsertcustomer();
       const formData = new FormData();
 
       formData.append("employee_id", getuserdata?.userId);
@@ -369,7 +373,6 @@ const Billing = () => {
     }
   };
 
-  
   const handleresetinvoice = async () => {
     setcustomerAddress("");
     setcustomerContactNo("");
@@ -388,7 +391,7 @@ const Billing = () => {
     localStorage.removeItem("invoicedetails");
     localStorage.removeItem("cartGrandTotalAmount");
     localStorage.removeItem("discountPercentage");
-     window.location.reload();
+    window.location.reload();
   };
 
   const handlegetinvoice = async () => {
@@ -475,7 +478,7 @@ const Billing = () => {
         console.error("Failed to logout:", err.message);
       });
       Toastsucess(response.message, "sucess", "light");
-      
+
       navigate("/");
     } catch (error) {
       Toastsucess(`${error.response?.data || error.message}.`);
@@ -499,9 +502,8 @@ const Billing = () => {
       text: "New",
       onClick: handleresetinvoice,
     },
-    { text: "Exit" ,onClick: handleLogout },
+    { text: "Exit", onClick: handleLogout },
   ];
-
 
   const handlecash = () => {
     setpaymentmethod("cash");

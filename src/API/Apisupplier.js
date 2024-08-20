@@ -79,10 +79,13 @@ export function Updatesupplier(getuserdata) {
     SupplierCode,
     SupplierAddress,
     SupplierDescription,
+    updated_timestamp ,
+    updated_by
   }) => {
     const res = await axios.put(
       `${API_URL}/supplier/updatesuplier`,
-      { SupplierCode, SupplierDescription, SupplierAddress },
+      { SupplierCode, SupplierDescription, SupplierAddress, updated_timestamp ,
+        updated_by },
       {
         headers: {
           "Content-Type": "application/json", // Ensure the content type is JSON

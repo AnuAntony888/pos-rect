@@ -62,3 +62,39 @@ export function GetInvoice(getuserdata) {
 
   return { invoicedisply, invoicedisplyerror, invoicedisplyisLoading };
 }
+
+
+//invoicenumber 
+export function GetInvoiceNumber() {
+  const getinvoice = async (params) => {
+    const res = await axios.post(
+      `${API_URL}/invoice/generate-invoice-number`,
+      params,
+      {
+        headers: {
+          "Content-Type": "application/json", // Ensure the content type is JSON
+          // Authorization: `Bearer ${getuserdata.token}`,
+        },
+      }
+    );
+
+    return res.data;
+  };
+
+  const {
+    mutateAsync: invoicenumber,
+    error: invoicenumbererror,
+    isLoading: invoicenumberisLoading,
+  } = useMutation(getinvoice, {
+    onError: (error) => {
+      console.error("API error:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.error || error.message);
+    },
+  });
+
+  return { 
+  invoicenumber,
+  invoicenumbererror,
+    invoicenumberisLoading,
+   };
+}

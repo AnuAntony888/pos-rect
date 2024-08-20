@@ -24,7 +24,7 @@ const Supplier = () => {
   const { updatesupplierdetails } = Updatesupplier(getuserdata);
   const { deleteSupplierDetails } = useDeleteSupplier(getuserdata);
 
- const{suppliercheck}= Checksupplier(getuserdata) 
+  const { suppliercheck } = Checksupplier(getuserdata);
   const handlesetDescription = (e) => {
     setDescription(e.target.value);
   };
@@ -32,7 +32,6 @@ const Supplier = () => {
     setAddress(e.target.value);
   };
 
- 
   const handlesetSupplierCode = (e) => {
     setSupplierCode(e.target.value);
   };
@@ -44,21 +43,25 @@ const Supplier = () => {
     refetch();
   }, [refetch]);
 
-
+  const currentTimestamp = new Date().toISOString();
   const handleCheckSupplier = async () => {
     if (!description || !address) {
       Toastsucess("Please fill in all required details.");
       return;
     }
-  
+
     try {
       // Call suppliercheck API
-      const checkResponse = await suppliercheck({ SupplierDescription: description });
+      const checkResponse = await suppliercheck({
+        SupplierDescription: description,
+      });
       console.log(checkResponse.exists, "checkResponse.exists");
-  
+
       if (checkResponse.exists) {
         // Display popup if the supplier exists
-        setDialogContent("Supplier Name already exists. Do you want to proceed?");
+        setDialogContent(
+          "Supplier Name already exists. Do you want to proceed?"
+        );
         setDialogOpen(true);
       } else {
         // If supplier does not exist, call handleinsertSupplier
@@ -66,7 +69,9 @@ const Supplier = () => {
         setDialogOpen(false);
       }
     } catch (error) {
-      Toastsucess(error.message || "An error occurred while checking the supplier.");
+      Toastsucess(
+        error.message || "An error occurred while checking the supplier."
+      );
     }
   };
 
@@ -79,12 +84,15 @@ const Supplier = () => {
       Toastsucess("Please fill your Details");
       return;
     }
- 
+
     try {
       const formData = new FormData();
+      // Get the current timestamp
 
       formData.append("SupplierDescription", description);
       formData.append("SupplierAddress", address);
+      formData.append("created_timestamp", currentTimestamp);
+      formData.append("created_by", getuserdata?.name);
 
       const response = await supplieraddress(formData);
       // console.log(response.message, "response");
@@ -106,13 +114,12 @@ const Supplier = () => {
         Toastsucess("Please enter a barcode.");
         return;
       }
-      const productData = await supplierdisply({ SupplierCode});
+      const productData = await supplierdisply({ SupplierCode });
       setAddress(productData?.supplier?.SupplierAddress);
       setDescription(productData?.supplier?.SupplierDescription);
+
       console.log(productData, "consoleget supplier");
-       Toastsucess(productData?.message, "success", "light");
-  
-    
+      Toastsucess(productData?.message, "success", "light");
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -122,13 +129,15 @@ const Supplier = () => {
     try {
       if (!SupplierCode || !description || !address) {
         Toastsucess("Please fill your Details");
-  
+
         return;
       }
       const productData = await updatesupplierdetails({
         SupplierCode,
         SupplierDescription: description,
         SupplierAddress: address,
+        updated_timestamp: currentTimestamp,
+        updated_by: getuserdata?.name,
       });
       setAddress(productData?.SupplierAddress);
       setDescription(productData?.SupplierAddress);
@@ -144,31 +153,29 @@ const Supplier = () => {
     setAddress("");
   };
 
-
   const handledeletesupplier = async () => {
     if (!SupplierCode) {
       Toastsucess("Please enter a suppliercode");
       return;
-    } 
+    }
     try {
       const formData = new FormData();
 
-      formData.append("SupplierCode ", SupplierCode );
+      formData.append("SupplierCode ", SupplierCode);
 
-
+      formData.append(" deleted_timestamp ", currentTimestamp);
+      formData.append(" deleted_by", getuserdata?.name);
       const response = await deleteSupplierDetails(formData);
       // console.log(response.message, "response");
- 
+
       Toastsucess(response.message, "sucess", "light");
       setSupplierCode("");
       setDescription("");
       setAddress("");
-
     } catch (error) {
       Toastsucess(error.message);
     }
   };
-
 
   const Invoice = [
     {
