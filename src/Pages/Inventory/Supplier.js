@@ -6,11 +6,13 @@ import {
   GetAllSupplier,
   Getsupplier,
   Updatesupplier,
+  useAllsupplierlist,
   useDeleteSupplier,
   useSupplierField,
 } from "../../API/Apisupplier";
 import ReusableDialog from "../../Reuse/ReusableDialog";
 import { useAuthContext } from "../../Context/AuthContext";
+import { Tabledisply } from "../../Reuse/Reuse";
 
 const Supplier = () => {
   const { user, getuserdata } = useAuthContext();
@@ -19,12 +21,16 @@ const Supplier = () => {
   const [address, setAddress] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState("");
+  const [Content, setContent] = useState([]);
   const { supplieraddress } = useSupplierField(getuserdata);
   const { supplierdisply } = Getsupplier(getuserdata);
   const { updatesupplierdetails } = Updatesupplier(getuserdata);
   const { deleteSupplierDetails } = useDeleteSupplier(getuserdata);
 
   const { suppliercheck } = Checksupplier(getuserdata);
+
+  const { data: supplierlist, refetch } = GetAllSupplier(getuserdata);
+
   const handlesetDescription = (e) => {
     setDescription(e.target.value);
   };
@@ -36,8 +42,6 @@ const Supplier = () => {
     setSupplierCode(e.target.value);
   };
 
-  // Using GetAllSupplier hook
-  const { refetch } = GetAllSupplier(getuserdata);
   useEffect(() => {
     // Refetch suppliers when component mounts
     refetch();
@@ -213,6 +217,27 @@ const Supplier = () => {
       onClick: handleupdatesupplier,
     },
   ];
+  const columns = [
+    {
+      headerName: "Supplier Code",
+      field: "suppliercode"
+    },
+    {
+      headerName: "Supplier Description",
+      field: "supplierdescription",
+    },
+    {
+      headerName: "Supplier Address",
+      field: "supplieraddress"
+    },
+  ];
+
+  const data = supplierlist ? supplierlist.map((data) => ({
+    suppliercode: `00000${ data.SupplierCode }`,
+    supplierdescription: data.SupplierDescription,
+    supplieraddress: data.SupplierAddress,
+  })) : [];
+
   return (
     <div>
       <Grid container spacing={2}>
@@ -275,6 +300,13 @@ const Supplier = () => {
             </Grid>
           </>
         ))}
+        <Grid item xs={12}>
+          <br />
+          <Tabledisply
+            columns={columns}
+            data={data}
+          />
+        </Grid>
       </Grid>
 
       <ReusableDialog

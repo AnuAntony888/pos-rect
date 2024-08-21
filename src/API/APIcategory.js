@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useMutation, useQuery } from "react-query";
 import { API_URL } from "./UserApi";
-
+export const currentTimestamp = new Date().toISOString();
 {
   /***************************insert into product************************************** */
 }
@@ -184,4 +184,23 @@ export function Checkcategory(getuserdata) {
      updatecategoryerror,
          updatecategoryisLoading,
     };
-  }
+}
+  
+
+{/*********************getallcategory list************************** */ }
+export function GetAllCategory(getuserdata) {
+  const getcategory = async () => {
+    console.log(getuserdata, "getuserdata");
+    const res = await axios.get(`${API_URL}/category/getAllcategory`, {
+      headers: {
+        Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+      },
+    });
+    return res.data;
+  };
+  const { data, error, isLoading, refetch } = useQuery(
+    "getcategory",
+    getcategory
+  );
+  return { data, error, isLoading, refetch };
+}

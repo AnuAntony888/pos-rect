@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
 import { Button, Grid } from "@mui/material";
 
 import { useAuthContext } from "../../Context/AuthContext";
 import {
   Checkcategory,
+  currentTimestamp,
+  GetAllCategory,
   GetCategory,
   UpdateCategory,
   useCategoryField,
   useDeleteCategory,
 } from "../../API/APIcategory";
 import ReusableDialog from "../../Reuse/ReusableDialog";
+import { Tabledisply } from "../../Reuse/Reuse";
 
 const Category = () => {
   const { getuserdata } = useAuthContext();
@@ -23,6 +26,11 @@ const Category = () => {
   const { categorycheck } = Checkcategory(getuserdata);
   const { deletecategoryDetails } = useDeleteCategory(getuserdata);
   const { updatecategorydetails } = UpdateCategory(getuserdata);
+  const { data: allcategorylist,refetch } = GetAllCategory(getuserdata)
+  useEffect(() => {
+    // Refetch suppliers when component mounts
+    refetch();
+  }, [refetch]);
   const handleCategoryCode = (e) => {
     setCategoryCode(e.target.value);
   };
@@ -38,6 +46,8 @@ const Category = () => {
     try {
       const formData = new FormData();
       formData.append("CategoryDescription", CategoryDescription);
+      formData.append("created_timestamp", currentTimestamp);
+      formData.append("created_by", getuserdata?.name);
       const response = await category(formData);
       Toastsucess(response.message, "sucess", "light");
       setDialogOpen(false);
@@ -73,8 +83,15 @@ const Category = () => {
     try {
       const formData = new FormData();
       formData.append("CategoryCode", CategoryCode);
+      
+      formData.append(" deleted_timestamp ", currentTimestamp);
+      formData.append(" deleted_by", getuserdata?.name);
       const response = await deletecategoryDetails(formData);
       Toastsucess(response.message, "sucess", "light");
+      refetch();
+      setCategoryCode("");
+      setCategoryDescription("");
+
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -88,6 +105,7 @@ const Category = () => {
       // Call suppliercheck API
       const formData = new FormData();
       formData.append("CategoryDescription", CategoryDescription);
+
       const checkResponse = await categorycheck(formData);
       if (checkResponse.exists) {
         setDialogContent(
@@ -115,6 +133,8 @@ const Category = () => {
       const formData = new FormData();
       formData.append("CategoryCode", CategoryCode);
       formData.append("CategoryDescription", CategoryDescription);
+      formData.append("updated_timestamp", currentTimestamp);
+      formData.append("updated_by", getuserdata?.name);
       const response = await updatecategorydetails(formData);
       Toastsucess(response.message, "sucess", "light");
       setCategoryCode("");
@@ -157,6 +177,23 @@ const Category = () => {
       onClick: handleupdatecategory,
     },
   ];
+  const columns = [
+    {
+      headerName: "Category Code",
+      field: "categorycode"
+    },
+    {
+      headerName: "Category Description",
+      field: "categorydescription",
+    },
+ 
+  ];
+
+  const data = allcategorylist ? allcategorylist.map((data) => ({
+    categorycode: `00000${ data.CategoryCode }`,
+    categorydescription: data.CategoryDescription,
+
+  })) : [];
   return (
     <div>
       <Grid container spacing={2}>
@@ -218,6 +255,13 @@ const Category = () => {
             </Grid>
           </>
         ))}
+        <Grid item xs={12}>
+        <br />
+          <Tabledisply
+            columns={columns}
+            data={data}
+          />
+        </Grid>
       </Grid>
       <ReusableDialog
         open={dialogOpen}
