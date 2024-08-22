@@ -13,19 +13,23 @@ import { Toastsucess, TypographyText } from "../../Reusable";
 import { GetAllSupplier } from "../../API/Apisupplier";
 import Supplier from "./Supplier";
 import {
+  GetAllItem,
   GetItemByCode,
   UpdateIteam,
   useDeleteItem,
   useIteamField,
 } from "../../API/APiiteam";
 import { useAuthContext } from "../../Context/AuthContext";
-import { GetAllCategory } from "../../API/APIcategory";
+import { currentTimestamp, GetAllCategory } from "../../API/APIcategory";
+import Iteamdeatilsdisply from "./Iteamdeatilsdisply";
 
 const IteamManagement = () => {
   const { getuserdata } = useAuthContext();
   console.log(getuserdata, "localStorage");
   const { data: allsupplier, refetch } = GetAllSupplier(getuserdata);
-  const { data: allcategorylist,refetch:categoryrefec } = GetAllCategory(getuserdata)
+  const { data: allcategorylist, refetch: categoryrefec } =
+    GetAllCategory(getuserdata);
+    const {  refetch:allitemrefetch } = GetAllItem(getuserdata);
   const { InserItem } = useIteamField(getuserdata);
   const { itembyitemcode } = GetItemByCode(getuserdata);
   const { updateitemdetails } = UpdateIteam(getuserdata);
@@ -39,8 +43,8 @@ const IteamManagement = () => {
   const [IteamPrice, setIteamPrice] = useState("");
   const [ItemCategory, setItemCategory] = useState("");
   const [selectedSupplier, setSelectedSupplier] = useState([]);
-  const[selectedcategory, setselectedcategory] = useState([]);
-  
+  const [selectedcategory, setselectedcategory] = useState([]);
+
   const [Iteamstock, setIteamstock] = useState("");
   useEffect(() => {
     if (allsupplier) {
@@ -50,9 +54,8 @@ const IteamManagement = () => {
       }));
       setSelectedSupplier(initialSupplierList);
     }
-    
   }, [allsupplier]);
-  console.log(allcategorylist,"allcategory")
+  console.log(allcategorylist, "allcategory");
   useEffect(() => {
     if (allcategorylist) {
       const initialSupplierList = allcategorylist.map((supplier) => ({
@@ -60,7 +63,7 @@ const IteamManagement = () => {
         eminame: supplier.CategoryDescription,
       }));
       setselectedcategory(initialSupplierList);
-    }    
+    }
   }, [allcategorylist]);
 
   // List of unit options
@@ -104,16 +107,19 @@ const IteamManagement = () => {
   };
   const handleCategory = (e) => {
     setItemCategory(e.target.value);
-  }
+  };
   useEffect(() => {
     refetch(); // Trigger a refetch if needed
-  }, [refetch]); // Dependency array includes refetch
+    categoryrefec();
+    allitemrefetch();
+  }, [refetch,categoryrefec,allitemrefetch]); // Dependency array includes refetch
 
   const handleinsertItem = async () => {
     if (
       !ItemCode ||
       !ItemDescription ||
       !ItemSupplier ||
+      !ItemCategory ||
       !ItemUnit ||
       !ItemTax ||
       !IteamDiscount ||
@@ -129,11 +135,14 @@ const IteamManagement = () => {
       formData.append("ItemCode", ItemCode);
       formData.append("ItemDescription", ItemDescription);
       formData.append("ItemSupplier", ItemSupplier);
+      formData.append("ItemCategory", ItemCategory);
       formData.append("ItemUnit", ItemUnit);
       formData.append("ItemTax", ItemTax);
       formData.append("IteamDiscount", IteamDiscount);
       formData.append("IteamPrice", IteamPrice);
       formData.append("Iteamstock", Iteamstock);
+      formData.append("created_timestamp", currentTimestamp);
+      formData.append("created_by", getuserdata?.name);
 
       const response = await InserItem(formData);
       Toastsucess(response.message, "success", "light");
@@ -145,6 +154,7 @@ const IteamManagement = () => {
       setItemDescription("");
       setIteamPrice("");
       setIteamstock("");
+      allitemrefetch();
     } catch (error) {}
 
     refetch();
@@ -153,11 +163,11 @@ const IteamManagement = () => {
   const handlegetItemByItemcode = async () => {
     try {
       if (!ItemCode) {
-        Toastsucess("Please enter a barcode.");
+        Toastsucess("Please enter a IteamCode.");
         return;
       }
       const productData = await itembyitemcode({ ItemCode });
-      console.log(productData, "prduct");
+      // console.log(productData, "prduct");
 
       // Extract the item data
       const item = productData?.[0];
@@ -171,7 +181,7 @@ const IteamManagement = () => {
 
         const fetchedSuppliers = productData.map((item) => item.ItemSupplier);
 
-        console.log(fetchedSuppliers, "fetchedSuppliers");
+        // console.log(fetchedSuppliers, "fetchedSuppliers");
 
         // Handle empty fetchedSuppliers
         if (fetchedSuppliers.length === 0) {
@@ -186,6 +196,25 @@ const IteamManagement = () => {
         }));
 
         setSelectedSupplier(initialSupplierList);
+
+        const fetchedCategory = productData.map((item) => item.ItemCategory);
+
+        // console.log(fetchedSuppliers, "fetchedSuppliers");
+
+        // Handle empty fetchedSuppliers
+        if (fetchedCategory.length === 0) {
+          console.log("No suppliers found.");
+          setItemCategory("");
+          return;
+        }
+
+        const initialCategoryList = fetchedCategory.map((category) => ({
+          emivalue: category,
+          eminame: category,
+        }));
+
+        setselectedcategory(initialCategoryList);
+
         console.log(initialSupplierList, "initialSupplierList");
       }
 
@@ -228,6 +257,8 @@ const IteamManagement = () => {
         IteamDiscount: IteamDiscount,
         IteamPrice: IteamPrice,
         Iteamstock: Iteamstock,
+        updated_timestamp: currentTimestamp,
+        updated_by: getuserdata?.name
       });
       setIteamDiscount(productData?.ItemDescription);
       setIteamPrice(productData?.IteamPrice);
@@ -240,6 +271,7 @@ const IteamManagement = () => {
       Toastsucess(productData?.message, "success", "light");
 
       refetch();
+      allitemrefetch();
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -263,6 +295,8 @@ const IteamManagement = () => {
       const formData = new FormData();
 
       formData.append("ItemCode ", ItemCode);
+      formData.append(" deleted_timestamp ", currentTimestamp);
+      formData.append(" deleted_by", getuserdata?.name);
 
       const response = await deleteItemDetails(formData);
       // console.log(response.message, "response");
@@ -277,6 +311,7 @@ const IteamManagement = () => {
       setIteamPrice("");
       setIteamstock("");
       refetch();
+      allitemrefetch();
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -316,8 +351,8 @@ const IteamManagement = () => {
     {
       label: "Item Category",
       txt: "Item Category",
-       value: ItemCategory,
-       onChange: handleCategory,
+      value: ItemCategory,
+      onChange: handleCategory,
       datas: selectedcategory,
     },
     {
@@ -385,7 +420,7 @@ const IteamManagement = () => {
 
         {Invoice3.map((data, index) => (
           <Grid item lg={3} xs={12} sm={6} md={3} key={index}>
-            {index === 2  ? (
+            {index === 2 ? (
               <>
                 <TypographyText
                   Typography={data.txt}
@@ -420,7 +455,7 @@ const IteamManagement = () => {
                   </Select>
                 </FormControl>
               </>
-            ):index === 3  ? (
+            ) : index === 3 ? (
               <>
                 <TypographyText
                   Typography={data.txt}
@@ -455,8 +490,7 @@ const IteamManagement = () => {
                   </Select>
                 </FormControl>
               </>
-            ) 
-              : index === 4 ? (
+            ) : index === 4 ? (
               <>
                 <TypographyText
                   Typography={data.txt}
@@ -544,6 +578,9 @@ const IteamManagement = () => {
             </Button>
           </Grid>
         ))}
+        <Grid item xs={12}>
+          <Iteamdeatilsdisply/>
+        </Grid>
       </Grid>
     </div>
   );

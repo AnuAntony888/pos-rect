@@ -21,7 +21,7 @@ const Supplier = () => {
   const [address, setAddress] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState("");
-  const [Content, setContent] = useState([]);
+ 
   const { supplieraddress } = useSupplierField(getuserdata);
   const { supplierdisply } = Getsupplier(getuserdata);
   const { updatesupplierdetails } = Updatesupplier(getuserdata);

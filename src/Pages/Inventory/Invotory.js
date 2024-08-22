@@ -52,12 +52,15 @@ const Invotory = () => {
     <div>
      
 
-      <Box sx={{ width: "100%" }}>
+
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
           onChange={handleChange}
-          aria-label="basic tabs example"
+          variant="scrollable"
+          scrollButtons
+          allowScrollButtonsMobile
+          aria-label="scrollable force tabs example"
         >
           {tabs.map((tab, index) => (
             <Tab
@@ -78,7 +81,7 @@ const Invotory = () => {
           {tab.content}
         </CustomTabPanel>
       ))}
-    </Box>
+
     </div>
   );
 };

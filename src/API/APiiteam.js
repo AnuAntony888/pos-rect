@@ -82,7 +82,9 @@ export function UpdateIteam(getuserdata) {
     ItemUnit,
     ItemTax,
     IteamDiscount,
-    IteamPrice,Iteamstock
+    IteamPrice, Iteamstock,
+    updated_timestamp,
+    updated_by
   }) => {
     const res = await axios.put(
       `${API_URL}/item/updateitem`,
@@ -93,7 +95,9 @@ export function UpdateIteam(getuserdata) {
         ItemUnit,
         ItemTax,
         IteamDiscount,
-        IteamPrice,Iteamstock
+        IteamPrice, Iteamstock,
+        updated_timestamp,
+        updated_by
       },
       {
         headers: {
@@ -128,35 +132,7 @@ export function UpdateIteam(getuserdata) {
 {
   /****************************update user**************************************** */
 }
-// const deleteItem = async ({ ItemCode}) => {
-//   const res = await axios.delete(`${API_URL}/item/deleteitem`, {
-//     data: { ItemCode }, // Pass data here for a DELETE request
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//   });
 
-//   return res.data;
-// };
-
-// export function useDeleteItem() {
-//   const {
-//     mutateAsync: deleteItemDetails,
-//     error: deleteItemDetailsError,
-//     isLoading: deleteItemDetailsIsLoading,
-//   } = useMutation(deleteItem , {
-//     onError: (error) => {
-//       console.error("API error:", error.response?.data || error.message);
-//       throw new Error(error.response?.data?.error || error.message);
-//     },
-//   });
-
-//   return {
-//     deleteItemDetails,
-//     deleteItemDetailsError,
-//     deleteItemDetailsIsLoading,
-//   };
-// }
 export function useDeleteItem(getuserdata) {
   const deleteItem = async (formData) => {
     const res = await axios.post(
@@ -192,4 +168,43 @@ deleteItemDetails,
    deleteItemDetailsError,
    deleteItemDetailsIsLoading,
   };
+}
+
+
+{/**********************get all Item***************************** */ }
+export function GetAllItem(getuserdata) {
+  const getitem = async () => {
+    console.log(getuserdata, "getuserdata");
+    const res = await axios.get(`${API_URL}/item/getAllItems`, {
+      headers: {
+        Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+      },
+    });
+    return res.data;
+  };
+  const { data, error, isLoading, refetch } = useQuery(
+    "getitem",
+    getitem
+  );
+  return { data, error, isLoading, refetch };
+}
+
+{/************************************************ */ }
+
+export function GetAllItemsBySupplierName(getuserdata) {
+  const getitembysuppliername = async (formData) => {
+    // console.log(getuserdata, "getuserdata");
+    const res = await axios.get(`${API_URL}/item/getItemsBySupplierName`,
+      formData,{
+      headers: {
+        Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+      },
+    });
+    return res.data;
+  };
+  const { data, error, isLoading, refetch } = useQuery(
+    "getitembysuppliername",
+    getitembysuppliername
+  );
+  return { data, error, isLoading, refetch };
 }
