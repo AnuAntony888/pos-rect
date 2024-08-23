@@ -549,7 +549,7 @@ const IteamManagement = () => {
         ))}
 
         {Buttons.map((data, index) => (
-          <Grid item lg={0.75} md={2.4} sm={6} xs={6} key={index}>
+          <Grid item lg={1} md={2.4} sm={6} xs={6} key={index}>
             <p></p>
             <Button
               variant="contained"

@@ -48,6 +48,7 @@ const Supplier = () => {
   }, [refetch]);
 
   const currentTimestamp = new Date().toISOString();
+  
   const handleCheckSupplier = async () => {
     if (!description || !address) {
       Toastsucess("Please fill in all required details.");

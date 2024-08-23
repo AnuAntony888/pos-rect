@@ -22,16 +22,13 @@ export function useIteamField(getuserdata) {
     error: InserItemerror,
     isLoading: InserItemisLoading,
   } = useMutation(ItemForm, {
-    onSuccess: (data) => {
-      
-    },
+    onSuccess: (data) => {},
     onError: (error) => {
       if (error.response) {
         Toastsucess(`${error.response.data.error}`);
       } else {
-        Toastsucess(error.message, );
+        Toastsucess(error.message);
       }
-    
     },
   });
 
@@ -82,9 +79,10 @@ export function UpdateIteam(getuserdata) {
     ItemUnit,
     ItemTax,
     IteamDiscount,
-    IteamPrice, Iteamstock,
+    IteamPrice,
+    Iteamstock,
     updated_timestamp,
-    updated_by
+    updated_by,
   }) => {
     const res = await axios.put(
       `${API_URL}/item/updateitem`,
@@ -95,9 +93,10 @@ export function UpdateIteam(getuserdata) {
         ItemUnit,
         ItemTax,
         IteamDiscount,
-        IteamPrice, Iteamstock,
+        IteamPrice,
+        Iteamstock,
         updated_timestamp,
-        updated_by
+        updated_by,
       },
       {
         headers: {
@@ -128,7 +127,6 @@ export function UpdateIteam(getuserdata) {
   };
 }
 
-
 {
   /****************************update user**************************************** */
 }
@@ -154,8 +152,8 @@ export function useDeleteItem(getuserdata) {
 
   const {
     mutateAsync: deleteItemDetails,
-    error:  deleteItemDetailsError,
-    isLoading:  deleteItemDetailsIsLoading,
+    error: deleteItemDetailsError,
+    isLoading: deleteItemDetailsIsLoading,
   } = useMutation(deleteItem, {
     onError: (error) => {
       console.error("API error:", error.response?.data || error.message);
@@ -164,47 +162,51 @@ export function useDeleteItem(getuserdata) {
   });
 
   return {
-deleteItemDetails,
-   deleteItemDetailsError,
-   deleteItemDetailsIsLoading,
+    deleteItemDetails,
+    deleteItemDetailsError,
+    deleteItemDetailsIsLoading,
   };
 }
 
-
-{/**********************get all Item***************************** */ }
-export function GetAllItem(getuserdata) {
+{
+  /**********************get all Item***************************** */
+}
+export function GetAllItem(getuserdata,SupplierDescription) {
   const getitem = async () => {
-    console.log(getuserdata, "getuserdata");
-    const res = await axios.get(`${API_URL}/item/getAllItems`, {
-      headers: {
-        Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
-      },
-    });
-    return res.data;
+    try {
+      console.log(getuserdata, "getuserdata");
+      const res = await axios.post(`${API_URL}/item/getAllItems`,
+        { "SupplierDescription": SupplierDescription },
+        {
+          headers: {
+            Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+          },
+        });
+      return res.data;
+    }
+    catch (error) {
+      if (error.response?.error) {
+        // Return the error response data
+        return Promise.reject(error.response.data);
+      } else {
+        // Handle other errors (e.g., network issues)
+        return Promise.reject({ error: "An unexpected error occurred." });
+      }
+    }
   };
   const { data, error, isLoading, refetch } = useQuery(
-    "getitem",
-    getitem
-  );
+     [ "getitem",SupplierDescription], getitem,{enabled:false});
   return { data, error, isLoading, refetch };
 }
 
-{/************************************************ */ }
 
-export function GetAllItemsBySupplierName(getuserdata) {
-  const getitembysuppliername = async (formData) => {
-    // console.log(getuserdata, "getuserdata");
-    const res = await axios.get(`${API_URL}/item/getItemsBySupplierName`,
-      formData,{
-      headers: {
-        Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
-      },
-    });
-    return res.data;
-  };
-  const { data, error, isLoading, refetch } = useQuery(
-    "getitembysuppliername",
-    getitembysuppliername
-  );
-  return { data, error, isLoading, refetch };
-}
+
+
+
+
+
+
+
+
+
+

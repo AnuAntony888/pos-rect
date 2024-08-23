@@ -118,7 +118,7 @@ const Billing = () => {
       !customerContactNo ||
       !customerTownCity ||
       !customerPin ||
-      !customerGSTN ||
+      // !customerGSTN ||
       !customerAddress
     ) {
       Toastsucess("Please fill Customer Details");
@@ -280,6 +280,8 @@ const Billing = () => {
         formData.append("product_discounted_total", discountPercentage);
         formData.append("product_total", `${cartTotalAmount.toFixed(2)}`);
         formData.append("paymentmethod", paymentmethod);
+        formData.append("created_by", getuserdata?.name);
+        formData.append("updated_by", getuserdata?.name);
         const response = await invoice(formData);
         Toastsucess(response.message, "sucess", "light");
 
@@ -320,6 +322,8 @@ const Billing = () => {
       formData.append("product_discounted_total", discountPercentage);
       formData.append("product_total", `${cartTotalAmount.toFixed(2)}`);
       formData.append("paymentmethod", paymentmethod);
+      formData.append("created_by", getuserdata?.name);
+      formData.append("updated_by", getuserdata?.name);
 
       const response = await invoice(formData);
 
@@ -364,7 +368,8 @@ const Billing = () => {
       formData.append("product_discounted_total", discountPercentage);
       formData.append("product_total", `${cartTotalAmount.toFixed(2)}`);
       formData.append("paymentmethod", paymentmethod);
-
+      formData.append("created_by", getuserdata?.name);
+      formData.append("updated_by", getuserdata?.name);
       const response = await invoice(formData);
 
       Toastsucess(response.message, "sucess", "light");
@@ -459,6 +464,8 @@ const Billing = () => {
   const handleLogout = async () => {
     try {
       const params = {}; // Replace with any params you need to pass
+      
+      // Clear local state
       setcustomerAddress("");
       setcustomerContactNo("");
       setcustomerName("");
@@ -466,7 +473,8 @@ const Billing = () => {
       setcustomerTownCity("");
       setcustomerGSTN("");
       setpaymentmethod("");
-      // Remove individual items
+  
+      // Clear local storage
       localStorage.removeItem("totalTaxPercentage");
       localStorage.removeItem("cartTotal");
       localStorage.removeItem("produt_items");
@@ -474,16 +482,24 @@ const Billing = () => {
       localStorage.removeItem("cartActualTotal");
       localStorage.removeItem("customer_id");
       localStorage.removeItem("invoicedetails");
-      const response = logout({ params, getuserdata }).catch((err) => {
-        console.error("Failed to logout:", err.message);
-      });
-      Toastsucess(response.message, "sucess", "light");
-
-      navigate("/");
+  
+      // Perform the logout API call
+      const response = await logout({ params, getuserdata });
+  
+      if (response?.message) {
+        Toastsucess(response.message, "success", "light");
+      } else {
+        throw new Error("Logout failed");
+      }
+  
+      // Redirect to the home page after a successful logout
+      window.location.href = "/"; // Redirect to the home page or any other desired page
+  
     } catch (error) {
       Toastsucess(`${error.response?.data || error.message}.`);
     }
   };
+  
   const lastbutton = [
     {
       text: "Save",
