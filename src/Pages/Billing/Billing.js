@@ -35,27 +35,23 @@ const Billing = () => {
   const [paymentmethod, setpaymentmethod] = useState("");
   const [status, setstatus] = useState("");
   const [empname, setempname] = useState("");
-  const { invoicenumber } = GetInvoiceNumber();
+
   const [invoiceNumber, setInvoiceNumber] = useState("");
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  const { invoicenumber, refetch } = GetInvoiceNumber(
+    getuserdata,
+    `${year}-${month}-${day}`
+  );
+
   useEffect(() => {
     const fetchInvoiceNumber = async () => {
       try {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, "0");
-        const day = String(today.getDate()).padStart(2, "0");
-
-        const response = await invoicenumber({
-          date: `${year}-${month}-${day}`,
-        });
-        console.log(response);
-        setInvoiceNumber(response.invoiceNumber); // Adjust if your API returns a different field
-
-        Toastsucess(
-          "Invoice number generated successfully!",
-          "success",
-          "light"
-        );
+        const response = await refetch();
+        setInvoiceNumber(response?.data?.invoiceNumber); // Adjust if your API returns a different field
       } catch (error) {
         Toastsucess(error.message, "error", "light");
       }
@@ -301,6 +297,7 @@ const Billing = () => {
       return;
     }
     try {
+       await refetch();
       const res = await handleinsertcustomer();
       const formData = new FormData();
 
@@ -347,6 +344,7 @@ const Billing = () => {
     }
 
     try {
+      await refetch();
       const res = await handleinsertcustomer();
       const formData = new FormData();
 
@@ -464,7 +462,7 @@ const Billing = () => {
   const handleLogout = async () => {
     try {
       const params = {}; // Replace with any params you need to pass
-      
+
       // Clear local state
       setcustomerAddress("");
       setcustomerContactNo("");
@@ -473,7 +471,7 @@ const Billing = () => {
       setcustomerTownCity("");
       setcustomerGSTN("");
       setpaymentmethod("");
-  
+
       // Clear local storage
       localStorage.removeItem("totalTaxPercentage");
       localStorage.removeItem("cartTotal");
@@ -482,24 +480,23 @@ const Billing = () => {
       localStorage.removeItem("cartActualTotal");
       localStorage.removeItem("customer_id");
       localStorage.removeItem("invoicedetails");
-  
+
       // Perform the logout API call
       const response = await logout({ params, getuserdata });
-  
+
       if (response?.message) {
         Toastsucess(response.message, "success", "light");
       } else {
         throw new Error("Logout failed");
       }
-  
+
       // Redirect to the home page after a successful logout
       window.location.href = "/"; // Redirect to the home page or any other desired page
-  
     } catch (error) {
       Toastsucess(`${error.response?.data || error.message}.`);
     }
   };
-  
+
   const lastbutton = [
     {
       text: "Save",

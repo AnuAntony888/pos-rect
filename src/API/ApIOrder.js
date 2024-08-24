@@ -1,4 +1,4 @@
-import { useMutation } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { API_URL } from "./UserApi";
 import axios from "axios";
 
@@ -63,38 +63,66 @@ export function GetInvoice(getuserdata) {
   return { invoicedisply, invoicedisplyerror, invoicedisplyisLoading };
 }
 
+//invoicenumber
+// export function GetInvoiceNumber() {
+//   const getinvoice = async (params) => {
+//     const res = await axios.post(
+//       `${API_URL}/invoice/generate-invoice-number`,
+//       params,
+//       {
+//         headers: {
+//           "Content-Type": "application/json", // Ensure the content type is JSON
+//           // Authorization: `Bearer ${getuserdata.token}`,
+//         },
+//       }
+//     );
 
-//invoicenumber 
-export function GetInvoiceNumber() {
-  const getinvoice = async (params) => {
-    const res = await axios.post(
-      `${API_URL}/invoice/generate-invoice-number`,
-      params,
-      {
-        headers: {
-          "Content-Type": "application/json", // Ensure the content type is JSON
-          // Authorization: `Bearer ${getuserdata.token}`,
-        },
+//     return res.data;
+//   };
+
+//   const {
+//     mutateAsync: invoicenumber,
+//     error: invoicenumbererror,
+//     isLoading: invoicenumberisLoading,
+//   } = useMutation(getinvoice, {
+//     onError: (error) => {
+//       console.error("API error:", error.response?.data || error.message);
+//       throw new Error(error.response?.data?.error || error.message);
+//     },
+//   });
+
+//   return {
+//   invoicenumber,
+//   invoicenumbererror,
+//     invoicenumberisLoading,
+//    };
+// }
+
+export function GetInvoiceNumber(getuserdata,date) {
+  const getinvoice = async () => {
+    try {
+      console.log(getuserdata, "getuserdata");
+      const res = await axios.post(`${API_URL}/invoice/generate-invoice-number`,
+        { "date": date},
+        {
+          headers: {
+            Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+          },
+        });
+      return res.data;
+    }
+    catch (error) {
+      if (error.response?.error) {
+        // Return the error response data
+        return Promise.reject(error.response.data);
+      } else {
+        // Handle other errors (e.g., network issues)
+        return Promise.reject({ error: "An unexpected error occurred." });
       }
-    );
-
-    return res.data;
+    }
   };
-
-  const {
-    mutateAsync: invoicenumber,
-    error: invoicenumbererror,
-    isLoading: invoicenumberisLoading,
-  } = useMutation(getinvoice, {
-    onError: (error) => {
-      console.error("API error:", error.response?.data || error.message);
-      throw new Error(error.response?.data?.error || error.message);
-    },
-  });
-
-  return { 
-  invoicenumber,
-  invoicenumbererror,
-    invoicenumberisLoading,
-   };
+  const { data:invoicenumber, error:invoicenumbererror, isLoading: invoicenumberisLoading, refetch } = useQuery(
+     [ "getinvoice",date], getinvoice,);
+  return {invoicenumber,invoicenumbererror,  invoicenumberisLoading, refetch };
 }
+
