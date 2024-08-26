@@ -411,7 +411,7 @@ const IteamManagement = () => {
       <Grid container spacing={2}>
         <Grid item lg={12} xs={12}>
           <TypographyText
-            Typography={"Category Management"}
+            Typography={"Iteam Management"}
             textAlign="left"
             fontSize=".9rem"
           />{" "}

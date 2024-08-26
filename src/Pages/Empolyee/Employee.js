@@ -1,8 +1,9 @@
-import { Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
 import { DeleteEmployee, GetAllEmployes, GetEmpolyee, UpdateEmployee, useRegister } from "../../API/UserApi";
 import { useAuthContext } from "../../Context/AuthContext";
+import { GetAllMaster } from "../../API/APImaster";
 
 const Employee = () => {
   const generateInvoiceNumber = () => {
@@ -19,10 +20,13 @@ const Employee = () => {
   const [employeeno, setemployeeno] = useState();
   const [employeecategory, setemployeecategory] = useState();
   const [employeestatus, setemployeestatus] = useState();
+  const [master, setmaster] = useState("");
+  const [selectedmaster, setselectedmaster] = useState([]);
   const [errors, setErrors] = useState({});
   const { getuserdata } = useAuthContext();
   const { register } = useRegister();
-  const { data ,refetch} = GetAllEmployes(getuserdata)
+  const { data, refetch } = GetAllEmployes(getuserdata);
+  const { getmaster, isLoadingrefetch } = GetAllMaster(getuserdata);
   useEffect(() => {
     // Refetch suppliers when component mounts
     refetch();
@@ -42,6 +46,9 @@ const Employee = () => {
   const handlemployeecategory = (e) => {
     setemployeecategory(e.target.value);
   };
+  const handlesetmaster = (e) => {
+    setmaster(e.target.value);
+  }
   useEffect(() => {
     setemployeestatus("employee");
     setemployeeno(generateInvoiceNumber());
@@ -73,6 +80,21 @@ const Employee = () => {
     setErrors((prev) => ({ ...prev, password: errorMsg }));
     setPassword(value);
   };
+
+
+  useEffect(() => {
+    console.log('getmaster:', getmaster);
+      if (Array.isArray(getmaster)) {
+        const initialSupplierList = getmaster.map((supplier) => ({
+          emivalue: supplier.master_id,
+          eminame: supplier.entityName,
+        }));
+
+        setselectedmaster(initialSupplierList);
+      }
+    }, [getmaster]); 
+     
+
 
   const Data = [
     {
@@ -107,6 +129,13 @@ const Employee = () => {
       onChange: handlePassword,
       value: password,
     },
+    {
+      label: "Employee Location",
+      txt: "Employee Location",
+    value: master,
+     onChange: handlesetmaster,
+      datas: selectedmaster,
+    },
   ];
   const handleApi = async () => {
     try {
@@ -127,6 +156,7 @@ const Employee = () => {
         employeeno,
         employeecategory,
         employeestatus,
+        master_id: master
       });
       Toastsucess("Sucessfully Registered ! ", "sucess", "light");
       setName("");
@@ -232,6 +262,7 @@ const Employee = () => {
     },
   ];
 
+
   return (
     <div>
       <Box
@@ -251,38 +282,75 @@ const Employee = () => {
             <hr />
           </Grid>
           {Data.map((data, index) => (
-            <>
-              <Grid item lg={3} md={4} sm={6} xs={6} key={index}>
-                <TypographyText
-                  Typography={data.txt}
-                  textAlign="left"
-                  fontSize=".9rem"
-                />
+  <Grid item lg={3} md={4} sm={6} xs={6} key={index}>
+    {index === 5 ? (
+      <>
+        <TypographyText
+          Typography={data.txt}
+          textAlign="left"
+          fontSize=".8rem"
+        />
+        <FormControl fullWidth size="small">
+          <InputLabel
+            id="location-select-label"
+            sx={{
+              fontFamily: "Poppins !important",
+              fontSize: ".85rem",
+            }}
+          >
+            Item Supplier
+          </InputLabel>
+          <Select
+            value={data.value}
+            onChange={data.onChange}
+            sx={{
+              backgroundColor: "#F7F7F7",
+              fontFamily: "Poppins !important",
+              fontSize: ".9rem",
+            }}
+          >
+            {Array.isArray(data.datas) &&
+              data.datas.map((datas, i) => (
+                <MenuItem key={datas.id || i} value={datas.emivalue}>
+                  {datas.eminame}
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+      </>
+    ) : (
+      <>
+        <TypographyText
+          Typography={data.txt}
+          textAlign="left"
+          fontSize=".9rem"
+        />
+        <input
+          required
+          type={data.type}
+          name={data.name}
+          value={data.value}
+          onChange={data.onChange}
+          style={{
+            height: "35px",
+            width: "100%",
+            border: "none",
+            backgroundColor: "#F7F7F7",
+          }}
+        />
+        {errors[data.name] && (
+          <TypographyText
+            Typography={errors[data.name]}
+            color="red"
+            textAlign="left"
+            textTransform="lowercase"
+          />
+        )}
+      </>
+    )}
+  </Grid>
+))}
 
-                <input
-                  required
-                  type={data.type}
-                  name={data.name}
-                  value={data.value}
-                  onChange={data.onChange}
-                  style={{
-                    height: "35px",
-                    width: "100%",
-                    border: "none",
-                    backgroundColor: "#F7F7F7",
-                  }}
-                />
-                {errors[data.name] && (
-                  <TypographyText
-                    Typography={errors[data.name]}
-                    color="red"
-                    textAlign="left"
-                    textTransform="lowercase"
-                  />
-                )}
-              </Grid>
-            </>
-          ))}
 
           {Buttons.map((data, index) => (
             <>
@@ -347,6 +415,9 @@ const Employee = () => {
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {data.name}
+              </TableCell>
+              <TableCell component="th" scope="row">
+                      {data.employeecategory}
                     </TableCell>
                     <TableCell component="th" scope="row">
                       {data.email}
@@ -374,6 +445,9 @@ const EmployeeDetails = [{
 {
 txt:"Employee Name"
   },
+  {
+    txt:"Employee Category"
+      },
   {
     txt:"Employee Email"
     }]

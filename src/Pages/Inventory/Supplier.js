@@ -15,7 +15,7 @@ import { useAuthContext } from "../../Context/AuthContext";
 import { Tabledisply } from "../../Reuse/Reuse";
 
 const Supplier = () => {
-  const { user, getuserdata } = useAuthContext();
+  const { getuserdata } = useAuthContext();
   const [SupplierCode, setSupplierCode] = useState("");
   const [description, setDescription] = useState("");
   const [address, setAddress] = useState("");

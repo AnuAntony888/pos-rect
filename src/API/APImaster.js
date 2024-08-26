@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API_URL } from "./UserApi";
-import { useMutation } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { Toastsucess } from "../Reusable";
 
 export function useMaster(getuserdata) {
@@ -70,4 +70,22 @@ export function useGetMaster(getuserdata) {
   return {    getmaster,
     getmasterererror,
     getmasterisLoading, };
+}
+
+//get all master
+export function GetAllMaster(getuserdata) {
+  const getmasterdata = async () => {
+    console.log(getuserdata, "getuserdata");
+    const res = await axios.get(`${API_URL}/master/getAllMaster`, {
+      headers: {
+        Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+      },
+    });
+    return res.data;
+  };
+  const { data:getmaster, error:getmastererror, isLoading:getmasterisLoading, refetch:isLoadingrefetch } = useQuery(
+    "getmasterdata",
+    getmasterdata
+  );
+  return { getmaster, getmastererror, getmasterisLoading, isLoadingrefetch };
 }

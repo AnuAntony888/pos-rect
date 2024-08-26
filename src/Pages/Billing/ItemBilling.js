@@ -104,17 +104,7 @@ const ItemBilling = () => {
     { txt: "Clear Item" },
   ];
 
-  const productinvoice = [
-    { txt: "Item Code" },
-    { txt: "Item Description" },
-    { txt: "Quantity" },
-    { txt: "Unit" },
-    { txt: "Unit Price" },
-    { txt: "Tax %" },
-    { txt: "Discount %" },
-    { txt: "Stock" },
-
-  ];
+  
 
   const handleRemove = () => {
     setItemCode("");
@@ -143,14 +133,7 @@ const ItemBilling = () => {
   console.log(productfectchdatils, "productfectchdatils");
   // const productfectchdatils = JSON.parse(localStorage.getItem("invoicedetails"));
 
-const combinedDetails = productfectchdatils.invoiceDetails.map(invoice => {
-  const product = productfectchdatils.productDetails.find(prod => prod.product_id === invoice.product_id);
-  
-  return {
-    ...invoice, // Include all invoice details
-    ...product, // Include all matching product details
-  };
-}) || [];
+
   
 
 
@@ -255,59 +238,7 @@ const combinedDetails = productfectchdatils.invoiceDetails.map(invoice => {
           {cartTotalAmount}
         </Grid>
       <Grid item xs={12}>
-        {/* {combinedDetails.length > 0 ?
-          <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="caption table">
-            <TableHead>
-              <TableRow>
-                {productinvoice.map((data, index) => (
-                  <TableCell
-                    className="shadow-checkoutCardheading"
-                    key={index}
-                  >
-                    {data.txt}
-                  </TableCell>
-                ))}{" "}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {
-                combinedDetails.map((data) => (
-                  <TableRow key={data.product_id}>
-                    <TableCell component="th" scope="row">
-                      {data.ItemCode}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.ItemDescription}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.cartCount}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.ItemUnit}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.IteamPrice}
-                    </TableCell>{" "}
-                    <TableCell component="th" scope="row">
-                      {data.ItemTax}
-                    </TableCell>{" "}
-                    <TableCell component="th" scope="row">
-                      {data.IteamDiscount}
-                    </TableCell>
-                
-                 
-                    <TableCell component="th" scope="row">
-                      {data.Iteamstock}
-                    </TableCell>
-                    
-                  </TableRow>
-                ))}
-              
-               
-            </TableBody>
-          </Table>
-        </TableContainer> : */}
+    
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="caption table">
               <TableHead>
