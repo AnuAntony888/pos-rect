@@ -26,10 +26,15 @@ import Iteamdeatilsdisply from "./Iteamdeatilsdisply";
 const IteamManagement = () => {
   const { getuserdata } = useAuthContext();
   console.log(getuserdata, "localStorage");
-  const { data: allsupplier, refetch } = GetAllSupplier(getuserdata);
-  const { data: allcategorylist, refetch: categoryrefec } =
-    GetAllCategory(getuserdata);
-    const {  refetch:allitemrefetch } = GetAllItem(getuserdata);
+  const { data: allsupplier, refetch } = GetAllSupplier(
+    getuserdata,
+    getuserdata?.master?.master_id
+  );
+  const { data: allcategorylist, refetch: categoryrefec } = GetAllCategory(
+    getuserdata,
+    getuserdata?.master?.master_id
+  );
+  const { refetch: allitemrefetch } = GetAllItem(getuserdata);
   const { InserItem } = useIteamField(getuserdata);
   const { itembyitemcode } = GetItemByCode(getuserdata);
   const { updateitemdetails } = UpdateIteam(getuserdata);
@@ -112,7 +117,7 @@ const IteamManagement = () => {
     refetch(); // Trigger a refetch if needed
     categoryrefec();
     allitemrefetch();
-  }, [refetch,categoryrefec,allitemrefetch]); // Dependency array includes refetch
+  }, [refetch, categoryrefec, allitemrefetch]); // Dependency array includes refetch
 
   const handleinsertItem = async () => {
     if (
@@ -258,7 +263,7 @@ const IteamManagement = () => {
         IteamPrice: IteamPrice,
         Iteamstock: Iteamstock,
         updated_timestamp: currentTimestamp,
-        updated_by: getuserdata?.name
+        updated_by: getuserdata?.name,
       });
       setIteamDiscount(productData?.ItemDescription);
       setIteamPrice(productData?.IteamPrice);
@@ -579,7 +584,7 @@ const IteamManagement = () => {
           </Grid>
         ))}
         <Grid item xs={12}>
-          <Iteamdeatilsdisply/>
+          <Iteamdeatilsdisply />
         </Grid>
       </Grid>
     </div>

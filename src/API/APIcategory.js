@@ -188,19 +188,36 @@ export function Checkcategory(getuserdata) {
   
 
 {/*********************getallcategory list************************** */ }
-export function GetAllCategory(getuserdata) {
+export function GetAllCategory(getuserdata,master_id) {
+
+
   const getcategory = async () => {
-    console.log(getuserdata, "getuserdata");
-    const res = await axios.get(`${API_URL}/category/getAllcategory`, {
-      headers: {
-        Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
-      },
-    });
-    return res.data;
+    try {
+      console.log(getuserdata, "getuserdata");
+      const res = await axios.post(
+        `${API_URL}/category/getAllcategory`,
+        { master_id: master_id },
+        {
+          headers: {
+            Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+          },
+        }
+      );
+      return res.data;
+    } catch (error) {
+      if (error.response?.error) {
+        // Return the error response data
+        return Promise.reject(error.response.data);
+      } else {
+        // Handle other errors (e.g., network issues)
+        return Promise.reject({ error: "An unexpected error occurred." });
+      }
+    }
   };
   const { data, error, isLoading, refetch } = useQuery(
-    "getcategory",
-    getcategory
-  );
+    [ "getcategory",master_id],
+     getcategory
+   );
+  
   return { data, error, isLoading, refetch };
 }

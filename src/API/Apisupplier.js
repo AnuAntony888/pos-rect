@@ -42,10 +42,10 @@ export function useSupplierField(getuserdata) {
 }
 
 export function Getsupplier(getuserdata) {
-  const getsupplierdisply = async ({ SupplierCode }) => {
+  const getsupplierdisply = async ({ SupplierCode, master_id }) => {
     const res = await axios.post(
       `${API_URL}/supplier/getsuplier`,
-      { SupplierCode },
+      { SupplierCode, master_id },
       {
         headers: {
           "Content-Type": "application/json", // Ensure the content type is JSON
@@ -79,13 +79,20 @@ export function Updatesupplier(getuserdata) {
     SupplierCode,
     SupplierAddress,
     SupplierDescription,
-    updated_timestamp ,
-    updated_by
+    updated_timestamp,
+    updated_by,
+    master_id,
   }) => {
     const res = await axios.put(
       `${API_URL}/supplier/updatesuplier`,
-      { SupplierCode, SupplierDescription, SupplierAddress, updated_timestamp ,
-        updated_by },
+      {
+        SupplierCode,
+        SupplierDescription,
+        SupplierAddress,
+        updated_timestamp,
+        updated_by,
+        master_id,
+      },
       {
         headers: {
           "Content-Type": "application/json", // Ensure the content type is JSON
@@ -159,19 +166,34 @@ export function useDeleteSupplier(getuserdata) {
 {
   /*****************************ceck alluser****************************** */
 }
-export function GetAllSupplier(getuserdata) {
-  const getsupplier = async () => {
-    console.log(getuserdata, "getuserdata");
-    const res = await axios.get(`${API_URL}/supplier/getAllsuplier`, {
-      headers: {
-        Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
-      },
-    });
-    return res.data;
+
+export function GetAllSupplier(getuserdata, master_id) {
+  const getallsupplier = async () => {
+    try {
+      console.log(getuserdata, "getuserdata");
+      const res = await axios.post(
+        `${API_URL}/supplier/getAllsuplier`,
+        { master_id: master_id },
+        {
+          headers: {
+            Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+          },
+        }
+      );
+      return res.data;
+    } catch (error) {
+      if (error.response?.error) {
+        // Return the error response data
+        return Promise.reject(error.response.data);
+      } else {
+        // Handle other errors (e.g., network issues)
+        return Promise.reject({ error: "An unexpected error occurred." });
+      }
+    }
   };
   const { data, error, isLoading, refetch } = useQuery(
-    "getsupplier",
-    getsupplier
+    ["getallsupplier", master_id],
+    getallsupplier
   );
   return { data, error, isLoading, refetch };
 }
@@ -206,6 +228,3 @@ export function Checksupplier(getuserdata) {
 
   return { suppliercheck, suppliercheckerror, suppliercheckisLoading };
 }
-
-
-

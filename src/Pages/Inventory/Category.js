@@ -26,7 +26,10 @@ const Category = () => {
   const { categorycheck } = Checkcategory(getuserdata);
   const { deletecategoryDetails } = useDeleteCategory(getuserdata);
   const { updatecategorydetails } = UpdateCategory(getuserdata);
-  const { data: allcategorylist,refetch } = GetAllCategory(getuserdata)
+  const { data: allcategorylist, refetch } = GetAllCategory(
+    getuserdata,
+    getuserdata?.master?.master_id
+  );
   useEffect(() => {
     // Refetch suppliers when component mounts
     refetch();
@@ -48,7 +51,9 @@ const Category = () => {
       formData.append("CategoryDescription", CategoryDescription);
       formData.append("created_timestamp", currentTimestamp);
       formData.append("created_by", getuserdata?.name);
+      formData.append("master_id", getuserdata?.master?.master_id);
       const response = await category(formData);
+      refetch();
       Toastsucess(response.message, "sucess", "light");
       setDialogOpen(false);
       setCategoryCode("");
@@ -66,6 +71,7 @@ const Category = () => {
     try {
       const formData = new FormData();
       formData.append("CategoryCode", CategoryCode);
+      formData.append("master_id", getuserdata?.master?.master_id);
       const response = await getcategorydisply(formData);
       setCategoryCode(response?.category?.CategoryCode);
       setCategoryDescription(response?.category?.CategoryDescription);
@@ -83,7 +89,7 @@ const Category = () => {
     try {
       const formData = new FormData();
       formData.append("CategoryCode", CategoryCode);
-      
+
       formData.append(" deleted_timestamp ", currentTimestamp);
       formData.append(" deleted_by", getuserdata?.name);
       const response = await deletecategoryDetails(formData);
@@ -91,7 +97,6 @@ const Category = () => {
       refetch();
       setCategoryCode("");
       setCategoryDescription("");
-
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -113,7 +118,6 @@ const Category = () => {
         );
         setDialogOpen(true);
       } else {
-   
         await handleinsertcategory();
         setDialogOpen(false);
       }
@@ -135,8 +139,10 @@ const Category = () => {
       formData.append("CategoryDescription", CategoryDescription);
       formData.append("updated_timestamp", currentTimestamp);
       formData.append("updated_by", getuserdata?.name);
+      formData.append("master_id", getuserdata?.master?.master_id);
       const response = await updatecategorydetails(formData);
       Toastsucess(response.message, "sucess", "light");
+      refetch();
       setCategoryCode("");
       setCategoryDescription("");
     } catch (error) {
@@ -165,7 +171,7 @@ const Category = () => {
       onClick: handlegetcategory,
     },
     {
-      txt: "Add",   
+      txt: "Add",
       onClick: handleCheckcategory,
     },
     {
@@ -180,20 +186,20 @@ const Category = () => {
   const columns = [
     {
       headerName: "Category Code",
-      field: "categorycode"
+      field: "categorycode",
     },
     {
       headerName: "Category Description",
       field: "categorydescription",
     },
- 
   ];
 
-  const data = allcategorylist ? allcategorylist.map((data) => ({
-    categorycode: `00000${ data.CategoryCode }`,
-    categorydescription: data.CategoryDescription,
-
-  })) : [];
+  const data = allcategorylist
+    ? allcategorylist.map((data) => ({
+        categorycode: `00000${data.CategoryCode}`,
+        categorydescription: data.CategoryDescription,
+      }))
+    : [];
   return (
     <div>
       <Grid container spacing={2}>
@@ -256,11 +262,8 @@ const Category = () => {
           </>
         ))}
         <Grid item xs={12}>
-        <br />
-          <Tabledisply
-            columns={columns}
-            data={data}
-          />
+          <br />
+          <Tabledisply columns={columns} data={data} />
         </Grid>
       </Grid>
       <ReusableDialog

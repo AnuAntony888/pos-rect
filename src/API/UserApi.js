@@ -3,6 +3,11 @@ import axios from "axios";
 
 export const API_URL = "http://localhost:5000/api"; // Update API URL as needed
 
+export const today = new Date();
+export const year = today.getFullYear();
+export const month = String(today.getMonth() + 1).padStart(2, "0");
+export const day = String(today.getDate()).padStart(2, "0");
+
 const registerHandler = async (params) => {
   try {
     const response = await axios.post(`${API_URL}/users/signup`, params);
@@ -32,7 +37,6 @@ export function useRegister() {
   return { register, isLoading, error };
 }
 
-
 //Login
 const loginHandler = async (params) => {
   try {
@@ -52,12 +56,14 @@ export function useUserLogin() {
   } = useMutation(loginHandler, {
     onSuccess: (data) => {
       if (data.statusCode === 401) {
-        console.error("Unauthorized:", data.errorMessage?.email[0] || "Unauthorized");
+        console.error(
+          "Unauthorized:",
+          data.errorMessage?.email[0] || "Unauthorized"
+        );
       } else {
         // Handle successful login
         console.log("Login successful:", data);
         localStorage.setItem("user", JSON.stringify(data));
-        
       }
       // localStorage.setItem("user", JSON.stringify(data));
     },
@@ -87,7 +93,11 @@ export function useLogout() {
     return res.data;
   };
 
-  const { mutateAsync: logout, isLoading, error } = useMutation(logoutHandler, {
+  const {
+    mutateAsync: logout,
+    isLoading,
+    error,
+  } = useMutation(logoutHandler, {
     onSuccess: (data) => {
       // Check if the server returned a 401 status code
       if (data.statusCode === 401) {
@@ -98,7 +108,10 @@ export function useLogout() {
     },
     onError: (error) => {
       // Log the error for debugging
-      console.error("Logout error:", error.response ? error.response.data : error.message);
+      console.error(
+        "Logout error:",
+        error.response ? error.response.data : error.message
+      );
       throw new Error(error.message);
     },
   });
@@ -106,10 +119,9 @@ export function useLogout() {
   return { logout, isLoading, error };
 }
 
-
 //get user details
 export function GetEmpolyee(getuserdata) {
-  const getemployee = async ({email }) => {
+  const getemployee = async ({ email }) => {
     const res = await axios.post(
       `${API_URL}/users/getuserbyemail`,
       { email },
@@ -135,27 +147,20 @@ export function GetEmpolyee(getuserdata) {
     },
   });
 
-  return {  getemployeedisply,
- getemployeeerror,
-    getemployeeisLoading,};
+  return { getemployeedisply, getemployeeerror, getemployeeisLoading };
 }
 
 /*********************update user**************************88 */
 export function UpdateEmployee(getuserdata) {
   const updateemployee = async ({
     email,
-    name,  
+    name,
     employeeno,
     employeecategory,
-
   }) => {
     const res = await axios.put(
       `${API_URL}/users/updateuser`,
-      {   email,
-        name,  
-        employeeno,
-        employeecategory,
-     },
+      { email, name, employeeno, employeecategory },
       {
         headers: {
           "Content-Type": "application/json", // Ensure the content type is JSON
@@ -169,7 +174,7 @@ export function UpdateEmployee(getuserdata) {
 
   const {
     mutateAsync: updateemployeedetails,
-    error:  updateemployeedetailserror,
+    error: updateemployeedetailserror,
     isLoading: updateemployeedetailsisLoading,
   } = useMutation(updateemployee, {
     onError: (error) => {
@@ -207,7 +212,7 @@ export function DeleteEmployee(getuserdata) {
 
   const {
     mutateAsync: deleteeemployeedetails,
-    error:  deleteeemployeeerror,
+    error: deleteeemployeeerror,
     isLoading: deleteeemployeeisLoading,
   } = useMutation(deleteeemployee, {
     onError: (error) => {
@@ -238,4 +243,44 @@ export function GetAllEmployes(getuserdata) {
     getemployee
   );
   return { data, error, isLoading, refetch };
+}
+
+//get Employee number
+
+export function GetEmployeeNumber(getuserdata, date) {
+  const getemployeenumber = async () => {
+    try {
+      console.log(getuserdata, "getuserdata");
+      const res = await axios.post(
+        `${API_URL}/users/generate-employee-number`,
+        { date: date },
+        {
+          headers: {
+            Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+          },
+        }
+      );
+      return res.data;
+    } catch (error) {
+      if (error.response?.error) {
+        // Return the error response data
+        return Promise.reject(error.response.data);
+      } else {
+        // Handle other errors (e.g., network issues)
+        return Promise.reject({ error: "An unexpected error occurred." });
+      }
+    }
+  };
+  const {
+    data: employeenumber,
+    error: employeenumberrerror,
+    isLoading: employeenumberisLoading,
+    refetch: employeenumberrefetch,
+  } = useQuery(["getemployeenumber", date], getemployeenumber);
+  return {
+    employeenumber,
+    employeenumberrerror,
+    employeenumberisLoading,
+    employeenumberrefetch,
+  };
 }

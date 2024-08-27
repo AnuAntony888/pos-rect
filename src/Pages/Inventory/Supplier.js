@@ -21,7 +21,7 @@ const Supplier = () => {
   const [address, setAddress] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState("");
- 
+
   const { supplieraddress } = useSupplierField(getuserdata);
   const { supplierdisply } = Getsupplier(getuserdata);
   const { updatesupplierdetails } = Updatesupplier(getuserdata);
@@ -29,7 +29,10 @@ const Supplier = () => {
 
   const { suppliercheck } = Checksupplier(getuserdata);
 
-  const { data: supplierlist, refetch } = GetAllSupplier(getuserdata);
+  const { data: supplierlist, refetch } = GetAllSupplier(
+    getuserdata,
+    getuserdata?.master?.master_id
+  );
 
   const handlesetDescription = (e) => {
     setDescription(e.target.value);
@@ -48,7 +51,7 @@ const Supplier = () => {
   }, [refetch]);
 
   const currentTimestamp = new Date().toISOString();
-  
+
   const handleCheckSupplier = async () => {
     if (!description || !address) {
       Toastsucess("Please fill in all required details.");
@@ -98,7 +101,7 @@ const Supplier = () => {
       formData.append("SupplierAddress", address);
       formData.append("created_timestamp", currentTimestamp);
       formData.append("created_by", getuserdata?.name);
-
+      formData.append("master_id", getuserdata?.master?.master_id);
       const response = await supplieraddress(formData);
       // console.log(response.message, "response");
       refetch();
@@ -119,11 +122,14 @@ const Supplier = () => {
         Toastsucess("Please enter a barcode.");
         return;
       }
-      const productData = await supplierdisply({ SupplierCode });
+      const productData = await supplierdisply({
+        SupplierCode,
+        master_id: getuserdata?.master?.master_id,
+      });
       setAddress(productData?.supplier?.SupplierAddress);
       setDescription(productData?.supplier?.SupplierDescription);
 
-      console.log(productData, "consoleget supplier");
+      // console.log(productData, "consoleget supplier");
       Toastsucess(productData?.message, "success", "light");
     } catch (error) {
       Toastsucess(error.message);
@@ -143,6 +149,7 @@ const Supplier = () => {
         SupplierAddress: address,
         updated_timestamp: currentTimestamp,
         updated_by: getuserdata?.name,
+        master_id: getuserdata?.master?.master_id,
       });
       setAddress(productData?.SupplierAddress);
       setDescription(productData?.SupplierAddress);
@@ -172,7 +179,7 @@ const Supplier = () => {
       formData.append(" deleted_by", getuserdata?.name);
       const response = await deleteSupplierDetails(formData);
       // console.log(response.message, "response");
-
+      refetch();
       Toastsucess(response.message, "sucess", "light");
       setSupplierCode("");
       setDescription("");
@@ -221,7 +228,7 @@ const Supplier = () => {
   const columns = [
     {
       headerName: "Supplier Code",
-      field: "suppliercode"
+      field: "suppliercode",
     },
     {
       headerName: "Supplier Description",
@@ -229,15 +236,17 @@ const Supplier = () => {
     },
     {
       headerName: "Supplier Address",
-      field: "supplieraddress"
+      field: "supplieraddress",
     },
   ];
 
-  const data = supplierlist ? supplierlist.map((data) => ({
-    suppliercode: `00000${ data.SupplierCode }`,
-    supplierdescription: data.SupplierDescription,
-    supplieraddress: data.SupplierAddress,
-  })) : [];
+  const data = supplierlist
+    ? supplierlist.map((data) => ({
+        suppliercode: `00000${data.SupplierCode}`,
+        supplierdescription: data.SupplierDescription,
+        supplieraddress: data.SupplierAddress,
+      }))
+    : [];
 
   return (
     <div>
@@ -303,10 +312,7 @@ const Supplier = () => {
         ))}
         <Grid item xs={12}>
           <br />
-          <Tabledisply
-            columns={columns}
-            data={data}
-          />
+          <Tabledisply columns={columns} data={data} />
         </Grid>
       </Grid>
 

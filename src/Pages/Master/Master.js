@@ -4,43 +4,47 @@ import { Box, Button, Grid } from "@mui/material";
 import { useAuthContext } from "../../Context/AuthContext";
 import { useGetMaster, useMaster } from "../../API/APImaster";
 
-
 const Master = () => {
-  const [entityName, setentityName] = useState(''); 
-  const [entityAddress, setentityAddress] = useState('');
-  const [tax, settax] = useState('');
-  const [discount, setdiscount] = useState('');
-  const [itemTax, setitemTax] = useState('');
-  const [itemDiscount, setitemDiscount] = useState('');
+  const [entityName, setentityName] = useState("");
+  const [entityAddress, setentityAddress] = useState("");
+  const [tax, settax] = useState("");
+  const [discount, setdiscount] = useState("");
+  const [itemTax, setitemTax] = useState("");
+  const [itemDiscount, setitemDiscount] = useState("");
   const { user, getuserdata } = useAuthContext();
-  const { insertmaster } = useMaster(getuserdata)
-  const { getmaster } = useGetMaster(getuserdata);
-  const handleentityName=(e) => {
-     setentityName(e.target.value);
-  }
+  const { insertmaster } = useMaster(getuserdata);
+  const { getmaster, getmasterrefetch } = useGetMaster(getuserdata, entityName);
+  const handleentityName = (e) => {
+    setentityName(e.target.value);
+  };
   const handleentityAddress = (e) => {
     setentityAddress(e.target.value);
-  }
+  };
   const handleTax = (e) => {
     settax(e.target.value);
-  }
+  };
   const handleDiscount = (e) => {
     setdiscount(e.target.value);
-  }
+  };
   const handleitemTax = (e) => {
- setitemTax(e.target.value);
-  }
-   const handleitemDiscount = (e) => {
-     setitemDiscount(e.target.value);
-     }
- const handleinsertSupplier = async () => {
-   if (!entityName || !entityAddress 
-      || !tax || !discount || !itemTax || !itemDiscount) 
-     {
+    setitemTax(e.target.value);
+  };
+  const handleitemDiscount = (e) => {
+    setitemDiscount(e.target.value);
+  };
+  const handleinsertSupplier = async () => {
+    if (
+      !entityName ||
+      !entityAddress ||
+      !tax ||
+      !discount ||
+      !itemTax ||
+      !itemDiscount
+    ) {
       Toastsucess("Please fill your Details");
       return;
     }
- 
+
     try {
       const formData = new FormData();
       formData.append("entityName", entityName);
@@ -50,85 +54,76 @@ const Master = () => {
       formData.append("itemTax", itemTax);
       formData.append("itemDiscount", itemDiscount);
 
-   
-
       const response = await insertmaster(formData);
 
       Toastsucess(response.message, "sucess", "light");
-      setentityName('');
-      setentityAddress('');
-      settax('');
-      setdiscount('');
-      setitemTax('');
-      setitemDiscount('');
-
+      setentityName("");
+      setentityAddress("");
+      settax("");
+      setdiscount("");
+      setitemTax("");
+      setitemDiscount("");
     } catch (error) {
       Toastsucess(error.message);
     }
   };
- 
-  const handlegetmaster = async () => {
-    if (!entityName ) 
-      {
-       Toastsucess("Please fill your Details");
-       return;
-     }
-  
-     try {
-       const formData = new FormData();
-       formData.append("entityName", entityName);
 
- 
-    
- 
-       const response = await getmaster(formData);
-    
-       setentityName(response?.masterTabele?.entityName);
-       setentityAddress(response?.masterTabele?.entityAddress);
-       settax(response?.masterTabele?.tax);
-       setdiscount(response?.masterTabele?.discount);
-       setitemTax(response?.masterTabele?.itemTax);
-       setitemDiscount(response?.masterTabele?.itemDiscount);
-       Toastsucess(response?.message, "sucess", "light");
-    
- 
-     } catch (error) {
-       Toastsucess(error.message);
-     }
-   };
+  const handlegetmaster = async () => {
+    if (!entityName) {
+      Toastsucess("Please fill your Details");
+      return;
+    }
+
+    try {
+      //  const formData = new FormData();
+      //  formData.append("entityName", entityName);
+
+      const response = await getmasterrefetch();
+
+      setentityName(response?.masterTabele?.entityName);
+      setentityAddress(response?.masterTabele?.entityAddress);
+      settax(response?.masterTabele?.tax);
+      setdiscount(response?.masterTabele?.discount);
+      setitemTax(response?.masterTabele?.itemTax);
+      setitemDiscount(response?.masterTabele?.itemDiscount);
+      Toastsucess(response?.message, "sucess", "light");
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+  };
   const Invoice = [
     {
       txt: "Entity Name",
       onChange: handleentityName,
-      value:entityName
+      value: entityName,
     },
     {
-      txt: "Entity Address"
-      , onChange: handleentityAddress,
-      value: entityAddress
+      txt: "Entity Address",
+      onChange: handleentityAddress,
+      value: entityAddress,
     },
     {
       txt: "tax",
       onChange: handleTax,
-      value: tax
+      value: tax,
     },
     {
       txt: "Discount",
       onChange: handleDiscount,
-      value: discount
-      },
+      value: discount,
+    },
     {
       txt: "Item Tax ",
       onChange: handleitemTax,
-      value: itemTax
+      value: itemTax,
     },
     {
       txt: "Item Discount",
       onChange: handleitemDiscount,
-      value: itemDiscount
-    }
+      value: itemDiscount,
+    },
   ];
- 
+
   return (
     <div>
       <Box
@@ -144,7 +139,8 @@ const Master = () => {
               Typography={"Heade Information"}
               textAlign="left"
               fontSize=".9rem"
-            /> <hr />
+            />{" "}
+            <hr />
           </Grid>
           <Grid item lg={4} xs={12} md={12}>
             <Button
@@ -163,9 +159,9 @@ const Master = () => {
               Check Master Data
             </Button>
           </Grid>
-          
+
           <Grid item lg={4} xs={12} md={12}>
-          <Button
+            <Button
               variant="contained"
               type="submit"
               sx={{

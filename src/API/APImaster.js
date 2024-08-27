@@ -37,40 +37,6 @@ export function useMaster(getuserdata) {
        insertmasterisLoading, };
 }
   
-/*******************get master**************************** */
-export function useGetMaster(getuserdata) {
-  const masterGet = async (formData) => {
-    const res = await axios.post(`${API_URL}/master/getmasterbyname`, formData, {
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-        Authorization: `Bearer ${getuserdata.token}`,
-      },
-    });
-    return res.data;
-  };
-
-  const {
-    mutateAsync: getmaster,
-    error: getmasterererror,
-    isLoading: getmasterisLoading,
-  } = useMutation(masterGet, {
-    onSuccess: (data) => {
-      
-    },
-    onError: (error) => {
-      if (error.response) {
-        Toastsucess(`${error.response.data.error}`);
-      } else {
-        Toastsucess(error.message, );
-      }
-    
-    },
-  });
-
-  return {    getmaster,
-    getmasterererror,
-    getmasterisLoading, };
-}
 
 //get all master
 export function GetAllMaster(getuserdata) {
@@ -88,4 +54,78 @@ export function GetAllMaster(getuserdata) {
     getmasterdata
   );
   return { getmaster, getmastererror, getmasterisLoading, isLoadingrefetch };
+}
+
+/*******************get master**************************** */
+// export function useGetMaster(getuserdata) {
+//   const masterGet = async (formData) => {
+//     const res = await axios.post(`${API_URL}/master/getmasterbyname`, formData, {
+//       headers: {
+//         "Content-type": "application/json; charset=UTF-8",
+//         Authorization: `Bearer ${getuserdata.token}`,
+//       },
+//     });
+//     return res.data;
+//   };
+
+//   const {
+//     mutateAsync: getmaster,
+//     error: getmasterererror,
+//     isLoading: getmasterisLoading,
+//   } = useMutation(masterGet, {
+//     onSuccess: (data) => {
+      
+//     },
+//     onError: (error) => {
+//       if (error.response) {
+//         Toastsucess(`${error.response.data.error}`);
+//       } else {
+//         Toastsucess(error.message, );
+//       }
+    
+//     },
+//   });
+
+//   return {    getmaster,
+//     getmasterererror,
+//     getmasterisLoading, };
+// }
+
+
+export function useGetMaster(getuserdata, entityName) {
+  const getmasterGet = async () => {
+    try {
+      console.log(getuserdata, "getuserdata");
+      const res = await axios.post(
+        `${API_URL}/users/generate-employee-number`,
+        { entityName: entityName },
+        {
+          headers: {
+            Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+          },
+        }
+      );
+      return res.data;
+    } catch (error) {
+      if (error.response?.error) {
+        // Return the error response data
+        return Promise.reject(error.response.data);
+      } else {
+        // Handle other errors (e.g., network issues)
+        return Promise.reject({ error: "An unexpected error occurred." });
+      }
+    }
+  };
+  const {
+    data: getmaster,
+    error: getmastererrerror,
+    isLoading: getmasterisLoading,
+    refetch: getmasterrefetch,
+  } = useQuery(["getmasterGet", entityName], getmasterGet);
+  return {
+    getmaster,
+    getmastererrerror,
+    getmasterisLoading,
+    getmasterrefetch,
+  };
 }

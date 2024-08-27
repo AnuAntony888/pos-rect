@@ -1,19 +1,36 @@
-import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import {
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
-import { DeleteEmployee, GetAllEmployes, GetEmpolyee, UpdateEmployee, useRegister } from "../../API/UserApi";
+import {
+  day,
+  DeleteEmployee,
+  GetAllEmployes,
+  GetEmployeeNumber,
+  GetEmpolyee,
+  month,
+  UpdateEmployee,
+  useRegister,
+  year,
+} from "../../API/UserApi";
 import { useAuthContext } from "../../Context/AuthContext";
 import { GetAllMaster } from "../../API/APImaster";
 
 const Employee = () => {
-  const generateInvoiceNumber = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
-    const day = String(today.getDate()).padStart(2, "0");
-    const randomPart = Math.floor(1000 + Math.random() * 9000); // Generate a random 4-digit number
-    return `EMP-${year}${month}${day}-${randomPart}`;
-  };
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,13 +44,34 @@ const Employee = () => {
   const { register } = useRegister();
   const { data, refetch } = GetAllEmployes(getuserdata);
   const { getmaster, isLoadingrefetch } = GetAllMaster(getuserdata);
+  const { employeenumber, employeenumberrefetch } = GetEmployeeNumber(
+    getuserdata,
+    `${year}-${month}-${day}`
+  );
   useEffect(() => {
     // Refetch suppliers when component mounts
     refetch();
+
+    setemployeestatus("employee");
   }, [refetch]);
+
+  useEffect(() => {
+    const fetchemployeeNumber = async () => {
+      try {
+        const response = await employeenumberrefetch();
+        setemployeeno(response?.data?.EmployeeNumber);
+        console.log(response?.data?.EmployeeNumber, "employeeno");
+      } catch (error) {
+        Toastsucess(error.message, "error", "light");
+      }
+    };
+
+    fetchemployeeNumber();
+  }, [employeenumberrefetch]);
+
   const { getemployeedisply } = GetEmpolyee(getuserdata);
   const { updateemployeedetails } = UpdateEmployee(getuserdata);
-  const { deleteeemployeedetails }= DeleteEmployee(getuserdata)
+  const { deleteeemployeedetails } = DeleteEmployee(getuserdata);
   const handleName = (e) => {
     if (!e.target.value) {
       setErrors((prev) => ({ ...prev, name: "name is required!" }));
@@ -48,12 +86,10 @@ const Employee = () => {
   };
   const handlesetmaster = (e) => {
     setmaster(e.target.value);
-  }
-  useEffect(() => {
-    setemployeestatus("employee");
-    setemployeeno(generateInvoiceNumber());
-  }, []);
-
+  };
+  const handleemployeeno = (e) => {
+    setemployeeno(e.target.value);
+  };
   const handleEmail = (e) => {
     const value = e.target.value;
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -81,20 +117,17 @@ const Employee = () => {
     setPassword(value);
   };
 
-
   useEffect(() => {
-    console.log('getmaster:', getmaster);
-      if (Array.isArray(getmaster)) {
-        const initialSupplierList = getmaster.map((supplier) => ({
-          emivalue: supplier.master_id,
-          eminame: supplier.entityName,
-        }));
+    console.log("getmaster:", getmaster);
+    if (Array.isArray(getmaster)) {
+      const initialSupplierList = getmaster.map((supplier) => ({
+        emivalue: supplier.master_id,
+        eminame: supplier.entityName,
+      }));
 
-        setselectedmaster(initialSupplierList);
-      }
-    }, [getmaster]); 
-     
-
+      setselectedmaster(initialSupplierList);
+    }
+  }, [getmaster]);
 
   const Data = [
     {
@@ -106,8 +139,8 @@ const Employee = () => {
     },
     {
       txt: "Employee No",
-
       value: employeeno,
+      onChange: handleemployeeno,
     },
     {
       txt: "Employee Category",
@@ -132,8 +165,8 @@ const Employee = () => {
     {
       label: "Employee Location",
       txt: "Employee Location",
-    value: master,
-     onChange: handlesetmaster,
+      value: master,
+      onChange: handlesetmaster,
       datas: selectedmaster,
     },
   ];
@@ -156,15 +189,16 @@ const Employee = () => {
         employeeno,
         employeecategory,
         employeestatus,
-        master_id: master
+        master_id: master,
       });
-      Toastsucess("Sucessfully Registered ! ", "sucess", "light");
+      Toastsucess(userData.message, "sucess", "light");
+      const response = await employeenumberrefetch();
+      setemployeeno(response?.data?.EmployeeNumber);
       setName("");
       setEmail("");
       setPassword("");
       setemployeecategory("");
       refetch();
-      // setemployeeno("");
     } catch (error) {
       if (error.response && error.response.data) {
         Toastsucess(`Error: ${error.response?.data || error.message}`);
@@ -182,10 +216,10 @@ const Employee = () => {
       const productData = await getemployeedisply({ email });
       setName(productData?.name);
       setEmail(productData?.email);
-      // setPassword(productData?.password);
+
       setemployeecategory(productData?.employeecategory);
       setemployeeno(productData?.employeeno);
-      console.log(productData, "consoleget supplier");
+
       Toastsucess(productData?.message, "success", "light");
     } catch (error) {
       Toastsucess(error.message);
@@ -209,10 +243,12 @@ const Employee = () => {
 
       // console.log(productData, "consoleget supplier");
       Toastsucess(productData.message, "success", "light");
+      const response = await employeenumberrefetch();
+      setemployeeno(response?.data?.EmployeeNumber);
       setEmail("");
       setName("");
-      setemployeeno("");
       setemployeecategory("");
+
       refetch();
     } catch (error) {
       Toastsucess(error.message);
@@ -222,22 +258,23 @@ const Employee = () => {
     if (!email) {
       Toastsucess("Please fill your Details");
       return;
-    } 
+    }
     try {
       const formData = new FormData();
 
       formData.append("email", email);
 
-
       const response = await deleteeemployeedetails(formData);
       // console.log(response.message, "response");
- 
+
       Toastsucess(response.message, "sucess", "light");
       setName("");
       setEmail("");
       setPassword("");
       setemployeecategory("");
       refetch();
+      const res = await employeenumberrefetch();
+      setemployeeno(res?.data?.EmployeeNumber);
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -254,14 +291,13 @@ const Employee = () => {
     },
     {
       txt: "Remove",
-      onClick:handledeleteeemployee
+      onClick: handledeleteeemployee,
     },
     {
       txt: "Update",
       onClick: handleupdatesupplier,
     },
   ];
-
 
   return (
     <div>
@@ -282,75 +318,74 @@ const Employee = () => {
             <hr />
           </Grid>
           {Data.map((data, index) => (
-  <Grid item lg={3} md={4} sm={6} xs={6} key={index}>
-    {index === 5 ? (
-      <>
-        <TypographyText
-          Typography={data.txt}
-          textAlign="left"
-          fontSize=".8rem"
-        />
-        <FormControl fullWidth size="small">
-          <InputLabel
-            id="location-select-label"
-            sx={{
-              fontFamily: "Poppins !important",
-              fontSize: ".85rem",
-            }}
-          >
-            Item Supplier
-          </InputLabel>
-          <Select
-            value={data.value}
-            onChange={data.onChange}
-            sx={{
-              backgroundColor: "#F7F7F7",
-              fontFamily: "Poppins !important",
-              fontSize: ".9rem",
-            }}
-          >
-            {Array.isArray(data.datas) &&
-              data.datas.map((datas, i) => (
-                <MenuItem key={datas.id || i} value={datas.emivalue}>
-                  {datas.eminame}
-                </MenuItem>
-              ))}
-          </Select>
-        </FormControl>
-      </>
-    ) : (
-      <>
-        <TypographyText
-          Typography={data.txt}
-          textAlign="left"
-          fontSize=".9rem"
-        />
-        <input
-          required
-          type={data.type}
-          name={data.name}
-          value={data.value}
-          onChange={data.onChange}
-          style={{
-            height: "35px",
-            width: "100%",
-            border: "none",
-            backgroundColor: "#F7F7F7",
-          }}
-        />
-        {errors[data.name] && (
-          <TypographyText
-            Typography={errors[data.name]}
-            color="red"
-            textAlign="left"
-            textTransform="lowercase"
-          />
-        )}
-      </>
-    )}
-  </Grid>
-))}
-
+            <Grid item lg={3} md={4} sm={6} xs={6} key={index}>
+              {index === 5 ? (
+                <>
+                  <TypographyText
+                    Typography={data.txt}
+                    textAlign="left"
+                    fontSize=".8rem"
+                  />
+                  <FormControl fullWidth size="small">
+                    <InputLabel
+                      id="location-select-label"
+                      sx={{
+                        fontFamily: "Poppins !important",
+                        fontSize: ".85rem",
+                      }}
+                    >
+                      Item Supplier
+                    </InputLabel>
+                    <Select
+                      value={data.value}
+                      onChange={data.onChange}
+                      sx={{
+                        backgroundColor: "#F7F7F7",
+                        fontFamily: "Poppins !important",
+                        fontSize: ".9rem",
+                      }}
+                    >
+                      {Array.isArray(data.datas) &&
+                        data.datas.map((datas, i) => (
+                          <MenuItem key={datas.id || i} value={datas.emivalue}>
+                            {datas.eminame}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </>
+              ) : (
+                <>
+                  <TypographyText
+                    Typography={data.txt}
+                    textAlign="left"
+                    fontSize=".9rem"
+                  />
+                  <input
+                    required
+                    type={data.type}
+                    name={data.name}
+                    value={data.value}
+                    onChange={data.onChange}
+                    style={{
+                      height: "35px",
+                      width: "100%",
+                      border: "none",
+                      backgroundColor: "#F7F7F7",
+                    }}
+                  />
+                  {errors[data.name] && (
+                    <TypographyText
+                      Typography={errors[data.name]}
+                      color="red"
+                      textAlign="left"
+                      textTransform="lowercase"
+                    />
+                  )}
+                </>
+              )}
+            </Grid>
+          ))}
 
           {Buttons.map((data, index) => (
             <>
@@ -391,46 +426,40 @@ const Employee = () => {
             <hr />
           </Grid>
           <Grid item lg={12} md={12}>
-
-          <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} aria-label="caption table">
-            <TableHead>
-              <TableRow>
-                {EmployeeDetails.map((data, index) => (
-                  <TableCell
-                    className="shadow-checkoutCardheading"
-                    key={index}
-                  >
-                    {data.txt}
-                  </TableCell>
-                ))}{" "}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-       {
-          data?.map((data) => (
-                  <TableRow key={data.product_id}>
-                    <TableCell component="th" scope="row">
-                      {data.employeeno}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.name}
-              </TableCell>
-              <TableCell component="th" scope="row">
-                      {data.employeecategory}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      {data.email}
-                    </TableCell>
-                   
-                    
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label="caption table">
+                <TableHead>
+                  <TableRow>
+                    {EmployeeDetails.map((data, index) => (
+                      <TableCell
+                        className="shadow-checkoutCardheading"
+                        key={index}
+                      >
+                        {data.txt}
+                      </TableCell>
+                    ))}{" "}
                   </TableRow>
-                ))}  
-              
-               
-            </TableBody>
-          </Table>
-        </TableContainer> 
+                </TableHead>
+                <TableBody>
+                  {data?.map((data) => (
+                    <TableRow key={data.product_id}>
+                      <TableCell component="th" scope="row">
+                        {data.employeeno}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.name}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.employeecategory}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.email}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Grid>
         </Grid>
       </Box>
@@ -439,15 +468,17 @@ const Employee = () => {
 };
 
 export default Employee;
-const EmployeeDetails = [{
-  txt:"Employee No"
-},
-{
-txt:"Employee Name"
+const EmployeeDetails = [
+  {
+    txt: "Employee No",
   },
   {
-    txt:"Employee Category"
-      },
+    txt: "Employee Name",
+  },
   {
-    txt:"Employee Email"
-    }]
+    txt: "Employee Category",
+  },
+  {
+    txt: "Employee Email",
+  },
+];

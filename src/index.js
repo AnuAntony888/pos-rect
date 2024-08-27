@@ -7,6 +7,7 @@ import { Provider } from "react-redux";
 import store from "./Redux/store";
 import { AuthProvider } from "./Context/AuthContext";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { MasterProvider } from "./Context/MasterContext";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -17,12 +18,14 @@ const queryClient = new QueryClient({
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <QueryClientProvider client={queryClient}>
-       <AuthProvider>
-    <Provider store={store}>
-      <App />
-      </Provider>
-      </AuthProvider>
-      </QueryClientProvider>
+    <AuthProvider>
+
+        <Provider store={store}>
+          <App />
+        </Provider>
+
+    </AuthProvider>
+  </QueryClientProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
