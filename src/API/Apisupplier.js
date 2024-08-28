@@ -193,7 +193,7 @@ export function GetAllSupplier(getuserdata, master_id) {
   };
   const { data, error, isLoading, refetch } = useQuery(
     ["getallsupplier", master_id],
-    getallsupplier
+    getallsupplier,
   );
   return { data, error, isLoading, refetch };
 }

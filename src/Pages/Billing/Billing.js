@@ -12,16 +12,20 @@ import { Getcustomer, useCustomerField } from "../../API/APICustomer";
 import {
   GetInvoice,
   GetInvoiceNumber,
+  useDeleteinvoice,
   useInsertInvoice,
+  useUpdateInvoice,
 } from "../../API/ApIOrder";
 import { useAuthContext } from "../../Context/AuthContext";
-import { useLogout } from "../../API/UserApi";
+import { day, month, useLogout, year } from "../../API/UserApi";
 import { useNavigate } from "react-router-dom";
+import { currentTimestamp } from "../../API/APIcategory";
 
 const Billing = () => {
   const { getuserdata } = useAuthContext();
   const dispatch = useDispatch();
   const { invoice } = useInsertInvoice(getuserdata);
+  const {invoiceupdate} =useUpdateInvoice(getuserdata)
   const { InserCustomer } = useCustomerField(getuserdata);
   const { customerdisply } = Getcustomer(getuserdata);
   const { invoicedisply } = GetInvoice(getuserdata);
@@ -35,17 +39,15 @@ const Billing = () => {
   const [paymentmethod, setpaymentmethod] = useState("");
   const [status, setstatus] = useState("");
   const [empname, setempname] = useState("");
-
   const [invoiceNumber, setInvoiceNumber] = useState("");
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
+  const { invoicenumber, refetch } = GetInvoiceNumber(getuserdata,`${year}-${month}-${day}`);
+  const { deleteinvoiceDetails } = useDeleteinvoice(getuserdata);
 
-  const { invoicenumber, refetch } = GetInvoiceNumber(
-    getuserdata,
-    `${year}-${month}-${day}`
-  );
+
+
+  // useEffect(() => {   
+  //     dispatch(calculateCartTotal({ master: getuserdata.master }));  
+  // }, [dispatch, getuserdata?.master]);
 
   useEffect(() => {
     const fetchInvoiceNumber = async () => {
@@ -68,10 +70,13 @@ const Billing = () => {
     totalTaxAmount,
     cartGrandTotalAmount,
   } = useSelector((state) => state.cartUi);
-  console.log(cartTotalAmount);
-  useEffect(() => {
-    dispatch(calculateCartTotal());
-  }, [cart_items, dispatch]);
+  console.log(totalTaxAmount);
+  useEffect(() => {   
+    dispatch(calculateCartTotal({ master: getuserdata.master }));  
+}, [dispatch,cart_items, getuserdata?.master]);
+  // useEffect(() => {
+  //   dispatch(calculateCartTotal());
+  // }, [cart_items, dispatch]);
 
   const genratedate = () => {
     const today = new Date();
@@ -219,14 +224,13 @@ const Billing = () => {
     settotal(cartTotalAmount);
     settax(totalTaxAmount);
     settotalgrand(cartGrandTotalAmount);
-    // console.log(totalTaxAmount, "totalTaxAmount");
   }, [
     cartActualTotal,
     discountPercentage,
     cartTotalAmount,
     totalTaxAmount,
     cartGrandTotalAmount,
-  ]); // Dependency array ensures this runs when cartActualTotal changes
+  ]);
 
   const last = [
     { txt: "Net Amount", value: actual_total },
@@ -272,12 +276,13 @@ const Billing = () => {
           JSON.stringify(cart_items.map((item) => item.cartCount))
         );
         formData.append("product_actual_total", cartActualTotal);
-        formData.append("orderstatus", status);
+        formData.append("orderstatus", "print");
         formData.append("product_discounted_total", discountPercentage);
         formData.append("product_total", `${cartTotalAmount.toFixed(2)}`);
         formData.append("paymentmethod", paymentmethod);
         formData.append("created_by", getuserdata?.name);
         formData.append("updated_by", getuserdata?.name);
+        formData.append("master_id", getuserdata?.master?.master_id);
         const response = await invoice(formData);
         Toastsucess(response.message, "sucess", "light");
 
@@ -297,7 +302,7 @@ const Billing = () => {
       return;
     }
     try {
-       await refetch();
+      await refetch();
       const res = await handleinsertcustomer();
       const formData = new FormData();
 
@@ -321,7 +326,7 @@ const Billing = () => {
       formData.append("paymentmethod", paymentmethod);
       formData.append("created_by", getuserdata?.name);
       formData.append("updated_by", getuserdata?.name);
-
+      formData.append("master_id", getuserdata?.master?.master_id);
       const response = await invoice(formData);
 
       Toastsucess(response.message, "sucess", "light");
@@ -332,49 +337,25 @@ const Billing = () => {
 
   /****************************cancel*************************************888 */
   const handlecancelinvoice = async () => {
-    if (!invoiceNumber || !cartActualTotal || !todaydate || !paymentmethod) {
-      Toastsucess("Please fill Customer Details");
+    if (!invoiceNumber) {
+      Toastsucess("Please enter a invoice_no");
       return;
     }
-
-    // Check if cart_items is null, undefined, or empty
-    if (!cart_items || cart_items.length === 0) {
-      Toastsucess("Cart is empty. Please add items to the cart.");
-      return;
-    }
-
     try {
-      await refetch();
-      const res = await handleinsertcustomer();
       const formData = new FormData();
 
-      formData.append("employee_id", getuserdata?.userId);
-      formData.append("invoice_no", invoiceNumber);
-      formData.append("invoice_date", todaydate);
-      formData.append("customer_id", res.customer_id);
-      formData.append(
-        "product_id",
-        JSON.stringify(cart_items.map((item) => item.product_id))
-      );
-
-      formData.append(
-        "cartCount",
-        JSON.stringify(cart_items.map((item) => item.cartCount))
-      );
-      formData.append("product_actual_total", cartActualTotal);
+      formData.append("invoice_no", invoiceNumber);  
       formData.append("orderstatus", "cancel");
-      formData.append("product_discounted_total", discountPercentage);
-      formData.append("product_total", `${cartTotalAmount.toFixed(2)}`);
-      formData.append("paymentmethod", paymentmethod);
-      formData.append("created_by", getuserdata?.name);
-      formData.append("updated_by", getuserdata?.name);
-      const response = await invoice(formData);
 
+      formData.append(" deleted_by", getuserdata?.name);
+      const response = await deleteinvoiceDetails(formData);
       Toastsucess(response.message, "sucess", "light");
+      await handleresetinvoice();
     } catch (error) {
       Toastsucess(error.message);
     }
   };
+
 
   const handleresetinvoice = async () => {
     setcustomerAddress("");
@@ -403,7 +384,10 @@ const Billing = () => {
         Toastsucess("Please enter a invoiceNumber.");
         return;
       }
-      const productData = await invoicedisply({ invoice_no: invoiceNumber });
+      const productData = await invoicedisply({
+        invoice_no: invoiceNumber,
+        master_id:getuserdata?.master?.master_id,
+      });
       setInvoiceNumber(productData?.invoiceDetails?.[0]?.invoice_no);
       settodaydate(productData?.invoiceDetails?.[0].invoice_date);
       setcustomerName(productData?.customerDetails?.[0]?.customerName);
@@ -497,10 +481,55 @@ const Billing = () => {
     }
   };
 
+  {/**********************update invoice*****************************/ }
+  const handleupdateinvoice = async () => {
+    if (!invoiceNumber || !cartActualTotal || !todaydate || !paymentmethod) {
+      Toastsucess("Please fill Customer Details");
+      return;
+    }
+    try {
+
+      const res = await handleinsertcustomer();
+      const formData = new FormData();
+
+      formData.append("employee_id", getuserdata?.userId);
+      formData.append("invoice_no", invoiceNumber);
+      formData.append("invoice_date", todaydate);
+      formData.append("customer_id", res.customer_id);
+      formData.append(
+        "product_id",
+        JSON.stringify(cart_items.map((item) => item.product_id))
+      );
+
+      formData.append(
+        "cartCount",
+        JSON.stringify(cart_items.map((item) => item.cartCount))
+      );
+      formData.append("product_actual_total", cartActualTotal);
+      formData.append("orderstatus", "update");
+      formData.append("product_discounted_total", discountPercentage);
+      formData.append("product_total", `${cartTotalAmount.toFixed(2)}`);
+      formData.append("paymentmethod", paymentmethod);
+      formData.append("updated_timestamp", currentTimestamp);
+      formData.append("updated_by", getuserdata?.name);
+      formData.append("master_id", getuserdata?.master?.master_id);
+      const response = await invoiceupdate
+        (formData);
+
+      Toastsucess(response.message, "sucess", "light");
+    } catch (error) {
+      Toastsucess(error.message);
+    }
+  };
+  
   const lastbutton = [
     {
       text: "Save",
       onClick: handlesaveinvoice,
+    },
+    {
+      text: "Update",
+      onClick: handleupdateinvoice ,
     },
     {
       text: "Print",

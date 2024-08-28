@@ -1,12 +1,10 @@
 import {
-  Autocomplete,
   Button,
   FormControl,
   Grid,
   InputLabel,
   MenuItem,
   Select,
-  TextField,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
@@ -25,8 +23,8 @@ import Iteamdeatilsdisply from "./Iteamdeatilsdisply";
 
 const IteamManagement = () => {
   const { getuserdata } = useAuthContext();
-  console.log(getuserdata, "localStorage");
-  const { data: allsupplier, refetch } = GetAllSupplier(
+
+  const { data: allsupplier, refetch: refetchSuppliers } = GetAllSupplier(
     getuserdata,
     getuserdata?.master?.master_id
   );
@@ -34,7 +32,10 @@ const IteamManagement = () => {
     getuserdata,
     getuserdata?.master?.master_id
   );
-  const { refetch: allitemrefetch } = GetAllItem(getuserdata);
+ const{refetch :allitemrefech } = GetAllItem(
+    getuserdata,
+    getuserdata?.master?.master_id,)
+
   const { InserItem } = useIteamField(getuserdata);
   const { itembyitemcode } = GetItemByCode(getuserdata);
   const { updateitemdetails } = UpdateIteam(getuserdata);
@@ -49,7 +50,6 @@ const IteamManagement = () => {
   const [ItemCategory, setItemCategory] = useState("");
   const [selectedSupplier, setSelectedSupplier] = useState([]);
   const [selectedcategory, setselectedcategory] = useState([]);
-
   const [Iteamstock, setIteamstock] = useState("");
   useEffect(() => {
     if (allsupplier) {
@@ -60,7 +60,7 @@ const IteamManagement = () => {
       setSelectedSupplier(initialSupplierList);
     }
   }, [allsupplier]);
-  console.log(allcategorylist, "allcategory");
+
   useEffect(() => {
     if (allcategorylist) {
       const initialSupplierList = allcategorylist.map((supplier) => ({
@@ -113,11 +113,7 @@ const IteamManagement = () => {
   const handleCategory = (e) => {
     setItemCategory(e.target.value);
   };
-  useEffect(() => {
-    refetch(); // Trigger a refetch if needed
-    categoryrefec();
-    allitemrefetch();
-  }, [refetch, categoryrefec, allitemrefetch]); // Dependency array includes refetch
+ 
 
   const handleinsertItem = async () => {
     if (
@@ -148,6 +144,7 @@ const IteamManagement = () => {
       formData.append("Iteamstock", Iteamstock);
       formData.append("created_timestamp", currentTimestamp);
       formData.append("created_by", getuserdata?.name);
+      formData.append("master_id", getuserdata?.master?.master_id);
 
       const response = await InserItem(formData);
       Toastsucess(response.message, "success", "light");
@@ -159,10 +156,10 @@ const IteamManagement = () => {
       setItemDescription("");
       setIteamPrice("");
       setIteamstock("");
-      allitemrefetch();
+      allitemrefech();
     } catch (error) {}
 
-    refetch();
+    refetchSuppliers();
   };
 
   const handlegetItemByItemcode = async () => {
@@ -171,7 +168,10 @@ const IteamManagement = () => {
         Toastsucess("Please enter a IteamCode.");
         return;
       }
-      const productData = await itembyitemcode({ ItemCode });
+      const productData = await itembyitemcode({
+        ItemCode,
+        master_id: getuserdata?.master?.master_id,
+      });
       // console.log(productData, "prduct");
 
       // Extract the item data
@@ -220,7 +220,7 @@ const IteamManagement = () => {
 
         setselectedcategory(initialCategoryList);
 
-        console.log(initialSupplierList, "initialSupplierList");
+        // console.log(initialSupplierList, "initialSupplierList");
       }
 
       Toastsucess("Product fetched successfully!", "success", "light");
@@ -264,6 +264,7 @@ const IteamManagement = () => {
         Iteamstock: Iteamstock,
         updated_timestamp: currentTimestamp,
         updated_by: getuserdata?.name,
+        master_id: getuserdata?.master?.master_id,
       });
       setIteamDiscount(productData?.ItemDescription);
       setIteamPrice(productData?.IteamPrice);
@@ -274,9 +275,9 @@ const IteamManagement = () => {
       setIteamstock(productData?.Iteamstock);
       console.log(productData, "consoleget supplier");
       Toastsucess(productData?.message, "success", "light");
-
-      refetch();
-      allitemrefetch();
+      allitemrefech();
+      refetchSuppliers();
+     
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -288,7 +289,7 @@ const IteamManagement = () => {
     setItemDescription("");
     setIteamPrice("");
     setIteamstock("");
-    refetch();
+    refetchSuppliers();
   };
 
   const handledeletItem = async () => {
@@ -315,14 +316,15 @@ const IteamManagement = () => {
       setItemDescription("");
       setIteamPrice("");
       setIteamstock("");
-      refetch();
-      allitemrefetch();
+      refetchSuppliers();
+       allitemrefech();
+     
     } catch (error) {
       Toastsucess(error.message);
     }
   };
 
-  const handleResetFields = () => {
+  const handleResetFields = async () => {
     setItemCode("");
     setIteamDiscount("");
     setItemTax("");
@@ -331,8 +333,18 @@ const IteamManagement = () => {
     setItemDescription("");
     setIteamPrice("");
     setIteamstock("");
-
-    refetch();
+    await refetchSuppliers(); // Await refetching all suppliers
+    const initialSupplierList = allsupplier.map((supplier) => ({
+      emivalue: supplier.SupplierDescription,
+      eminame: supplier.SupplierDescription,
+    }));
+    setSelectedSupplier(initialSupplierList);
+    await categoryrefec(); // Await refetching all categories
+    const initialcategoryList = allcategorylist.map((supplier) => ({
+      emivalue: supplier.CategoryDescription,
+      eminame: supplier.CategoryDescription,
+    }));
+    setselectedcategory(initialcategoryList);
   };
 
   const Invoice3 = [

@@ -119,7 +119,7 @@ const Supplier = () => {
   const handlegetsupplier = async () => {
     try {
       if (!SupplierCode) {
-        Toastsucess("Please enter a barcode.");
+        Toastsucess("Please enter a SupplierCode.");
         return;
       }
       const productData = await supplierdisply({

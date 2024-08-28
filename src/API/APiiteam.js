@@ -39,10 +39,10 @@ export function useIteamField(getuserdata) {
 }
 
 export function GetItemByCode(getuserdata) {
-  const getitembyitemcode = async ({ ItemCode }) => {
+  const getitembyitemcode = async ({ ItemCode ,master_id}) => {
     const res = await axios.post(
       `${API_URL}/item/getitembyitemcode`,
-      { ItemCode },
+      { ItemCode , master_id},
       {
         headers: {
           "Content-Type": "application/json", // Ensure the content type is JSON
@@ -83,6 +83,7 @@ export function UpdateIteam(getuserdata) {
     Iteamstock,
     updated_timestamp,
     updated_by,
+    master_id,
   }) => {
     const res = await axios.put(
       `${API_URL}/item/updateitem`,
@@ -97,6 +98,7 @@ export function UpdateIteam(getuserdata) {
         Iteamstock,
         updated_timestamp,
         updated_by,
+        master_id,
       },
       {
         headers: {
@@ -171,22 +173,28 @@ export function useDeleteItem(getuserdata) {
 {
   /**********************get all Item***************************** */
 }
-export function GetAllItem(getuserdata,SupplierDescription) {
+export function GetAllItem(getuserdata,master_id,SupplierDescription) {
   const getitem = async () => {
     try {
       console.log(getuserdata, "getuserdata");
       const res = await axios.post(`${API_URL}/item/getAllItems`,
-        { "SupplierDescription": SupplierDescription },
+        { master_id: master_id,
+          SupplierDescription: SupplierDescription,
+         
+        },
         {
           headers: {
             Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
           },
         });
+
       return res.data;
     }
     catch (error) {
-      if (error.response?.error) {
-        // Return the error response data
+
+      if (error.response) {
+         
+ 
         return Promise.reject(error.response.data);
       } else {
         // Handle other errors (e.g., network issues)
@@ -195,7 +203,7 @@ export function GetAllItem(getuserdata,SupplierDescription) {
     }
   };
   const { data, error, isLoading, refetch } = useQuery(
-     [ "getitem",SupplierDescription], getitem,{enabled:false});
+     [ "getitem",master_id,SupplierDescription], getitem,{enabled:false});
   return { data, error, isLoading, refetch };
 }
 

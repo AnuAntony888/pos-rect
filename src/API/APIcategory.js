@@ -216,7 +216,7 @@ export function GetAllCategory(getuserdata,master_id) {
   };
   const { data, error, isLoading, refetch } = useQuery(
     [ "getcategory",master_id],
-     getcategory
+     getcategory,
    );
   
   return { data, error, isLoading, refetch };

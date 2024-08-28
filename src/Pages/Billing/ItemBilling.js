@@ -48,7 +48,10 @@ const ItemBilling = () => {
         Toastsucess("Please enter a barcode.");
         return;
       }
-      const productData = await itembyitemcode({ ItemCode });
+      const productData = await itembyitemcode({
+        ItemCode,
+        master_id:getuserdata?.master?.master_id
+      });
 
       setSearchBarcode(productData?.[0]);
 

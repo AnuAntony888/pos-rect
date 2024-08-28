@@ -102,13 +102,16 @@ const Caruislice = createSlice({
       localStorage.setItem("produt_items", JSON.stringify(state.cart_items));
     },
 
-    calculateCartTotal: (state) => {
+    calculateCartTotal: (state, action) => {
+      const { master = {} } = action.payload || {}; // Provide default values
+      // console.log(master,"master")
       let cartTotal = 0;
       let cartActualTotal = 0;
       let totalDiscountAmount = 0;
       let totalTaxAmount = 0;
 
       state.cart_items.forEach((item) => {
+        console.log(master, "master");
         const itemActualTotal = item.IteamPrice * item.cartCount;
 
         const discount = itemActualTotal * (item.IteamDiscount / 100);
@@ -117,10 +120,15 @@ const Caruislice = createSlice({
           item.IteamDiscount > 0 ? itemActualTotal - discount : itemActualTotal;
         console.log(itemDiscountedTotal, "itemDiscountedTotal ");
 
-        // const itemTax = itemActualTotal * (item.ItemTax / 100);
-        const itemTax = itemDiscountedTotal * (item.ItemTax / 100);
+        //original
+        // const itemTax = itemDiscountedTotal * (item.ItemTax / 100);
+        const masterTax = parseFloat(master.tax);
+        const itemTax =
+          master.itemTax === "yes"
+            ? itemDiscountedTotal * (masterTax/ 100)
+            : itemDiscountedTotal * (item.ItemTax / 100);
 
-        // console.log(itemTax, "itemtax");
+        console.log(itemTax, "itemtax");
         totalTaxAmount += itemTax;
         cartTotal += itemDiscountedTotal;
         cartActualTotal += itemActualTotal;
@@ -147,7 +155,10 @@ const Caruislice = createSlice({
         JSON.stringify(discountPercentage)
       );
       localStorage.setItem("totalTaxAmount", JSON.stringify(totalTaxAmount));
-      localStorage.setItem("cartGrandTotalAmount", JSON.stringify(cartGrandTotalAmount));
+      localStorage.setItem(
+        "cartGrandTotalAmount",
+        JSON.stringify(cartGrandTotalAmount)
+      );
     },
   },
 });

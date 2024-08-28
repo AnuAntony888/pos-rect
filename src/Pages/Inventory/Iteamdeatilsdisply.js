@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { GetAllItem, GetAllItemsBySupplierName, useSearchItem } from "../../API/APiiteam";
+import {
+  GetAllItem,
+  GetAllItemsBySupplierName,
+  useSearchItem,
+} from "../../API/APiiteam";
 import { useAuthContext } from "../../Context/AuthContext";
 
 import {
@@ -13,20 +17,24 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import { GetAllCategory } from "../../API/APIcategory";
+
 import { Toastsucess } from "../../Reusable";
 
 const Iteamdeatilsdisply = () => {
   const { getuserdata } = useAuthContext();
   const [SupplierDescription, setSupplierDescription] = useState();
-  GetAllCategory(getuserdata);
-  const { data: allitem, refetch } = GetAllItem(getuserdata,SupplierDescription);
-  
+
+  const { data: allitem, refetch } = GetAllItem(
+    getuserdata,
+    getuserdata?.master?.master_id,
+    SupplierDescription
+  );
+
   const handlesearch = (e) => {
-    setSupplierDescription(e.target.value)
-  }
+    setSupplierDescription(e.target.value);
+  };
   useEffect(() => {
-    refetch(); 
+    refetch();
   }, [refetch]);
 
   const handlegetsupplier = async () => {
@@ -35,11 +43,9 @@ const Iteamdeatilsdisply = () => {
         Toastsucess("Please enter a Search.");
         return;
       }
-   
-      const response = await  refetch ();
-      Toastsucess(response.error?.error);
 
-    
+      const response = await refetch();
+      Toastsucess(response.error?.error);
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -83,8 +89,6 @@ const Iteamdeatilsdisply = () => {
     },
   ];
 
- 
-
   const data = [];
 
   if (allitem) {
@@ -109,32 +113,31 @@ const Iteamdeatilsdisply = () => {
     });
   }
   const handlereset = async () => {
-    setSupplierDescription('')
+    setSupplierDescription("");
     await refetch();
-  }
+  };
   return (
     <div>
       <Grid container spacing={2}>
         <Grid item lg={4} md={4} sm={6} xs={12}>
-        <input
-              required
-              style={{
-                height: "35px",
-                width: "100%",
-                border: "none",
-                backgroundColor: "#F7F7F7",
-              }}
-              value={SupplierDescription}
-              onChange={handlesearch}
-            />
+          <input
+            required
+            style={{
+              height: "35px",
+              width: "100%",
+              border: "none",
+              backgroundColor: "#F7F7F7",
+            }}
+            value={SupplierDescription}
+            onChange={handlesearch}
+          />
         </Grid>
         <Grid item lg={1} md={2.4} sm={3} xs={6}>
           <Button
             variant="contained"
             type="submit"
             sx={{
-              bgcolor:
-                'darkgreen',
+              bgcolor: "darkgreen",
 
               color: "#fff",
               textAlign: "left",
@@ -142,16 +145,17 @@ const Iteamdeatilsdisply = () => {
               textTransform: "capitalize",
               margin: "auto",
             }}
-             onClick={handlegetsupplier}
-          >Search</Button>
+            onClick={handlegetsupplier}
+          >
+            Search
+          </Button>
         </Grid>
         <Grid item lg={1} md={2.4} sm={3} xs={6}>
           <Button
             variant="contained"
             type="submit"
             sx={{
-              bgcolor:
-                'orange',
+              bgcolor: "orange",
 
               color: "#fff",
               textAlign: "left",
@@ -159,32 +163,38 @@ const Iteamdeatilsdisply = () => {
               textTransform: "capitalize",
               margin: "auto",
             }}
-             onClick={handlereset}
-          >Reset</Button>
+            onClick={handlereset}
+          >
+            Reset
+          </Button>
         </Grid>
         <Grid item xs={12}>
-      <TableContainer component={Paper}>
-        <Table aria-label="caption table">
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell key={column.field}>{column.headerName}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((row, rowIndex) => (
-              <TableRow key={rowIndex}>
-                {columns.map((column) => (
-                  <TableCell key={column.field}>{row[column.field]}</TableCell>
+          <TableContainer component={Paper}>
+            <Table aria-label="caption table">
+              <TableHead>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableCell key={column.field}>
+                      {column.headerName}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.map((row, rowIndex) => (
+                  <TableRow key={rowIndex}>
+                    {columns.map((column) => (
+                      <TableCell key={column.field}>
+                        {row[column.field]}
+                      </TableCell>
+                    ))}
+                  </TableRow>
                 ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+              </TableBody>
+            </Table>
           </TableContainer>
-          </Grid>
         </Grid>
+      </Grid>
     </div>
   );
 };

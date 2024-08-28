@@ -34,10 +34,13 @@ export function useInsertInvoice(getuserdata) {
 }
 
 export function GetInvoice(getuserdata) {
-  const getinvoice = async ({ invoice_no }) => {
+  const getinvoice = async ({ invoice_no ,master_id}) => {
     const res = await axios.post(
       `${API_URL}/invoice/getinvoice`,
-      { invoice_no },
+      {
+        invoice_no,
+        master_id
+      },
       {
         headers: {
           "Content-Type": "application/json", // Ensure the content type is JSON
@@ -63,40 +66,7 @@ export function GetInvoice(getuserdata) {
   return { invoicedisply, invoicedisplyerror, invoicedisplyisLoading };
 }
 
-//invoicenumber
-// export function GetInvoiceNumber() {
-//   const getinvoice = async (params) => {
-//     const res = await axios.post(
-//       `${API_URL}/invoice/generate-invoice-number`,
-//       params,
-//       {
-//         headers: {
-//           "Content-Type": "application/json", // Ensure the content type is JSON
-//           // Authorization: `Bearer ${getuserdata.token}`,
-//         },
-//       }
-//     );
-
-//     return res.data;
-//   };
-
-//   const {
-//     mutateAsync: invoicenumber,
-//     error: invoicenumbererror,
-//     isLoading: invoicenumberisLoading,
-//   } = useMutation(getinvoice, {
-//     onError: (error) => {
-//       console.error("API error:", error.response?.data || error.message);
-//       throw new Error(error.response?.data?.error || error.message);
-//     },
-//   });
-
-//   return {
-//   invoicenumber,
-//   invoicenumbererror,
-//     invoicenumberisLoading,
-//    };
-// }
+{/**********************************Get invoice next number****************************************/}
 
 export function GetInvoiceNumber(getuserdata,date) {
   const getinvoice = async () => {
@@ -126,3 +96,71 @@ export function GetInvoiceNumber(getuserdata,date) {
   return {invoicenumber,invoicenumbererror,  invoicenumberisLoading, refetch };
 }
 
+{/******************************delete invoice details  ************************************** */ }
+
+
+export function useDeleteinvoice(getuserdata) {
+  const deleteinvoice = async (formData) => {
+    const res = await axios.post(
+      `${API_URL}/invoice/deleteinvoice`,
+      formData,
+
+      {
+        method: "POST",
+
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          Authorization: `Bearer ${getuserdata.token}`,
+        },
+      }
+    );
+
+    return res.data;
+  };
+
+  const {
+    mutateAsync: deleteinvoiceDetails,
+    error: deleteinvoiceError,
+    isLoading: deleteinvoiceIsLoading,
+  } = useMutation(deleteinvoice, {
+    onError: (error) => {
+      console.error("API error:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.error || error.message);
+    },
+  });
+
+  return {
+    deleteinvoiceDetails,
+    deleteinvoiceError,
+    deleteinvoiceIsLoading,
+  };
+}
+
+
+{/*************************update invoice*********************************** */ }
+export function useUpdateInvoice(getuserdata) {
+  const invoiceUpdate = async (formData) => {
+    const res = await axios.post(`${API_URL}/invoice/updateinvoice`, formData, {
+      method: "POST",
+
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+        Authorization: `Bearer ${getuserdata.token}`,
+      },
+    });
+    // console.log(res, "response of profile");
+    return res.data;
+  };
+
+  const {
+    mutateAsync: invoiceupdate,
+    error: invoiceupdateerror,
+    isLoading: invoiceupdateisLoading,
+  } = useMutation(invoiceUpdate, {
+    onSuccess: (data) => {},
+    onError: (error) => {
+      throw new Error(error.message);
+    },
+  });
+  return { invoiceupdate, invoiceupdateerror, invoiceupdateisLoading };
+}
