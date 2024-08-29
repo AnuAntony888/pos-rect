@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Toastsucess, TypographyText } from "../../Reusable";
-import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select } from "@mui/material";
+import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import { useAuthContext } from "../../Context/AuthContext";
-import { useGetMaster, useMaster, useMasterdetails } from "../../API/APImaster";
+import { GetAllMaster, useGetMaster, useMaster, useMasterdetails } from "../../API/APImaster";
 
 const Master = () => {
   const [entityName, setentityName] = useState("");
@@ -11,11 +11,17 @@ const Master = () => {
   const [discount, setdiscount] = useState("");
   const [itemTax, setitemTax] = useState("");
   const [itemDiscount, setitemDiscount] = useState("");
-  const { user, getuserdata } = useAuthContext();
+  const {  getuserdata } = useAuthContext();
   const { insertmaster } = useMaster(getuserdata);
   const { masterdetails, masterdetailsrefetch } = useMasterdetails(getuserdata,
     entityName,false
   );
+  const { getmaster, isLoadingrefetch } = GetAllMaster(getuserdata);
+  useEffect(() => {
+    isLoadingrefetch();
+  },[isLoadingrefetch])
+
+  // console.log(getmaster,"getmaster")
   const handleentityName = (e) => {
     setentityName(e.target.value);
   };
@@ -60,6 +66,7 @@ const Master = () => {
       const response = await insertmaster(formData);
 
       Toastsucess(response.message, "sucess", "light");
+      isLoadingrefetch();
       setentityName("");
       setentityAddress("");
       settax("");
@@ -82,6 +89,7 @@ const Master = () => {
       setdiscount(masterdetails.masterTabele.discount);
       setitemTax(masterdetails.masterTabele.itemTax);
       setitemDiscount(masterdetails.masterTabele.itemDiscount);
+      isLoadingrefetch();
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -142,7 +150,7 @@ const Master = () => {
       onClick: fetchMasterDetails,
     },
     {
-      txt: "Add Master Data",
+      txt: "Add/Update Master Data",
       onClick: handleinsertSupplier ,
     },
   ];
@@ -287,6 +295,51 @@ const Master = () => {
               </Button>
             </Grid>
           ))}
+          <Grid item lg={12} md={12}>
+            <TableContainer component={Paper}>
+              <Table  aria-label="caption table">
+                <TableHead>
+                  <TableRow>
+                    {EmployeeDetails.map((data, index) => (
+                      <TableCell
+                        className="shadow-checkoutCardheading"
+                        key={index}
+                      >
+                        {data.txt}
+                      </TableCell>
+                    ))}{" "}
+                  </TableRow>
+                </TableHead>
+                <TableBody >
+                  {getmaster?.map((data) => (
+                    <TableRow key={data.product_id}>
+                      <TableCell component="th" scope="row">
+                        {data.entityName}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.entityAddress}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.tax}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.discount}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.itemTax ===1?"yes":"No"
+                        }
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {data.itemDiscount
+ ===1?"yes":"No"
+                        }
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
         </Grid>
       </Box>
     </div>
@@ -294,3 +347,23 @@ const Master = () => {
 };
 
 export default Master;
+const EmployeeDetails = [
+  {
+    txt: "Entity Name",
+  },
+  {
+    txt: "Entity Address",
+  },
+  {
+    txt: "Tax",
+  },
+  {
+    txt: "Discount",
+  },
+  {
+    txt: "Item Tax",
+  },
+  {
+    txt: "Item Discount",
+  },
+];
