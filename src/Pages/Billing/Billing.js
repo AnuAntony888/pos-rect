@@ -20,12 +20,18 @@ import { useAuthContext } from "../../Context/AuthContext";
 import { day, month, useLogout, year } from "../../API/UserApi";
 import { useNavigate } from "react-router-dom";
 import { currentTimestamp } from "../../API/APIcategory";
+import { useMasterdetails } from "../../API/APImaster";
 
 const Billing = () => {
   const { getuserdata } = useAuthContext();
   const dispatch = useDispatch();
+  const { masterdetails } = useMasterdetails(
+    getuserdata,
+    getuserdata.master.entityName,true
+  );
+
   const { invoice } = useInsertInvoice(getuserdata);
-  const {invoiceupdate} =useUpdateInvoice(getuserdata)
+  const { invoiceupdate } = useUpdateInvoice(getuserdata);
   const { InserCustomer } = useCustomerField(getuserdata);
   const { customerdisply } = Getcustomer(getuserdata);
   const { invoicedisply } = GetInvoice(getuserdata);
@@ -40,13 +46,14 @@ const Billing = () => {
   const [status, setstatus] = useState("");
   const [empname, setempname] = useState("");
   const [invoiceNumber, setInvoiceNumber] = useState("");
-  const { invoicenumber, refetch } = GetInvoiceNumber(getuserdata,`${year}-${month}-${day}`);
+  const { invoicenumber, refetch } = GetInvoiceNumber(
+    getuserdata,
+    `${year}-${month}-${day}`
+  );
   const { deleteinvoiceDetails } = useDeleteinvoice(getuserdata);
 
-
-
-  // useEffect(() => {   
-  //     dispatch(calculateCartTotal({ master: getuserdata.master }));  
+  // useEffect(() => {
+  //     dispatch(calculateCartTotal({ master: getuserdata.master }));
   // }, [dispatch, getuserdata?.master]);
 
   useEffect(() => {
@@ -71,10 +78,10 @@ const Billing = () => {
     cartGrandTotalAmount,
   } = useSelector((state) => state.cartUi);
   console.log(totalTaxAmount);
-  useEffect(() => {   
-    dispatch(calculateCartTotal({ master: getuserdata.master }));  
-}, [dispatch,cart_items, getuserdata?.master]);
-  // useEffect(() => {
+  useEffect(() => {
+    dispatch(calculateCartTotal({ master: masterdetails?.masterTabele }));
+  }, [dispatch, cart_items, masterdetails?.masterTabele]);
+
   //   dispatch(calculateCartTotal());
   // }, [cart_items, dispatch]);
 
@@ -344,7 +351,7 @@ const Billing = () => {
     try {
       const formData = new FormData();
 
-      formData.append("invoice_no", invoiceNumber);  
+      formData.append("invoice_no", invoiceNumber);
       formData.append("orderstatus", "cancel");
 
       formData.append(" deleted_by", getuserdata?.name);
@@ -355,7 +362,6 @@ const Billing = () => {
       Toastsucess(error.message);
     }
   };
-
 
   const handleresetinvoice = async () => {
     setcustomerAddress("");
@@ -386,7 +392,7 @@ const Billing = () => {
       }
       const productData = await invoicedisply({
         invoice_no: invoiceNumber,
-        master_id:getuserdata?.master?.master_id,
+        master_id: getuserdata?.master?.master_id,
       });
       setInvoiceNumber(productData?.invoiceDetails?.[0]?.invoice_no);
       settodaydate(productData?.invoiceDetails?.[0].invoice_date);
@@ -481,14 +487,15 @@ const Billing = () => {
     }
   };
 
-  {/**********************update invoice*****************************/ }
+  {
+    /**********************update invoice*****************************/
+  }
   const handleupdateinvoice = async () => {
     if (!invoiceNumber || !cartActualTotal || !todaydate || !paymentmethod) {
       Toastsucess("Please fill Customer Details");
       return;
     }
     try {
-
       const res = await handleinsertcustomer();
       const formData = new FormData();
 
@@ -513,15 +520,14 @@ const Billing = () => {
       formData.append("updated_timestamp", currentTimestamp);
       formData.append("updated_by", getuserdata?.name);
       formData.append("master_id", getuserdata?.master?.master_id);
-      const response = await invoiceupdate
-        (formData);
+      const response = await invoiceupdate(formData);
 
       Toastsucess(response.message, "sucess", "light");
     } catch (error) {
       Toastsucess(error.message);
     }
   };
-  
+
   const lastbutton = [
     {
       text: "Save",
@@ -529,7 +535,7 @@ const Billing = () => {
     },
     {
       text: "Update",
-      onClick: handleupdateinvoice ,
+      onClick: handleupdateinvoice,
     },
     {
       text: "Print",

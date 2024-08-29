@@ -41,7 +41,7 @@ export function useMaster(getuserdata) {
 //get all master
 export function GetAllMaster(getuserdata) {
   const getmasterdata = async () => {
-    console.log(getuserdata, "getuserdata");
+    // console.log(getuserdata, "getuserdata");
     const res = await axios.get(`${API_URL}/master/getAllMaster`, {
       headers: {
         Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
@@ -57,39 +57,7 @@ export function GetAllMaster(getuserdata) {
 }
 
 /*******************get master**************************** */
-// export function useGetMaster(getuserdata) {
-//   const masterGet = async (formData) => {
-//     const res = await axios.post(`${API_URL}/master/getmasterbyname`, formData, {
-//       headers: {
-//         "Content-type": "application/json; charset=UTF-8",
-//         Authorization: `Bearer ${getuserdata.token}`,
-//       },
-//     });
-//     return res.data;
-//   };
 
-//   const {
-//     mutateAsync: getmaster,
-//     error: getmasterererror,
-//     isLoading: getmasterisLoading,
-//   } = useMutation(masterGet, {
-//     onSuccess: (data) => {
-      
-//     },
-//     onError: (error) => {
-//       if (error.response) {
-//         Toastsucess(`${error.response.data.error}`);
-//       } else {
-//         Toastsucess(error.message, );
-//       }
-    
-//     },
-//   });
-
-//   return {    getmaster,
-//     getmasterererror,
-//     getmasterisLoading, };
-// }
 
 
 export function useGetMaster(getuserdata, entityName) {
@@ -127,5 +95,49 @@ export function useGetMaster(getuserdata, entityName) {
     getmastererrerror,
     getmasterisLoading,
     getmasterrefetch,
+  };
+}
+
+
+
+{/*****************************************/ }
+
+export function useMasterdetails(getuserdata, entityName,enabled=true) {
+  const getmasterdetails = async () => {
+    try {
+      // console.log(getuserdata, "getuserdata");
+      const res = await axios.post(
+        `${API_URL}/master/getmasterbyname`,
+        { entityName: entityName },
+        {
+          headers: {
+            Authorization: `Bearer ${getuserdata.token}`, // Add the Bearer token here
+          },
+        }
+      );
+      return res.data;
+    } catch (error) {
+      if (error.response?.error) {
+        // Return the error response data
+        return Promise.reject(error.response.data);
+      } else {
+        // Handle other errors (e.g., network issues)
+        return Promise.reject({ error: "An unexpected error occurred." });
+      }
+    }
+  };
+  const {
+    data: masterdetails,
+    error: masterdetailserror,
+    isLoading: masterdetailsisLoading,
+    refetch: masterdetailsrefetch,
+  } = useQuery(["getmasterdetails", entityName], getmasterdetails,
+    {enabled}
+  );
+  return {
+    masterdetails,
+    masterdetailserror,
+    masterdetailsisLoading,
+    masterdetailsrefetch,
   };
 }
