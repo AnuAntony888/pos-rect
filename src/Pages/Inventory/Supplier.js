@@ -206,6 +206,12 @@ const Supplier = () => {
       onChange: handlesetAddress,
     },
   ];
+
+  const Reset = () => {
+    setSupplierCode("");
+    setDescription("");
+    setAddress("");
+  }
   const Buttons = [
     {
       txt: "Check",
@@ -224,6 +230,11 @@ const Supplier = () => {
       txt: "Update",
       onClick: handleupdatesupplier,
     },
+    {
+      txt: 'Reset',
+      onClick: Reset,
+      
+    }
   ];
   const columns = [
     {
@@ -295,7 +306,8 @@ const Supplier = () => {
                       ? "darkgreen"
                       : index === 2
                       ? "darkred"
-                      : "yellow",
+                          : index === 3?
+                          "yellow":'orange',
 
                   color: "#fff",
                   textAlign: "left",

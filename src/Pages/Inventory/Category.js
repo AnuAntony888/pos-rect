@@ -153,6 +153,10 @@ const Category = () => {
   const handleCancelDialog = () => {
     setDialogOpen(false);
   };
+  const Reset = () => {
+    setCategoryCode("");
+    setCategoryDescription("");
+  }
   const Invoice = [
     {
       txt: "Category Code",
@@ -182,6 +186,11 @@ const Category = () => {
       txt: "Update",
       onClick: handleupdatecategory,
     },
+    {
+      txt: 'Reset',
+      onClick: Reset,
+      
+    }
   ];
   const columns = [
     {
@@ -233,21 +242,21 @@ const Category = () => {
         ))}
         {Buttons.map((data, index) => (
           <>
-            <Grid item lg={0.75} md={3} sm={6} xs={6} key={index}>
+            <Grid item lg={1} md={3} sm={6} xs={6} key={index}>
               <p></p>
               <Button
                 variant="contained"
                 type="submit"
                 sx={{
                   bgcolor:
-                    index === 0
-                      ? "#48DBE8"
-                      : index === 1
-                      ? "darkgreen"
-                      : index === 2
-                      ? "darkred"
-                      : "yellow",
-
+                  index === 0
+                  ? "#48DBE8"
+                  : index === 1
+                  ? "darkgreen"
+                  : index === 2
+                  ? "darkred"
+                      : index === 3?
+                      "yellow":'orange',
                   color: "#fff",
                   textAlign: "left",
                   width: "100%",

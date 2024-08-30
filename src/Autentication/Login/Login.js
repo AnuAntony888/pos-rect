@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUserLogin } from "../../API/UserApi";
 import { useAuthContext } from "../../Context/AuthContext";
 
+import { useZxing } from "react-zxing";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,6 +15,14 @@ const Login = () => {
   const { login, isLoading, error } = useUserLogin();
   const { user, getuserdata } = useAuthContext();
   const { saveUser } = useAuthContext();
+  const [showVideoFeed, setShowVideoFeed] = useState(true);
+  const { ref } = useZxing({
+    onDecodeResult(result) {
+  
+      setShowVideoFeed(false);
+      setEmail(result.getText()); // Automatically populate the text field with the scanned barcode
+    },
+  });
   const handleEmail = (e) => {
     const value = e.target.value;
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
@@ -42,7 +52,7 @@ const Login = () => {
 
   const Data = [
     {
-      txt: "Email",
+      txt: "Username",
       name: "email",
       type: "text",
       onChange: handleEmail,
@@ -89,7 +99,7 @@ const Login = () => {
       }
     }
   };
-console.log(getuserdata,"anju@email.com")
+// console.log(getuserdata,"anju@email.com")
   return (
     <div>
       <Box sx={{ flexGrow: 1, p: "8%" }}>
@@ -110,6 +120,14 @@ console.log(getuserdata,"anju@email.com")
               alt=""
               width={"80%"}
             />
+                 {showVideoFeed && (
+            <video
+              ref={ref}
+              style={{ width: "100%", maxWidth: "100%", height: "auto" }}
+              autoPlay
+              playsInline
+            />
+          )}
           </Grid>
           <Grid
             item
@@ -167,11 +185,12 @@ console.log(getuserdata,"anju@email.com")
               }}
              onClick={handleApi}
             >
-              Send Message
+           Login
             </Button>
           </Grid>
-          <Grid item xs={12}><Link to='/signup'>Signup</Link></Grid>
+          {/* <Grid item xs={12}><Link to='/signup'>Signup</Link></Grid> */}
         </Grid>
+
       </Box>
     </div>
   );

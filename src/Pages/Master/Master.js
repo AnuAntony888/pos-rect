@@ -95,6 +95,16 @@ const Master = () => {
     }
   };
 
+  const Reset = () => {
+    isLoadingrefetch();
+    setentityName("");
+    setentityAddress("");
+    settax("");
+    setdiscount("");
+    setitemTax("");
+    setitemDiscount("");
+    
+  }
   const valutax = [
     { emivalue: 1, eminame: "yes" },
     { emivalue: 0, eminame: "NO" },
@@ -150,8 +160,17 @@ const Master = () => {
       onClick: fetchMasterDetails,
     },
     {
-      txt: "Add/Update Master Data",
+      txt: "Add Master Data",
       onClick: handleinsertSupplier ,
+    },
+    {
+      txt: "Update Master Data",
+      onClick: handleinsertSupplier ,
+    },
+
+    {
+      txt: "Reset",
+      onClick: Reset ,
     },
   ];
   return (
@@ -280,8 +299,8 @@ const Master = () => {
                       : index === 1
                       ? "darkgreen"
                       : index === 2
-                      ? "darkred"
-                      : "yellow",
+                          ? "yellow"
+                      : "orange",
 
                   color: "#fff",
                   textAlign: "left",
