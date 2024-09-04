@@ -113,7 +113,7 @@ const Singup = () => {
       setName("");
       setEmail("");
       setPassword("");
-       Navigate("/");
+      //  Navigate("/");
     } catch (error) {
       if (error.response && error.response.data) {
         Toastsucess(`Error: ${error.response?.data || error.message}`);

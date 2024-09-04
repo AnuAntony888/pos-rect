@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from "react-query";
 import axios from "axios";
 
-  // export const API_URL = "http://localhost:5000/api"; 
- export const API_URL = "https://backend-chi-lac.vercel.app/api";
+     export const API_URL = "http://localhost:5000/api"; 
+  //  export const API_URL = "https://backend-three-sepia.vercel.app/api";
 export const today = new Date();
 export const year = today.getFullYear();
 export const month = String(today.getMonth() + 1).padStart(2, "0");
@@ -13,8 +13,9 @@ const registerHandler = async (params) => {
     const response = await axios.post(`${API_URL}/users/signup`, params);
     return response.data;
   } catch (error) {
-    console.error("API error:", error.response?.data || error.message);
-    throw new Error(error.response.data.error || error.message);
+     const errorMessage = error.response?.data?.error || error.message;
+    // console.error("API error:",  error.message);
+     throw new Error(errorMessage);
   }
 };
 
@@ -25,11 +26,13 @@ export function useRegister() {
     error,
   } = useMutation(registerHandler, {
     onSuccess: (data) => {
+      // console.log("Registration successful:", data);
       if (data.statusCode === 401) {
         throw new Error(data.errorMessage?.email[0] || "Unauthorized");
       }
     },
     onError: (error) => {
+      
       throw new Error(error.message);
     },
   });
@@ -40,7 +43,8 @@ export function useRegister() {
 //Login
 const loginHandler = async (params) => {
   try {
-    const response = await axios.post(`${API_URL}/users/login`, params);
+    const response = await axios.post(`${API_URL}/users/login`,
+     params);
     return response.data;
   } catch (error) {
     console.error("API error:", error.response?.data || error.message);
@@ -65,7 +69,7 @@ export function useUserLogin() {
         console.log("Login successful:", data);
         localStorage.setItem("user", JSON.stringify(data));
       }
-      // localStorage.setItem("user", JSON.stringify(data));
+    
     },
     onError: (error) => {
       console.error("Login failed:", error.message);

@@ -102,7 +102,7 @@ const Login = () => {
 // console.log(getuserdata,"anju@email.com")
   return (
     <div>
-      <Box sx={{ flexGrow: 1, p: "8%" }}>
+      <Box sx={{ flexGrow: 1, pl: "12%",pt:'8%' ,pr:'12%',pb:'12%'}}>
         <Grid
           container
           spacing={2}
@@ -113,39 +113,35 @@ const Login = () => {
             lg={6}
             md={6}
             xs={12}
-            sx={{ pb: "16px", pr: "15px", margin: "auto" }}
+            sx={{  margin: "auto" }}
           >
             <img
               src="https://cdni.iconscout.com/illustration/premium/thumb/profile-login-6748762-5574989.png?f=webp"
               alt=""
-              width={"80%"}
+              width={"85%"}
             />
-                 {showVideoFeed && (
+                 {/* {showVideoFeed && (
             <video
               ref={ref}
               style={{ width: "100%", maxWidth: "100%", height: "auto" }}
               autoPlay
               playsInline
             />
-          )}
+          )} */}
           </Grid>
           <Grid
             item
             lg={6}
             md={6}
             xs={12}
-            sx={{ pb: "15px", pr: "16px", margin: "auto" }}
+            sx={{  margin: "auto" ,padding:'8%'}}
           >
             <TypographyText
               Typography={<>Smart Billing</>}
-              fontWeight="500"
+              fontWeight="600"
               variant={"h4"}
             />
-            <TypographyText
-              Typography={<>Vedaham Business Solutions</>}
-              fontWeight="500"
-              variant={"h5"}
-            />
+           
             {Data.map((data, index) => (
               <div key={index} style={{ marginBottom: "16px" }}>
                 <TypographyText Typography={data.txt} textAlign="left" />
@@ -173,6 +169,7 @@ const Login = () => {
                 )}
               </div>
             ))}
+            <br/>
             <Button
               variant="contained"
               type="submit"

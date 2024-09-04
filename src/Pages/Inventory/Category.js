@@ -250,13 +250,13 @@ const Category = () => {
                 sx={{
                   bgcolor:
                   index === 0
-                  ? "#48DBE8"
+                  ? "blueviolet"
                   : index === 1
                   ? "darkgreen"
                   : index === 2
                   ? "darkred"
                       : index === 3?
-                      "yellow":'orange',
+                      "darkgoldenrod":'orange',
                   color: "#fff",
                   textAlign: "left",
                   width: "100%",

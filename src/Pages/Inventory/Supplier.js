@@ -178,7 +178,7 @@ const Supplier = () => {
       formData.append(" deleted_timestamp ", currentTimestamp);
       formData.append(" deleted_by", getuserdata?.name);
       const response = await deleteSupplierDetails(formData);
-      // console.log(response.message, "response");
+   
       refetch();
       Toastsucess(response.message, "sucess", "light");
       setSupplierCode("");
