@@ -107,13 +107,13 @@ const Master = () => {
   }
   const valutax = [
     { emivalue: 1, eminame: "yes" },
-    { emivalue: 0, eminame: "NO" },
+    { emivalue: 0, eminame: "No" },
 
     // Add more units as needed
   ];
   const valudiscount = [
     { emivalue: 1, eminame: "yes" },
-    { emivalue: 0, eminame: "NO" },
+    { emivalue: 0, eminame: "No" },
 
     // Add more units as needed
   ];
@@ -131,7 +131,7 @@ const Master = () => {
       value: entityAddress,
     },
     {
-      txt: "tax",
+      txt: "GST",
       onChange: handleTax,
       value: tax,
     },
@@ -141,7 +141,7 @@ const Master = () => {
       value: discount,
     },
     {
-      txt: "Item Tax ",
+      txt: "Item GST ",
       onChange: handleitemTax,
       value: itemTax,
       datas: valutax ,
@@ -205,11 +205,13 @@ const Master = () => {
                     <FormControl fullWidth size="small">
                       <InputLabel
                         sx={{
-                          fontFamily: "Poppins !important",
+                          fontFamily: "'Poppins', sans-serif",
                           fontSize: ".85rem",
                         }}
+                        shrink={false}
                       >
-                        {data.label || data.txt}
+                        {itemTax.length===0?
+                        data.label || data.txt:''}
                       </InputLabel>
                       <Select
                         value={data.value}
@@ -217,7 +219,7 @@ const Master = () => {
                         disabled={data.disabled}
                         sx={{
                           backgroundColor: "#F7F7F7",
-                          fontFamily: "Poppins !important",
+                          fontFamily: "'Poppins', sans-serif",
                           fontSize: ".9rem",
                         }}
                       >
@@ -239,11 +241,13 @@ const Master = () => {
                   <FormControl fullWidth size="small">
                     <InputLabel
                       sx={{
-                        fontFamily: "Poppins !important",
+                        fontFamily: "'Poppins', sans-serif",
                         fontSize: ".85rem",
-                      }}
+                        }}
+                        shrink={false}
                     >
-                      {data.label || data.txt}
+                        {itemDiscount.length===0?
+                          data.label || data.txt:''}
                     </InputLabel>
                     <Select
                       value={data.value}
@@ -251,7 +255,7 @@ const Master = () => {
                       disabled={data.disabled}
                       sx={{
                         backgroundColor: "#F7F7F7",
-                        fontFamily: "Poppins !important",
+                        fontFamily: "'Poppins', sans-serif",
                         fontSize: ".9rem",
                       }}
                     >
@@ -294,15 +298,15 @@ const Master = () => {
                 type="submit"
                 sx={{
                   bgcolor:
-                    index === 0
-                      ? "#48DBE8"
-                      : index === 1
-                      ? "darkgreen"
-                      : index === 2
-                          ? "yellow"
-                      : "orange",
-
-                  color: "#fff",
+                index === 0
+                ? "purple"
+                : index === 1
+                ? "darkgreen"
+                : index === 2
+                ? "#FFCE00"
+                    : index === 3?
+                    "#FF7400":'#FF7400',
+                color: "#fff",
                   textAlign: "left",
                   width: "100%",
                   textTransform: "capitalize",
@@ -374,13 +378,13 @@ const EmployeeDetails = [
     txt: "Entity Address",
   },
   {
-    txt: "Tax",
+    txt: "GST",
   },
   {
     txt: "Discount",
   },
   {
-    txt: "Item Tax",
+    txt: "Item GST",
   },
   {
     txt: "Item Discount",

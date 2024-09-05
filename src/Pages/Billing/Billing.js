@@ -256,7 +256,10 @@ const Billing = () => {
     { txt: "Empolyee", value: empname },
   ];
   const last2 = [
-    { txt: "Tax ", value: totaltax ? `${totaltax.toFixed(2)}` : 0 },
+    { txt: "Total GST", value: totaltax ? `${totaltax.toFixed(2)}` : 0 },
+    { txt: "CGST", value: totaltax ? (totaltax / 2).toFixed(2) : "0" },
+
+    { txt: "SGST", value: totaltax ? (totaltax / 2).toFixed(2) : "0" },
     {
       txt: "Total With Tax",
       value: totalgrand ? `${totalgrand.toFixed(2)}` : 0,
@@ -632,7 +635,7 @@ const Billing = () => {
                       height: "35px",
                       width: "100%",
                       border: "none",
-                      backgroundColor: "#F7F7F7",
+                      backgroundColor: "#ECECEC",
                     }}
                   />
                 </Grid>
@@ -673,7 +676,7 @@ const Billing = () => {
                       height: "35px",
                       width: "100%",
                       border: "none",
-                      backgroundColor: "#F7F7F7",
+                      backgroundColor: "#ECECEC",
                     }}
                   />
                 </Grid>
@@ -693,7 +696,7 @@ const Billing = () => {
               style={{
                 border: "none",
                 width: "100%",
-                backgroundColor: "#F7F7F7",
+                backgroundColor: "#ECECEC",
               }}
               onChange={handlecustomerAddress}
               value={customerAddress}
@@ -742,7 +745,7 @@ const Billing = () => {
                       height: "35px",
                       width: "100%",
                       border: "none",
-                      backgroundColor: "#F7F7F7",
+                      backgroundColor: "#ECECEC",
                     }}
                   />
                 </Grid>
@@ -800,7 +803,7 @@ const Billing = () => {
                         height: "35px",
                         width: "100%",
                         border: "none",
-                        backgroundColor: "#F7F7F7",
+                        backgroundColor: "#ECECEC",
                       }}
                       value={data.value}
                     />

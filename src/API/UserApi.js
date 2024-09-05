@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from "react-query";
 import axios from "axios";
 
-     export const API_URL = "http://localhost:5000/api"; 
-  //  export const API_URL = "https://backend-three-sepia.vercel.app/api";
+    //  export const API_URL = "http://localhost:5000/api"; 
+   export const API_URL = "https://backend-three-sepia.vercel.app/api";
 export const today = new Date();
 export const year = today.getFullYear();
 export const month = String(today.getMonth() + 1).padStart(2, "0");

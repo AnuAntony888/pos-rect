@@ -492,7 +492,7 @@ const IteamManagement = () => {
                         fontSize: ".85rem",
                       }}
                     >
-                      Item Category
+                        {ItemCategory.length === 0 ? 'Item Category' : ''}
                     </InputLabel>
                     <Select
                       value={data.value}
@@ -526,7 +526,7 @@ const IteamManagement = () => {
                         fontSize: ".85rem",
                       }}
                     >
-                      {data.label || data.txt}
+                      {ItemUnit.length === 0? data.label || data.txt:''}
                     </InputLabel>
                     <Select
                       value={data.value}

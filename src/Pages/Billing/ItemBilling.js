@@ -160,7 +160,7 @@ const ItemBilling = () => {
               height: "35px",
               width: "100%",
               border: "none",
-              backgroundColor: "#F7F7F7",
+              backgroundColor: "#ECECEC",
             }}
           />
         </Grid>
@@ -203,7 +203,7 @@ const ItemBilling = () => {
                   height: "35px",
                   width: "100%",
                   border: "none",
-                  backgroundColor: "#F7F7F7",
+                  backgroundColor: "#ECECEC",
                 }}
               />
             </Grid>

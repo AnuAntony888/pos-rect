@@ -330,18 +330,19 @@ const Employee = () => {
                     <InputLabel
                       id="location-select-label"
                       sx={{
-                        fontFamily: "Poppins !important",
+                        fontFamily: "'Poppins', sans-serif",
                         fontSize: ".85rem",
                       }}
+                      shrink={false}
                     >
-                      Item Supplier
+                   {master.length===0?'Entity Name':''}
                     </InputLabel>
                     <Select
                       value={data.value}
                       onChange={data.onChange}
                       sx={{
                         backgroundColor: "#F7F7F7",
-                        fontFamily: "Poppins !important",
+                        fontFamily: "'Poppins', sans-serif",
                         fontSize: ".9rem",
                       }}
                     >
