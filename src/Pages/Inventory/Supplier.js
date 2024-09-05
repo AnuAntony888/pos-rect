@@ -300,15 +300,14 @@ const Supplier = () => {
                 type="submit"
                 sx={{
                   bgcolor:
-                    index === 0
-                      ? "#48DBE8"
-                      : index === 1
-                      ? "darkgreen"
-                      : index === 2
-                      ? "darkred"
-                          : index === 3?
-                          "yellow":'orange',
-
+                  index === 0
+                  ? "purple"
+                  : index === 1
+                  ? "darkgreen"
+                  : index === 2
+                  ? "darkred"
+                      : index === 3?
+                      "#FFCE00":'#FF7400',
                   color: "#fff",
                   textAlign: "left",
                   width: "100%",

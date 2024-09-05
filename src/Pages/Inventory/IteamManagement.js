@@ -32,9 +32,10 @@ const IteamManagement = () => {
     getuserdata,
     getuserdata?.master?.master_id
   );
- const{refetch :allitemrefech } = GetAllItem(
+  const { refetch: allitemrefech } = GetAllItem(
     getuserdata,
-    getuserdata?.master?.master_id,)
+    getuserdata?.master?.master_id
+  );
 
   const { InserItem } = useIteamField(getuserdata);
   const { itembyitemcode } = GetItemByCode(getuserdata);
@@ -113,7 +114,6 @@ const IteamManagement = () => {
   const handleCategory = (e) => {
     setItemCategory(e.target.value);
   };
- 
 
   const handleinsertItem = async () => {
     if (
@@ -277,7 +277,6 @@ const IteamManagement = () => {
       Toastsucess(productData?.message, "success", "light");
       allitemrefech();
       refetchSuppliers();
-     
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -317,8 +316,7 @@ const IteamManagement = () => {
       setIteamPrice("");
       setIteamstock("");
       refetchSuppliers();
-       allitemrefech();
-     
+      allitemrefech();
     } catch (error) {
       Toastsucess(error.message);
     }
@@ -349,12 +347,12 @@ const IteamManagement = () => {
 
   const Invoice3 = [
     {
-      txt: "ItemCode",
+      txt: "Item Code",
       value: ItemCode,
       onChange: handlesetItemCode,
     },
     {
-      txt: "ItemDescription",
+      txt: "Item Description",
       value: ItemDescription,
       onChange: handlesetItemDescription,
     },
@@ -379,22 +377,22 @@ const IteamManagement = () => {
       datas: unitOptions,
     },
     {
-      txt: "Item Tax",
+      txt: "Item GST",
       value: ItemTax,
       onChange: handlesetItemTax,
     },
     {
-      txt: "IteamDiscount",
+      txt: "Item Discount",
       value: IteamDiscount,
       onChange: handlesetIteamDiscount,
     },
     {
-      txt: "Iteam Price",
+      txt: "Item Price",
       value: IteamPrice,
       onChange: handlesetIteamPrice,
     },
     {
-      txt: "Iteam Stock",
+      txt: "Item Stock",
       value: Iteamstock,
       onChange: handlIteamstock,
     },
@@ -422,7 +420,8 @@ const IteamManagement = () => {
       onClick: handleResetFields,
     },
   ];
-
+  console.log(ItemSupplier.length, "handlesetItem");
+  
   return (
     <div>
       <Grid container spacing={2}>
@@ -435,135 +434,143 @@ const IteamManagement = () => {
           <hr />
         </Grid>
 
-        {Invoice3.map((data, index) => (
-          <Grid item lg={3} xs={12} sm={6} md={3} key={index}>
-            {index === 2 ? (
-              <>
-                <TypographyText
-                  Typography={data.txt}
-                  textAlign="left"
-                  fontSize=".8rem"
-                />
-                <FormControl fullWidth size="small">
-                  <InputLabel
-                    id="location-select-label"
-                    sx={{
-                      fontFamily: "Poppins !important",
-                      fontSize: ".85rem",
+        {Invoice3.map((data, index) => {
+          
+          console.log(data.value,"data.value"); // Log data to console
+          return (
+            <Grid item lg={3} xs={12} sm={6} md={3} key={index}>
+              {index === 2 ? (
+                <>
+                  <TypographyText
+                    Typography={data.txt}
+                    textAlign="left"
+                    fontSize=".8rem"
+                  />
+                  <FormControl fullWidth size="small">
+                 
+                 <InputLabel
+                      id="location-select-label"
+                         shrink={false}
+                      sx={{
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: ".85rem",
+                      }}
+                    >
+{ItemSupplier.length=== 0?'Item Supplier':''}
+                    </InputLabel>
+                    <Select
+                      value={data.value}
+                      onChange={data.onChange}
+                      disabled={data.disabled}
+                      sx={{
+                        backgroundColor: "#F7F7F7",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: ".9rem",
+                      }}
+                    >
+                      {Array.isArray(data.datas) &&
+                        data.datas.map((datas, index) => (
+                          <MenuItem key={index} value={datas.emivalue}>
+                            {datas.eminame}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </>
+              ) : index === 3 ? (
+                <>
+                  <TypographyText
+                    Typography={data.txt}
+                    textAlign="left"
+                    fontSize=".8rem"
+                  />
+                  <FormControl fullWidth size="small">
+                    <InputLabel
+                      id="location-select-label"
+                      sx={{
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: ".85rem",
+                      }}
+                    >
+                      Item Category
+                    </InputLabel>
+                    <Select
+                      value={data.value}
+                      onChange={data.onChange}
+                      sx={{
+                        backgroundColor: "#F7F7F7",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: ".9rem",
+                      }}
+                    >
+                      {Array.isArray(data.datas) &&
+                        data.datas.map((datas, index) => (
+                          <MenuItem key={index} value={datas.emivalue}>
+                            {datas.eminame}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </>
+              ) : index === 4 ? (
+                <>
+                  <TypographyText
+                    Typography={data.txt}
+                    textAlign="left"
+                    fontSize=".8rem"
+                  />
+                  <FormControl fullWidth size="small">
+                    <InputLabel
+                      sx={{
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: ".85rem",
+                      }}
+                    >
+                      {data.label || data.txt}
+                    </InputLabel>
+                    <Select
+                      value={data.value}
+                        
+                      onChange={data.onChange}
+                      disabled={data.disabled}
+                      sx={{
+                        backgroundColor: "#F7F7F7",
+                        fontFamily: "'Poppins', sans-serif",
+                        fontSize: ".9rem",
+                      }}
+                    >
+                      {data.datas &&
+                        data.datas.map((option, index) => (
+                          <MenuItem key={index} value={option.emivalue}>
+                            {option.eminame}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </>
+              ) : (
+                <>
+                  <TypographyText
+                    Typography={data.txt}
+                    textAlign="left"
+                    fontSize=".8rem"
+                  />
+                  <input
+                    required
+                    style={{
+                      height: "35px",
+                      width: "100%",
+                      border: "none",
+                      backgroundColor: "#F7F7F7",
                     }}
-                  >
-                    Item Supplier
-                  </InputLabel>
-                  <Select
                     value={data.value}
                     onChange={data.onChange}
-                    sx={{
-                      backgroundColor: "#F7F7F7",
-                      fontFamily: "Poppins !important",
-                      fontSize: ".9rem",
-                    }}
-                  >
-                    {Array.isArray(data.datas) &&
-                      data.datas.map((datas, index) => (
-                        <MenuItem key={index} value={datas.emivalue}>
-                          {datas.eminame}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </FormControl>
-              </>
-            ) : index === 3 ? (
-              <>
-                <TypographyText
-                  Typography={data.txt}
-                  textAlign="left"
-                  fontSize=".8rem"
-                />
-                <FormControl fullWidth size="small">
-                  <InputLabel
-                    id="location-select-label"
-                    sx={{
-                      fontFamily: "Poppins !important",
-                      fontSize: ".85rem",
-                    }}
-                  >
-                    Item Category
-                  </InputLabel>
-                  <Select
-                    value={data.value}
-                    onChange={data.onChange}
-                    sx={{
-                      backgroundColor: "#F7F7F7",
-                      fontFamily: "Poppins !important",
-                      fontSize: ".9rem",
-                    }}
-                  >
-                    {Array.isArray(data.datas) &&
-                      data.datas.map((datas, index) => (
-                        <MenuItem key={index} value={datas.emivalue}>
-                          {datas.eminame}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </FormControl>
-              </>
-            ) : index === 4 ? (
-              <>
-                <TypographyText
-                  Typography={data.txt}
-                  textAlign="left"
-                  fontSize=".8rem"
-                />
-                <FormControl fullWidth size="small">
-                  <InputLabel
-                    sx={{
-                      fontFamily: "Poppins !important",
-                      fontSize: ".85rem",
-                    }}
-                  >
-                    {data.label || data.txt}
-                  </InputLabel>
-                  <Select
-                    value={data.value}
-                    onChange={data.onChange}
-                    disabled={data.disabled}
-                    sx={{
-                      backgroundColor: "#F7F7F7",
-                      fontFamily: "Poppins !important",
-                      fontSize: ".9rem",
-                    }}
-                  >
-                    {data.datas &&
-                      data.datas.map((option, index) => (
-                        <MenuItem key={index} value={option.emivalue}>
-                          {option.eminame}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </FormControl>
-              </>
-            ) : (
-              <>
-                <TypographyText
-                  Typography={data.txt}
-                  textAlign="left"
-                  fontSize=".8rem"
-                />
-                <input
-                  required
-                  style={{
-                    height: "35px",
-                    width: "100%",
-                    border: "none",
-                    backgroundColor: "#F7F7F7",
-                  }}
-                  value={data.value}
-                  onChange={data.onChange}
-                />
-              </>
-            )}
-          </Grid>
-        ))}
+                  />
+                </>
+              )}
+            </Grid>
+          )
+        })}
 
         {Buttons.map((data, index) => (
           <Grid item lg={1} md={2.4} sm={6} xs={6} key={index}>
@@ -574,15 +581,14 @@ const IteamManagement = () => {
               sx={{
                 bgcolor:
                   index === 0
-                    ? "#48DBE8"
+                    ? "purple"
                     : index === 1
                     ? "darkgreen"
                     : index === 2
                     ? "darkred"
                     : index === 3
-                    ? "yellow"
-                    : "orange",
-
+                    ? "#FFCE00"
+                    : "#FF7400",
                 color: "#fff",
                 textAlign: "left",
                 width: "100%",

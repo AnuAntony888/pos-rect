@@ -52,11 +52,11 @@ const Iteamdeatilsdisply = () => {
   };
   const columns = [
     {
-      headerName: "ItemCode",
+      headerName: "Item Code",
       field: "ItemCode",
     },
     {
-      headerName: "ItemDescription",
+      headerName: "Item Description",
       field: "ItemDescription",
     },
     {
@@ -72,19 +72,19 @@ const Iteamdeatilsdisply = () => {
       field: "ItemUnit",
     },
     {
-      headerName: "Item Tax",
+      headerName: "Item GST",
       field: "ItemTax",
     },
     {
-      headerName: "IteamDiscount",
+      headerName: "Item Discount",
       field: "IteamDiscount",
     },
     {
-      headerName: "Iteam Price",
+      headerName: "Item Price",
       field: "IteamPrice",
     },
     {
-      headerName: "Iteam Stock",
+      headerName: "Item Stock",
       field: "Iteamstock",
     },
   ];
@@ -137,7 +137,7 @@ const Iteamdeatilsdisply = () => {
             variant="contained"
             type="submit"
             sx={{
-              bgcolor: "darkgreen",
+              bgcolor: "purple",
 
               color: "#fff",
               textAlign: "left",
@@ -155,7 +155,7 @@ const Iteamdeatilsdisply = () => {
             variant="contained"
             type="submit"
             sx={{
-              bgcolor: "orange",
+              bgcolor: "#FF7400",
 
               color: "#fff",
               textAlign: "left",

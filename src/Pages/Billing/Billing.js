@@ -27,7 +27,8 @@ const Billing = () => {
   const dispatch = useDispatch();
   const { masterdetails } = useMasterdetails(
     getuserdata,
-    getuserdata.master.entityName,true
+    getuserdata.master.entityName,
+    true
   );
 
   const { invoice } = useInsertInvoice(getuserdata);
@@ -238,23 +239,31 @@ const Billing = () => {
     totalTaxAmount,
     cartGrandTotalAmount,
   ]);
+  const roundAmount = (value) => {
+    const decimalPart = value % 1;
+    const integerPart = Math.floor(value);
+    return decimalPart > 0.5 ? integerPart + 1 : integerPart;
+  };
 
   const last = [
     { txt: "Net Amount", value: actual_total },
     {
-      txt: "Discount %",
-      value: actual_discount ? `${actual_discount.toFixed(2)} %` : 0,
+      txt: "Discount ",
+      value: actual_discount ? `${actual_discount.toFixed(2)} ` : 0,
     },
     { txt: "Total", value: total },
 
     { txt: "Empolyee", value: empname },
   ];
   const last2 = [
-    { txt: "Tax ", value: totaltax },
-    { txt: "Total With Tax", value: totalgrand ? totalgrand : 0 },
+    { txt: "Tax ", value: totaltax ? `${totaltax.toFixed(2)}` : 0 },
+    {
+      txt: "Total With Tax",
+      value: totalgrand ? `${totalgrand.toFixed(2)}` : 0,
+    },
     {
       txt: "Round of Amount",
-      value: totalgrand ? `${totalgrand.toFixed(2)}` : 0,
+      value: totalgrand ? roundAmount(totalgrand) : 0,
     },
   ];
   const printRef = useRef(null);

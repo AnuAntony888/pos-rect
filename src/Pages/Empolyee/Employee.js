@@ -389,21 +389,22 @@ const Employee = () => {
 
           {Buttons.map((data, index) => (
             <>
-              <Grid item lg={2} md={2} sm={3} xs={6} key={index}>
+              <Grid item lg={1} md={2} sm={3} xs={6} key={index}>
                 <p></p>
                 <Button
                   variant="contained"
                   type="submit"
                   sx={{
                     bgcolor:
-                      index === 0
-                        ? "#48DBE8"
-                        : index === 1
-                        ? "darkgreen"
-                        : index === 2
-                        ? "red"
-                        : "yellow",
-
+                    index === 0
+                    ? "purple"
+                    : index === 1
+                    ? "darkgreen"
+                    : index === 2
+                    ? "darkred"
+                        : index === 3?
+                        "#FFCE00":'#FF7400',
+           
                     color: "#fff",
                     textAlign: "left",
                     width: "100%",

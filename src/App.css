@@ -28,3 +28,7 @@
   color: #61dafb;
 }
 
+.MuiTableCell-root {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+}

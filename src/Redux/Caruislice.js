@@ -113,15 +113,14 @@ const Caruislice = createSlice({
       state.cart_items.forEach((item) => {
         console.log(master, "master");
         const itemActualTotal = item.IteamPrice * item.cartCount;
-// actual discount
+        // actual discount
         // const  discount= itemActualTotal * (item.IteamDiscount / 100);
-        const masterDiscount = parseFloat(master.discount
-          );
-          const  discount=  master.itemDiscount === 1 ?
-        itemActualTotal * (masterDiscount/ 100)
-          :
-        itemActualTotal * (item.IteamDiscount / 100)
-          
+        const masterDiscount = parseFloat(master.discount);
+        const discount =
+          master.itemDiscount === 1
+            ? itemActualTotal * (masterDiscount / 100)
+            : itemActualTotal * (item.IteamDiscount / 100);
+
         console.log(discount, "discount ");
         const itemDiscountedTotal =
           item.IteamDiscount > 0 ? itemActualTotal - discount : itemActualTotal;
@@ -143,9 +142,11 @@ const Caruislice = createSlice({
         item.itemActualTotal = itemActualTotal;
       });
 
-      const discountPercentage = (totalDiscountAmount / cartActualTotal) * 100;
-
+      // const discountPercentage = (totalDiscountAmount / cartActualTotal) * 100;
+      const discountin = (totalDiscountAmount / cartActualTotal) * 100;
       const cartGrandTotalAmount = cartTotal + totalTaxAmount;
+      
+      const discountPercentage = cartActualTotal * (discountin / 100);
 
       console.log(cartActualTotal, "cartActualTotal");
       console.log(cartTotal, "cartTotal");
