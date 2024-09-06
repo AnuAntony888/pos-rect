@@ -1,6 +1,6 @@
 import { Box, Button, Grid } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
-import { Toastsucess, TypographyText } from "../../Reusable";
+import { PaymentButton, Toastsucess, TypographyText } from "../../Reusable";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToCart,
@@ -270,6 +270,15 @@ const Billing = () => {
     },
   ];
   const printRef = useRef(null);
+       // Preparing separate customer data
+       const customerData = {
+        customer_name: customerName,
+        customer_contact_no: customerContactNo,
+        customer_town_city: customerTownCity,
+        customer_pin: customerPin,
+         customer_gstn: customerGSTN,
+        customer_address: customerAddress,
+      };
   const handlePrintClick = async () => {
     setstatus("print");
     try {
@@ -304,8 +313,15 @@ const Billing = () => {
         formData.append("master_id", getuserdata?.master?.master_id);
         const response = await invoice(formData);
         Toastsucess(response.message, "sucess", "light");
-
-        window.print();
+    
+        // Pass formData to /print page via the navigate 
+        
+        navigate("/print", {
+          state: {
+            formData: Object.fromEntries(formData),
+            customerData: customerData,
+       } });
+        // window.print();
       } catch (error) {
         Toastsucess(error.message);
       }
@@ -344,8 +360,12 @@ const Billing = () => {
       formData.append("product_total", `${cartTotalAmount.toFixed(2)}`);
       formData.append("paymentmethod", paymentmethod);
       formData.append("created_by", getuserdata?.name);
-      formData.append("updated_by", getuserdata?.name);
+
       formData.append("master_id", getuserdata?.master?.master_id);
+
+      formData.append("tax", `${totaltax.toFixed(2)}`);
+      formData.append("totalWithTax", `${totalgrand.toFixed(2)}`);
+      formData.append("roundAmount", roundAmount(totalgrand));
       const response = await invoice(formData);
 
       Toastsucess(response.message, "sucess", "light");
@@ -532,6 +552,9 @@ const Billing = () => {
       formData.append("updated_timestamp", currentTimestamp);
       formData.append("updated_by", getuserdata?.name);
       formData.append("master_id", getuserdata?.master?.master_id);
+      formData.append("tax", `${totaltax.toFixed(2)}`);
+      formData.append("totalWithTax", `${totalgrand.toFixed(2)}`);
+      formData.append("roundAmount", roundAmount(totalgrand));
       const response = await invoiceupdate(formData);
 
       Toastsucess(response.message, "sucess", "light");
@@ -565,11 +588,8 @@ const Billing = () => {
     { text: "Exit", onClick: handleLogout },
   ];
 
-  const handlecash = () => {
-    setpaymentmethod("cash");
-  };
-  const handlecard = () => {
-    setpaymentmethod("card");
+  const handleMethodChange = (method) => () => {
+    setpaymentmethod(method);
   };
 
   return (
@@ -751,42 +771,34 @@ const Billing = () => {
                 </Grid>
               ))}
               <Grid item lg={3} md={3} sm={6} xs={12}>
-                <Box sx={{ pb: "10px" }}>
-                  <Button
-                    variant="contained"
-                    type="submit"
-                    sx={{
-                      bgcolor: paymentmethod === "cash" ? "green" : "#F7F7F7",
-                      color: paymentmethod === "cash" ? "white" : "black",
-
-                      textAlign: "left",
-                      width: "100%",
-                      textTransform: "capitalize",
-                      margin: "auto",
-                      p: "2px",
-                    }}
-                    onClick={handlecash}
-                  >
-                    Cash
-                  </Button>
-                </Box>
-
-                <Button
-                  variant="contained"
-                  type="submit"
+                <Box
                   sx={{
-                    bgcolor: paymentmethod === "card" ? "green" : "#F7F7F7",
-                    color: paymentmethod === "card" ? "white" : "black",
-                    textAlign: "left",
-                    width: "100%",
-                    textTransform: "capitalize",
-                    margin: "auto",
-                    p: "2px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "10px",
+                    pb: "10px",
+                    pt: "10px",
                   }}
-                  onClick={handlecard}
                 >
-                  Card
-                </Button>
+                  <PaymentButton
+                    method="cash"
+                    label="Cash"
+                    currentMethod={paymentmethod}
+                    onClick={handleMethodChange("cash")}
+                  />
+                  <PaymentButton
+                    method="card"
+                    label="Card"
+                    currentMethod={paymentmethod}
+                    onClick={handleMethodChange("card")}
+                  />
+                  <PaymentButton
+                    method="UPI"
+                    label="UPI"
+                    currentMethod={paymentmethod}
+                    onClick={handleMethodChange("UPI")}
+                  />
+                </Box>
               </Grid>
               {last2.map((data, index) => (
                 <>

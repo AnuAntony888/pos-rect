@@ -98,3 +98,23 @@ export const Toastsucess = (message, success, theme) => {
     });
   }
 };
+
+
+export const PaymentButton = ({ method, label, currentMethod, onClick }) => (
+  <Button
+    variant="contained"
+    type="submit"
+    sx={{
+      bgcolor: currentMethod === method ? "green" : "#F7F7F7",
+      color: currentMethod === method ? "white" : "black",
+      textAlign: "left",
+      width: "100%",
+      textTransform: "capitalize",
+      margin: "auto",
+      p: "2px",
+    }}
+    onClick={onClick}
+  >
+    {label}
+  </Button>
+);
