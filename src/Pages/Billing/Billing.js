@@ -413,7 +413,8 @@ const Billing = () => {
     localStorage.removeItem("invoicedetails");
     localStorage.removeItem("cartGrandTotalAmount");
     localStorage.removeItem("discountPercentage");
-    window.location.reload();
+ // Redirect to /main
+ navigate('/');
   };
 
   const handlegetinvoice = async () => {
@@ -505,16 +506,20 @@ const Billing = () => {
 
       // Perform the logout API call
       const response = await logout({ params, getuserdata });
-
+      console.log(response?.message, "response")
+      
       if (response?.message) {
+        console.log(response,"response")
         Toastsucess(response.message, "success", "light");
       } else {
+
         throw new Error("Logout failed");
       }
-
-      // Redirect to the home page after a successful logout
-      window.location.href = "/"; // Redirect to the home page or any other desired page
+      // navigate('/Test')
+      // window.location.reload();
+// window.location.href='/Test'; 
     } catch (error) {
+      console.log(error.response?.data || error.message);
       Toastsucess(`${error.response?.data || error.message}.`);
     }
   };

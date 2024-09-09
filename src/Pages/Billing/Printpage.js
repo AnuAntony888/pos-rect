@@ -27,10 +27,10 @@ const Printpage = () => {
   const location = useLocation();
   const { formData, customerData } = location.state; // Access the passed formData
   console.log(formData, customerData);
-  // useEffect(() => {
-  //   // Automatically trigger print when the component is rendered
-  //   window.print();
-  // }, []);
+  useEffect(() => {
+    // Automatically trigger print when the component is rendered
+    window.print();
+  }, []);
   const {
     cart_items,
     cartTotalAmount,
@@ -44,7 +44,11 @@ const Printpage = () => {
     dispatch(calculateCartTotal({ master: masterdetails?.masterTabele }));
   }, [dispatch, cart_items, masterdetails?.masterTabele]);
 
-
+  const roundAmount = (value) => {
+    const decimalPart = value % 1;
+    const integerPart = Math.floor(value);
+    return decimalPart > 0.5 ? integerPart + 1 : integerPart;
+  };
   const Data = [
     {
       txt: "Invoice",
@@ -62,7 +66,12 @@ const Printpage = () => {
       customerTownCity: customerData?.customer_town_city,
       customerPin: customerData?.customer_pin,
       customerGSTN: customerData?.customer_gstn,
-      totalTaxAmount:totalTaxAmount
+      cartActualTotal: cartActualTotal,
+      discountPercentage: discountPercentage,
+      cartTotalAmount: cartTotalAmount,
+      totalTaxAmount: (totalTaxAmount / 2).toFixed(2),
+      cartGrandTotalAmount: cartGrandTotalAmount.toFixed(2),
+      RoundofAmount:roundAmount(cartGrandTotalAmount)
     }, // Include rows here
   ];
 
@@ -275,22 +284,23 @@ const Printpage = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>ItemCode</TableCell>
+                    <TableCell>ID</TableCell>
                     <TableCell>Name</TableCell>
                     <TableCell> Quntity</TableCell>
                     <TableCell>Unit Price</TableCell>
-                    {/* <TableCell>Item Unit</TableCell> */}
+                    <TableCell>
+IteamDiscount</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {cart_items?.length > 0 ? (
                     cart_items.map((item, index) => (
                       <TableRow key={index}>
-                        <TableCell>{item.ItemCode}</TableCell>
+          <TableCell>{index + 1}</TableCell> {/* Incrementing the ID from 1 */}
                         <TableCell>{item.ItemDescription}</TableCell>
                         <TableCell>{item.cartCount}</TableCell>
                         <TableCell>{item.IteamPrice}</TableCell>
-                        {/* <TableCell>{item.ItemUnit}</TableCell> */}
+                        <TableCell>{item.IteamDiscount}%</TableCell>
                       </TableRow>
                     ))
                   ) : (
@@ -311,38 +321,38 @@ const Printpage = () => {
            
               borderTop: ".5px solid black",
             }}
-          ><Grid container spacing={0}>
-                <Grid item xs={6}></Grid>
-          <Grid item xs={3}>
-            <TypographyText
-              Typography="Net Total"
-              textAlign="left"
-              fontSize=".8rem"
-            />
-              </Grid>
-              <Grid item xs={3}>
-            <TypographyText
-                  Typography={data.totalTaxAmount}
-              textAlign="left"
-              fontSize=".8rem"
-            />
-              </Grid>
-              <Grid item xs={6}></Grid>
-          <Grid item xs={3}>
-            <TypographyText
-              Typography="Net Total"
-              textAlign="left"
-              fontSize=".8rem"
-            />
-              </Grid>
-              <Grid item xs={3}>
-            <TypographyText
-                  Typography={data.totalTaxAmount}
-              textAlign="left"
-              fontSize=".8rem"
-            />
-              </Grid>
-              </Grid>
+          >
+     <Grid container spacing={0}>
+    {[
+      { label: "Net Total", value: data.cartActualTotal },
+      { label: "Discount", value: data.discountPercentage },
+                { label: "Total", value: data.cartTotalAmount},
+                { label: "CGST", value: data.totalTaxAmount },
+                { label: "SGST", value: data.totalTaxAmount }, 
+                { label: "Total With Tax", value: data.cartGrandTotalAmount },
+                { label: "Round of Amount", value: data.RoundofAmount},
+    ].map((item, index) => (
+      <React.Fragment key={index}>
+        <Grid item xs={6}></Grid>
+        <Grid item xs={3}>
+          <TypographyText
+            Typography={item.label}
+            textAlign="left"
+            fontSize=".8rem"
+            fontWeight="600"
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <TypographyText
+            Typography={item.value}
+            textAlign="left"
+            fontSize=".8rem"
+            fontWeight="600"
+          />
+        </Grid>
+      </React.Fragment>
+    ))}
+  </Grid>
           </Grid>
         </Grid>
       ))}
