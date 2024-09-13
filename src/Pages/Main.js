@@ -60,8 +60,6 @@ export default function Main() {
         console.error("Failed to logout:", err.message);
       });
       Toastsucess(response.message, "sucess", "light");
-      
-      navigate("/");
     } catch (error) {
       Toastsucess(`${error.response?.data || error.message}.`);
     }
@@ -70,12 +68,28 @@ export default function Main() {
   const tabs = [
     { label: "Billing", content: <Billing /> },
     { label: "Inventory", content: <Invotory /> },
-    
-      // Conditional rendering for the "Master" tab
-  ...(getuserdata?.employeestatus === "admin"
-    ? [{ label: "Empolyee", content: <Employee /> },{ label: "Master", content: <Master /> },]
-    : []),
-    { label: <Button onClick={handleLogout}>Logout</Button> },
+
+    // Conditional rendering for the "Master" tab
+    ...(getuserdata?.employeestatus === "admin"
+      ? [
+          { label: "Empolyee", content: <Employee /> },
+          { label: "Master", content: <Master /> },
+        ]
+      : []),
+    {
+      label: (
+        <Button
+          onClick={handleLogout}
+          sx={{
+            color: "#666666",
+            fontFamily: "'Poppins', sans-serif",
+            textTransform: "capitalize",
+          }}
+        >
+          Logout
+        </Button>
+      ),
+    },
   ];
 
   return (

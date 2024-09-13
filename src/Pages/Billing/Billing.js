@@ -124,11 +124,8 @@ const Billing = () => {
   const handleinsertcustomer = async () => {
     if (
       !customerName ||
-      !customerContactNo ||
-      !customerTownCity ||
-      !customerPin ||
-      // !customerGSTN ||
-      !customerAddress
+      !customerContactNo
+  
     ) {
       Toastsucess("Please fill Customer Details");
       return;
@@ -137,10 +134,10 @@ const Billing = () => {
       const formData = new FormData();
       formData.append("customerName", customerName);
       formData.append("customerContactNo", customerContactNo);
-      formData.append("customerTownCity", customerTownCity);
-      formData.append("customerPin", customerPin);
-      formData.append("customerGSTN", customerGSTN);
-      formData.append("customerAddress", customerAddress);
+      formData.append("customerTownCity", customerTownCity?customerTownCity:null);
+      formData.append("customerPin", customerPin?customerPin:null);
+      formData.append("customerGSTN", customerGSTN?customerGSTN:null);
+      formData.append("customerAddress", customerAddress?customerAddress:null);
       const response = await InserCustomer(formData);
       setcustomerid(response.customer_id);
       localStorage.setItem("customer_id", response.customer_id);
@@ -153,7 +150,7 @@ const Billing = () => {
   const handlegetsupplier = async () => {
     try {
       if (!customerContactNo) {
-        Toastsucess("Please enter a barcode.");
+        Toastsucess("Please enter a ContactNo");
         return;
       }
       const productData = await customerdisply({ customerContactNo });
@@ -414,7 +411,7 @@ const Billing = () => {
     localStorage.removeItem("cartGrandTotalAmount");
     localStorage.removeItem("discountPercentage");
  // Redirect to /main
- navigate('/');
+ window.location.reload();
   };
 
   const handlegetinvoice = async () => {
@@ -515,9 +512,7 @@ const Billing = () => {
 
         throw new Error("Logout failed");
       }
-      // navigate('/Test')
-      // window.location.reload();
-// window.location.href='/Test'; 
+
     } catch (error) {
       console.log(error.response?.data || error.message);
       Toastsucess(`${error.response?.data || error.message}.`);
@@ -730,7 +725,7 @@ const Billing = () => {
           {/*********************section 3************************ */}
           <Grid item lg={12} xs={12}>
             <TypographyText
-              Typography={"Iteam Information"}
+              Typography={"Item Information"}
               textAlign="left"
               fontSize=".9rem"
             />{" "}

@@ -20,7 +20,12 @@ const Itemaddtocart = (props) => {
   const handleAddToCart = () => {
     if (count > products?.Iteamstock) {
       Toastsucess("Quantity exceeds stock limit.");
-      }
+      return;
+    }
+    if (products?.Iteamstock <= 0 ) {
+      Toastsucess("Product is out of stock");
+      return;
+    }
     const updatedProducts = { ...products };    // updatedProducts["cartCount"] = Number(count); 
     
     updatedProducts["cartCount"] = JSON.parse(count); 
